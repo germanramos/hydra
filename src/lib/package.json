@@ -1,0 +1,36 @@
+{
+  	"name"		: "sokobank"
+,	"version"	: "0.0.1"
+,
+  	"dependencies"	: {
+       	"async"	 	: "0.2.x"
+	,  	"mongodb" 	: "1.2.x"
+	,  	"cookies" 	: "0.3.x"
+	,	"rabbit.js"	: "0.2.x"
+	,  	"nodetime"	: "0.6.x"
+	,  	"express" 	: "3.x"
+	,  	"passport" 	: "0.1.x"
+	,  	"passport-google-oauth"	: "0.1.x"
+	,  	"passport-facebook" 	: "0.1.x"
+	,  	"passport-twitter" 		: "0.1.x"
+	,	"q"			: "0.8.x"
+	,	"redis"		: "0.8.2"
+	,	"connect-redis" : "x"
+	,	"mocha"		: "1.8.x"
+	,	"xtend"		: "1.0.x"
+	,	"amqp":"https://github.com/postwait/node-amqp/tarball/master"
+	,	"oauth2orize":"0.1.x"
+	,	"request":"x"
+	,	"node-uuid": "1.4.x"
+	,	"connect": "x"
+	,	"hero"	 : "https://github.com/thegameofcode/hero/tarball/master"
+	,	"pastry"		: "https://github.com/luismesas/pastry/tarball/master"
+	,	"qlog-node" : "https://github.com/bbva-innotech/qlog-node/tarball/master"
+	}
+,
+	"engines" : {
+    	"node"	: "0.8.x"
+    ,	"npm"	: "1.1.x"
+  	}
+}
+

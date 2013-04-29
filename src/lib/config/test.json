@@ -1,0 +1,144 @@
+{
+    "oauth" : {
+        "login" : {
+            "google" : {
+                "client_id"     : "819059209731.apps.googleusercontent.com"
+            ,   "secret_key"    : "yyo-n9IZv93IpzO3n5-T2WGk"
+            ,   "redirect_uri"  : "https://user.skbk.es/auth/go"
+            }
+        ,
+            "facebook" : {
+                "client_id"     : "507083802671696"
+            ,   "secret_key"    : "b6bc1f4f72f696341aa937bf340257de"
+            ,   "redirect_uri"  : "https://user.skbk.es/auth/fb"
+            }
+        ,
+            "twitter" : {
+                "client_id"     : "P31MuyforWCMfcOzR7a6qQ"
+            ,   "secret_key"    : "EV96SKFezXOCiuouvQEOVU0Uf3oYvHpNdS2mnhqlWU4"
+            ,   "redirect_uri"  : "https://user.skbk.es/auth/tw"
+            }
+        }
+    }
+,
+    "mq" : {
+        "feed" : {
+            "host"      : "localhost"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_feed"
+        ,   "queue"     : "sokobank_feed_q"
+        ,   "type"      : "rabbitmq"
+        }
+    ,
+        "monitor" : {
+            "host"      : "localhost"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_monitor"
+        ,   "queue"     : "sokobank_monitor_q"
+        ,   "type"      : "rabbitmq"
+        }
+    ,
+        "message_nopush" : {
+            "host"      : "localhost"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_message_nopush"
+        ,   "queue"     : "sokobank_message_nopush_q"
+        ,   "type"      : "rabbitmq"
+        }
+    ,
+        "message_pending" : {
+            "host"      : "localhost"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_message_pending"
+        ,   "queue"     : "sokobank_message_pending_q"
+        ,   "type"      : "rabbitmq"
+        }
+    ,
+        "message_sent" : {
+            "host"      : "localhost"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_message_sent"
+        ,   "queue"     : "sokobank_message_sent_q"
+        ,   "type"      : "rabbitmq"
+        }
+    ,
+        "push" : {
+            "host"      : "localhost"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_push"
+        ,   "queue"     : "sokobank_push_q%1"
+        ,   "type"      : "rabbitmq"
+        }
+    }
+,
+    "db" : {
+        "user_config" : {
+            "host" : "localhost"
+        ,   "port" : "6379"
+        ,   "type" : "redis"
+        ,   "params" : {}
+        }
+    ,
+        "session_config" : {
+            "host" : "localhost"
+        ,   "port" : "6379"
+        ,   "type" : "redis"
+        ,   "params" : {}
+        }
+    ,
+        "api" : {
+            "host" : "localhost"
+        ,   "port" : "6379"
+        ,   "type" : "redis"
+        ,   "params" : {}
+        }
+    ,
+        "monitor" : {
+            "host" : "localhost"
+        ,   "port" : "27017"
+        ,   "name" : "test_sokobank_monitor"
+        ,   "type" : "mongodb"
+        ,   "params" : {}
+        }
+    ,
+        "message" : {
+            "host" : "localhost"
+        ,   "port" : "27017"
+        ,   "name" : "test_sokobank_message"
+        ,   "type" : "mongodb"
+        ,   "params" : {}
+        }
+    ,
+        "config" : {
+            "host" : "localhost"
+        ,   "port" : "27017"
+        ,   "name" : "test_sokobank_config"
+        ,   "type" : "mongodb"
+        ,   "params" : {}
+        }
+    }
+,
+    "ranger": {
+        "pusher0": {
+            "host" :"localhost"
+        ,   "port" : "4000"
+        ,   "bindKey" : "p0"
+        },
+        "pusher1": {
+            "host" :"localhost"
+        ,   "port" : "4001"
+        ,   "bindKey" : "p1"
+        },
+        "pusher2": {
+            "host" :"localhost"
+        ,   "port" : "4002"
+        ,   "bindKey" : "p2"
+        },
+    }
+    ,
+    "api" : {
+        "pusher_auth" :{ 
+            "port": "5000"
+        }
+    }
+}

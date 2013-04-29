@@ -1,0 +1,238 @@
+{
+    "oauth" : {
+        "login" : {
+            "google" : {
+                "client_id"     : "819059209731.apps.googleusercontent.com"
+            ,   "secret_key"    : "yyo-n9IZv93IpzO3n5-T2WGk"
+            ,   "redirect_uri"  : "http://localhost:3000/auth/go"
+            }
+        ,
+            "facebook" : {
+                "client_id"     : "133398170171060"
+            ,   "secret_key"    : "74254f38f8ceece0ab643d9ff61cd5e2"
+            ,   "redirect_uri"  : "http://local.skbk.es:3000/auth/fb/callback"
+            }
+        ,
+            "twitter" : {
+                "client_id"     : "P31MuyforWCMfcOzR7a6qQ"
+            ,   "secret_key"    : "EV96SKFezXOCiuouvQEOVU0Uf3oYvHpNdS2mnhqlWU4"
+            ,   "redirect_uri"  : "http://localhost:3000/auth/tw"
+            }
+        }
+    }
+,
+    "api" : {
+        "statics" : {
+            "proxy" : "http://local.skbk.es/proxy/"
+        }
+    ,
+        "auth" : {
+            "port"      : 3000
+        ,   "allowedOrigins" : ["http://local.skbk.es","http://local.skbk.es:3000","http://local.skbk.es:3001","http://local.skbk.es:3002","http://local.skbk.es:3003","http://local.skbk.es:3004","http://local.skbk.es:3005"]
+        ,   "cookie" : {
+                "Domain" : ".skbk.es",
+                "httpOnly": false
+            }
+        ,   "silent"    : {
+                "fb" : "http://local.skbk.es:3000/api/fb/silent/:scope"
+            ,   "go" : "http://local.skbk.es:3000/api/go/silent/:scope"
+            ,   "tw" : "http://local.skbk.es:3000/api/tw/silent/:scope"
+            }
+        ,   "chain" : {
+                "usr"   : "http://local.skbk.es:3002/api/session/"
+            ,   "msg"   : "http://local.skbk.es:3003/api/session/"
+            ,   "www"   : "http://local.skbk.es/usr/"
+            }
+        }
+    ,
+        "api" : {
+            "host"      : "localhost"
+        ,   "port"      : 3001
+        ,   "allowedOrigins" : ["http://local.skbk.es"]
+        }
+    ,
+        "usr" : {
+            "port"      : 3002
+        ,   "allowedOrigins" : ["http://local.skbk.es"]
+        ,   "account"   : "http://local.skbk.es:3002/api/user"
+        ,   "create"    : "http://local.skbk.es:3002/api/user"
+        ,   "cfg"       : "http://local.skbk.es:3002/cfg"
+        }
+    ,
+        "msg" : {
+            "port"      : 3003
+        ,   "allowedOrigins" : ["http://local.skbk.es"]
+        ,   "access"    : "http://local.skbk.es:3003/api/access"
+        ,   "pending"   : "http://local.skbk.es:3003/user/me/pending"
+        }
+    ,
+        "monitor" : {
+            "port"      : 3004
+        ,   "allowedOrigins" : ["http://local.skbk.es"]
+        }
+    ,
+        "fake" : {
+            "host"      : "localhost"
+        ,   "port"      : 3005
+        ,   "allowedOrigins" : ["http://local.skbk.es"]
+        }
+    ,
+        "psh" : {
+            "port"      : 3006
+        ,   "allowedOrigins" : ["http://local.skbk.es"]
+        ,   "access"    : "http://local.skbk.es:3006/api/access"
+        ,   "sse"       : "http://local.skbk.es:3006/sse"
+        }
+
+    }
+,
+    "mq" : {
+        "feed" : {
+            "host"      : "localhost"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_feed"
+        ,   "exchange_opts"   : {}
+        ,   "routing_key"   : "*"
+        ,   "queue"     : "sokobank_feed_q"
+        ,   "queue_opts"   : {}
+        ,   "type"      : "amqp"
+        }
+    ,
+        "monitor" : {
+            "host"      : "localhost"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_monitor"
+        ,   "exchange_opts"   : {}
+        ,   "routing_key"   : "*"
+        ,   "queue"     : "sokobank_monitor_q"
+        ,   "queue_opts"   : {}
+        ,   "type"      : "amqp"
+        }
+    ,
+        "message_nopush" : {
+            "host"      : "localhost"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_message_nopush"
+        ,   "exchange_opts"   : {}
+        ,   "routing_key"   : "*"
+        ,   "queue"     : "sokobank_message_nopush_q"
+        ,   "queue_opts"   : {}
+        ,   "type"      : "amqp"
+        }
+    ,
+        "message_pending" : {
+            "host"      : "localhost"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_message_pending"
+        ,   "exchange_opts"   : {}
+        ,   "routing_key"   : "*"
+        ,   "queue"     : "sokobank_message_pending_q"
+        ,   "queue_opts"   : {}
+        ,   "type"      : "amqp"
+        }
+    ,
+        "message_sent" : {
+            "host"      : "localhost"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_message_sent"
+        ,   "exchange_opts"   : {}
+        ,   "routing_key"   : "*"
+        ,   "queue"     : "sokobank_message_sent_q"
+        ,   "queue_opts"   : {}
+        ,   "type"      : "amqp"
+        }
+    ,
+        "push" : {
+            "host"      : "localhost"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_push"
+        ,   "exchange_opts"   : {}
+        ,   "routing_key"   : "*"
+        ,   "queue"     : "sokobank_push_q%1"
+        ,   "queue_opts"   : {}
+        ,   "type"      : "amqp"
+        }
+    }
+,
+    "db" : {
+        "session" : {
+            "host" : "localhost"
+        ,   "port" : "6379"
+        ,   "type" : "redis"
+        ,   "params" : {}
+        }
+    ,
+        "user_config" : {
+            "host" : "localhost"
+        ,   "port" : "6379"
+        ,   "type" : "redis"
+        ,   "params" : {}
+        }
+    ,
+        "session_config" : {
+            "host" : "localhost"
+        ,   "port" : "6379"
+        ,   "type" : "redis"
+        ,   "params" : {}
+        }
+    ,
+        "api" : {
+            "host" : "localhost"
+        ,   "port" : "6379"
+        ,   "type" : "redis"
+        ,   "params" : {}
+        }
+    ,
+        "auth_session" : {
+            "host" : "localhost"
+        ,   "port" : "6379"
+        ,   "type" : "redis"
+        ,   "params" : {}
+        }
+    ,
+        "monitor" : {
+            "host" : "localhost"
+        ,   "port" : "27017"
+        ,   "name" : "sokobank_monitor"
+        ,   "type" : "mongodb"
+        ,   "params" : {}
+        }
+    ,
+        "message" : {
+            "host" : "localhost"
+        ,   "port" : "27017"
+        ,   "name" : "sokobank_message"
+        ,   "type" : "mongodb"
+        ,   "params" : {}
+        }
+    ,
+        "config" : {
+            "host" : "localhost"
+        ,   "port" : "27017"
+        ,   "name" : "sokobank_config"
+        ,   "type" : "mongodb"
+        ,   "params" : {}
+        }
+    }
+,
+    "ranger" : {
+        "pusher1" : {
+            "name": "pusher1",
+            "host" : "local.skbk.es:3011",
+            "port" : 3011,
+            "routingKey" : ["0.*", "1.*", "2.*", "3.*", "4.*", "5.*", "6.*", "7.*"]
+        },
+        "pusher2" : {
+            "name": "pusher2",
+            "host" : "local.skbk.es:3012",
+            "port" : 3012,
+            "routingKey" : ["8.*", "9.*", "a.*", "b.*", "c.*", "d.*", "e.*", "f.*"]
+        }
+    }
+,   
+    "qlog" : {
+        "url" : "http://localhost:5000"
+    ,   "clientId" : "uDkINI_HsgyzIJ4h"
+    ,   "secretKey" : "2DSMgnPLr-gNTI6qkSNRkso1pq8UZpRT"
+    }
+}

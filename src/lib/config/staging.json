@@ -1,0 +1,87 @@
+{
+    "mq" : {
+        "feed" : {
+            "host"      : "mq.feed.skbk.es"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_feed"
+        ,   "queue"     : "sokobank_feed_q"
+        ,   "type"      : "rabbitmq"
+        }
+    ,
+        "monitor" : {
+            "host"      : "mq.monitor.skbk.es"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_monitor"
+        ,   "queue"     : "sokobank_monitor_q"
+        ,   "type"      : "rabbitmq"
+        }
+    ,
+        "message_nopush" : {
+            "host"      : "mq.message-nopush.skbk.es"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_message_nopush"
+        ,   "queue"     : "sokobank_message_nopush_q"
+        ,   "type"      : "rabbitmq"
+        }
+    ,
+        "message_pending" : {
+            "host"      : "mq.message-pending.skbk.es"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_message_pending"
+        ,   "queue"     : "sokobank_message_pending_q"
+        ,   "type"      : "rabbitmq"
+        }
+    ,
+        "message_sent" : {
+            "host"      : "mq.message-sent.skbk.es"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_message_sent"
+        ,   "queue"     : "sokobank_message_sent_q"
+        ,   "type"      : "rabbitmq"
+        }
+    ,
+        "push" : {
+            "host"      : "mq.push.skbk.es"
+        ,   "port"      : ""
+        ,   "exchange"  : "sokobank_push"
+        ,   "queue"     : "sokobank_push_q%1"
+        ,   "type"      : "rabbitmq"
+        }
+    }
+,
+    "db" : {
+        "redis_user_config" : {
+            "host" : "db.user-config.skbk.es"
+        ,   "port" : ""
+        }
+    ,
+        "redis_session_config" : {
+            "host" : "db.session-config.skbk.es"
+        ,   "port" : ""
+        }
+    ,
+        "redis_api" : {
+            "host" : "db.api.skbk.es"
+        ,   "port" : ""
+        }
+    ,
+        "mongo_monitor" : {
+            "host" : "db.monitor.skbk.es"
+        ,   "name" : "sokobank_monitor"
+        ,   "port" : ""
+        }
+    ,
+        "mongo_message" : {
+            "host" : "db.message.skbk.es"
+        ,   "name" : "sokobank_message"
+        ,   "port" : ""
+        }
+    ,
+        "mongo_config" : {
+            "host" : "db.config.skbk.es"
+        ,   "name" : "sokobank_config"
+        ,   "port" : ""
+        }
+    }
+
+}

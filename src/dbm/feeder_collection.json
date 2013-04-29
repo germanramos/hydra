@@ -1,0 +1,14 @@
+{
+    "_id": "",
+    "name": "",
+    "host": "",
+    "clientId": "",
+    "secretKey": "",
+    "kinds": [
+        {
+            "_id": "",
+            "name": "",
+            "text": ""
+        }
+    ]
+}
