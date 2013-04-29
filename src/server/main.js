@@ -6,8 +6,8 @@ var front = require('./front');
 var back = require('./back');
 
 var app = express();
-front.bind(app, data) 
-back.bind(app, data)
+front.bind(app, data);
+back.bind(app, data);
 
 app.listen(PORT);
 console.log('Listening on port ' + PORT);

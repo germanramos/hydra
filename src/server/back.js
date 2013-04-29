@@ -97,13 +97,13 @@ function bind(app, data) {
 		if (server.length <= 0) {
 			res.send({err:data.err_back.already_stopped});
 		} else {
-			var index = server[0].services.indexOf(req.params.service_id)
+			var index = server[0].services.indexOf(req.params.service_id);
 			if ( index >= 0) {
 				if (server[0].services.length > 1) {
 					server[0].services.splice(index,1);
 				} else {
-					var index = data.servers.indexOf(server[0]);
-					data.servers.splice(index, 1)
+					index = data.servers.indexOf(server[0]);
+					data.servers.splice(index, 1);
 				}
 				res.send({err:data.err_back.ok});
 			} else {
@@ -125,7 +125,7 @@ function bind(app, data) {
 		console.log("command: get_servers");
 		var servers = data.servers.filter(function (server) {
 			if (server.services.indexOf(req.params.service_id) >= 0) {
-				return true
+				return true;
 			}
 		});
 		res.send({servers:servers});

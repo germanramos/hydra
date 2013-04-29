@@ -32,10 +32,10 @@ services = [
 servers = [
 	{name: 'server1.com', services: ['Service1']},
 	{name: 'server2.com', services: ['Service3']},
-	{name: 'server3.com', services: ['Service1','Service2','Service3']},
+	{name: 'server3.com', services: ['Service1','Service2','Service3']}
 ];
 
-active_links = []
+active_links = [];
 
 module.exports = {
 	err_enum: err_enum,
@@ -44,5 +44,5 @@ module.exports = {
 	consumers: consumers,
 	services: services,
 	servers: servers,
-	active_links: active_links,
+	active_links: active_links
 };

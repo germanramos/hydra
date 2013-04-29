@@ -2,7 +2,7 @@
 function checkIds(req, res, service_id, consumer_id) {
 	//Check consumer id
 	var consumer = consumers.filter(function (consumer) {
-		return consumer.id == consumer_id
+		return consumer.id == consumer_id;
 	});
 	if (consumer.length <= 0) {
 		res.send({err:err_enum.wrong_consumer, srv:null});
@@ -10,7 +10,7 @@ function checkIds(req, res, service_id, consumer_id) {
 
 	//Check service id
 	var service = services.filter(function (service) {
-		return service.id == service_id
+		return service.id == service_id;
 	});
 	if (service.length <= 0) {
 		res.send({err:err_enum.wrong_service, srv:null});
