@@ -5,50 +5,33 @@ var sys 	= require('sys')
 var _servers = [
     {
         "port"      : 3000
-    ,   "filePath"  : "./sokobank_auth/app/main.js"
+    ,   "filePath"  : "./server/main.js"
     }
 ,
     {
-        "port"      : 3001
-    ,   "filePath"  : "./sokobank_api/app/main.js"
+        "port"      : 4001
+    ,   "filePath"  : "./server/serviceTime.js"
     }
 ,
     {
-        "port"      : 3002
-    ,   "filePath"  : "./sokobank_userconf/app/main.js"
+        "port"      : 4002
+    ,   "filePath"  : "./server/serviceSum.js"
     }
 ,
     {
-        "port"      : 3003
-    ,   "filePath"  : "./sokobank_message_manager/app/main.js"
-    }
-,
-    {
-        "port"      : 3004
-    ,   "filePath"  : "./sokobank_monitor/app/main.js"
-    }
-,
-    {
-        "port"      : 3005
-    ,   "filePath"  : "./sokobank_fake_feeder/app/main.js"
-    }
-,
-    {
-        "port"      : 3006
-    ,   "filePath"  : "./sokobank_pusher/app/main.js"
+        "port"      : 4003
+    ,   "filePath"  : "./server/serviceUuid.js"
     }
 ];
 
-var _env = 'pro';
 var _processes = [];
 var _startingError = false;
 
 for ( var f=0, F=_servers.length; f<F && !_startingError; f++ ) {
 	console.log('starting '+_servers[f].filePath+' on port '+_servers[f].port);
-	console.log(' -> node '+_servers[f].filePath+' --port='+_servers[f].port+' --env='+_env );
 	_processes.push (
 		exec(
-			'node '+_servers[f].filePath+' --port='+_servers[f].port+' --env='+_env
+			'node '+_servers[f].filePath+' '+_servers[f].port
 		,
 			function (err, stdout, stderr) {
 				if (err !== null) {

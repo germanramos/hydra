@@ -1,0 +1,88 @@
+<html>
+<head>
+	<script type="text/JavaScript" src="hydr-german.js"></script>
+	<script type="text/JavaScript" src="jquery-1.9.1.js"></script>
+	<script>
+		var user = "Juan";
+		window.onload = function() {
+			$("table .service .buttonStart").click(function(obj) {
+				var tr = $(this).parents(".service");
+				var service = tr.find(".text").val();
+				var params = tr.find(".params").val();
+				if (params == null)
+					params = "";
+				hydr.client.start(service, user, function(data) {
+					tr.find(".ser").html(JSON.stringify(data));
+					tr.find(".res").attr('src', data.srv + "/" + service + params);
+				});
+			});
+			
+			$("table .service .buttonStop").click(function(obj) {
+				var tr = $(this).parents(".service");
+				var service = tr.find(".text").val();
+				tr.find(".ser").html('');
+				tr.find(".res").attr('src', "");
+				hydr.client.stop(service, user);
+			});
+		};
+	</script>
+	<style>
+		table {
+			width: 100%;
+		}
+		table td {
+			border: solid 1px;
+			text-align: center;
+		}
+		table iframe {
+			width: 100%;
+			border: 0;
+		}
+	</style>
+</head>
+<body>
+	<table>
+		<thead>
+			<td>Service</td>
+			<td>Server</td>
+			<td>Answer</td>
+		</thead>
+		<tbody>
+			<tr class="service">
+				<td>
+					<input class="text" type="text" value="service_time"><br>
+	 				<input class="buttonStart" type="button" value="Start service">
+	 				<input class="buttonStop" type="button" value="Stop service">
+				</td><td>
+					<span class="ser"> </span>
+				</td><td>
+					<iframe class="res" src=""> </iframe>
+				</td>
+			</tr>
+			<tr class="service">
+				<td>
+					Service name: <input class="text" type="text" value="service_sum"><br>
+					Service params: <input class="params" type="text" value="/2/3"><br>
+	 				<input class="buttonStart" type="button" value="Start service">
+	 				<input class="buttonStop" type="button" value="Stop service">
+				</td><td>
+					<span class="ser"> </span>
+				</td><td>
+					<iframe class="res" src=""> </iframe>
+				</td>
+			</tr>
+			<tr class="service">
+				<td>
+					<input class="text" type="text" value="service_uuid"><br>
+	 				<input class="buttonStart" type="button" value="Start service">
+	 				<input class="buttonStop" type="button" value="Stop service">
+				</td><td>
+					<span class="ser"> </span>
+				</td><td>
+					<iframe class="res" src=""> </iframe>
+				</td>
+			</tr>
+		</tbody>
+	</table> 
+</body>
+</html>

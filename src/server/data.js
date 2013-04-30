@@ -13,8 +13,8 @@ err_back = {
 };
 
 siblings = [
-	'localhost:3000',
-	'localhost:3001'
+	'http://localhost:3000',
+	//'http://localhost:3001'
 ];
 
 consumers = [
@@ -23,16 +23,16 @@ consumers = [
 ];
 
 services = [
-	{id: 'Service1'},
-	{id: 'Service2'},
-	{id: 'Service3'},
-	{id: 'Service4'}
+	{id: 'service_time'},
+	{id: 'service_sum'},
+	{id: 'service_uuid'},
+	{id: 'service_other'}
 ];
 
 servers = [
-	{name: 'server1.com', services: ['Service1']},
-	{name: 'server2.com', services: ['Service3']},
-	{name: 'server3.com', services: ['Service1','Service2','Service3']}
+	{name: 'http://localhost:4001', services: ['service_time']},
+	{name: 'http://localhost:4003', services: ['service_uuid']},
+	{name: 'http://localhost:4002', services: ['service_sum']}
 ];
 
 active_links = [];
