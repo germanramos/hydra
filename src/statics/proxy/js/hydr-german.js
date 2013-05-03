@@ -24,7 +24,7 @@ var hydr = {};
 		_HTTP_SUCCESS	= 200;
 
 	hydr._ROOT_REFRESH_TIME = 3600000; // ms.
-	hydr._REFRESH_TIME = 60000; // ms.
+	hydr._REFRESH_TIME = 10000; // ms.
 
 	hydr._servers = ['http://localhost:3000'];
 	var	_root_timer = null;
@@ -163,7 +163,7 @@ var hydr = {};
 		,	_cbk = null // Callback to notify further changes of the found server
 		,	_timer = null; // Internal timer to verify if the server is still the right one or it has changed
 
-		this._get_server_from_service = function (){ // Gets the proper server to provide a service to a consumer
+		var _get_server_from_service = function (){ // Gets the proper server to provide a service to a consumer
 			console.log("Get server from service refresh");
 			var count = hydr._servers.length
 			,	responses = [];
@@ -191,7 +191,7 @@ var hydr = {};
 					}
 				});
 			}
-			_timer = setTimeout(this._get_server_from_service, hydr._REFRESH_TIME);
+			_timer = setTimeout(_get_server_from_service, hydr._REFRESH_TIME);
 		};
 
 		this.start = function (cbk){
@@ -199,7 +199,7 @@ var hydr = {};
 			if (_timer){
 				clearInterval(_timer);
 			}
-			this._get_server_from_service();
+			_get_server_from_service();
 		};
 
 		this.stop = function (){

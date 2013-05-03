@@ -1,0 +1,100 @@
+<html>
+<head>
+	<script type="text/JavaScript" src="hydr-german.js"></script>
+	<script type="text/JavaScript" src="jquery-1.9.1.js"></script>
+	<script>
+		var hydra_server = "http://127.0.0.1:3000/";
+		window.onload = function() {
+			$("#getServices").attr('src', hydra_server + "get_services");
+			
+			$("#addService").click(function(obj) {
+				var service = window.prompt("Enter service name to add","service_");
+				var url = hydra_server + "post_start_service/" + service;
+				$.ajax({
+					url: url,
+				}).done(function ( data ) {
+					alert(data);
+					$("#getServices").attr('src', hydra_server + "get_services");
+				});
+			});
+			
+			$("#removeService").click(function(obj) {
+				var service = window.prompt("Enter service name to remove","service_");
+				var url = hydra_server + "post_stop_service/" + service;
+				$.ajax({
+					url: url,
+				}).done(function ( data ) {
+					alert(data);
+					$("#getServices").attr('src', hydra_server + "get_services");
+				});
+			});
+			
+			$("#addServer").click(function(obj) {
+				var server = window.prompt("Enter server name","http://");
+				var service = window.prompt("Enter service name","service_");
+				var url = hydra_server + "post_start_server/" + encodeURIComponent(server) + "/" + service;
+				$.ajax({
+					url: url,
+				}).done(function ( data ) {
+					alert(data);
+					$("#getServers").attr('src', hydra_server + "get_servers");
+				});
+			});
+			
+			$("#removeServer").click(function(obj) {
+				var server = window.prompt("Enter server name","http://");
+				var service = window.prompt("Enter service name","service_");
+				var url = hydra_server + "post_stop_server/" + encodeURIComponent(server) + "/" + service;
+				$.ajax({
+					url: url,
+				}).done(function ( data ) {
+					alert(data);
+					$("#getServers").attr('src', hydra_server + "get_servers");
+				});
+			});
+		};
+	</script>
+	<style>
+		table {
+			width: 100%;
+		}
+		table td {
+			border: solid 1px;
+			text-align: center;
+		}
+		table iframe {
+			width: 100%;
+			height: 500px;
+			border: 0;
+		}
+	</style>
+</head>
+<body>	
+	<table>
+		<thead>
+			<td>Services</td>
+			<td>Servers</td>
+		</thead>
+		<tbody>
+			<tr>
+				<td>
+					<iframe id="getServices" src="http://127.0.0.1:3000/get_services"> </iframe>
+				</td>
+				<td>
+					<iframe id="getServers" src="http://127.0.0.1:3000/get_servers"> </iframe>
+				</td>				
+			</tr>
+			<tr>
+				<td>
+					<input id="addService" type="button" value="Add service">
+	 				<input id="removeService" type="button" value="Remove service">
+				</td>
+				<td>
+					<input id="addServer" type="button" value="Add server">
+	 				<input id="removeServer" type="button" value="Remove server">
+				</td>
+			</tr>
+		</tbody>
+	</table> 
+</body>
+</html>
