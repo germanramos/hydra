@@ -7,7 +7,18 @@ if (process.argv.length != 3) {
 
 PORT = process.argv[2];
 
+var allowCrossDomain = function(req, res, next) {
+	var baseurl = req.get('origin');
+	var referer = req.get('Referer');
+	res.header('Access-Control-Allow-Origin',baseurl);
+	res.header('Access-Control-Allow-Credentials', true);
+	next();
+};
+
 var app = express();
+app.configure(function() {
+    app.use(allowCrossDomain);
+});
 app.get('/service_time', function(req, res) {
 		//Print log
 		console.log("-------------------");

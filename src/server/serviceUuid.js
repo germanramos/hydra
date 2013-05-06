@@ -16,7 +16,18 @@ function guid() {
          s4() + '-' + s4() + s4() + s4();
 }
 
+function allowCrossDomain(req, res, next) {
+	var baseurl = req.get('origin');
+	var referer = req.get('Referer');
+	res.header('Access-Control-Allow-Origin',baseurl);
+	res.header('Access-Control-Allow-Credentials', true);
+	next();
+};
+
 var app = express();
+app.configure(function() {
+    app.use(allowCrossDomain);
+});
 app.get('/service_uuid', function(req, res) {
 		//Print log
 		console.log("-------------------");
