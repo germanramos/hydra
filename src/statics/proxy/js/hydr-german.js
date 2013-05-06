@@ -167,6 +167,7 @@ var hydr = {};
 			console.log("Get server from service refresh");
 			var count = hydr._servers.length;
 			var	responses = [];
+			var start_time = new Date().getTime();
 			for (var i=0, end=count; i<end; ++i) {
 				var url = hydr._servers[i] + '/post_start/'+_service_id + '/' + _consumer_id;
 				console.log("Refresing: " + url);
@@ -178,6 +179,7 @@ var hydr = {};
 						for (var i=0, end=responses.length, not_found = true; i<end; ++i && not_found){
 							if (responses[i].err == "ok") { // Ok Response
 								if (server != responses[i].srv){
+									responses[i].request_time = new Date().getTime() - start_time;
 									console.log("Refreshed: " + url + ": " + JSON.stringify(responses[i]));
 									server = responses[i].srv;
 									status = responses[i].err;

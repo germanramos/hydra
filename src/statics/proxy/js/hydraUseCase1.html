@@ -8,9 +8,7 @@
 			$("table .service .buttonStart").click(function(obj) {
 				var tr = $(this).parents(".service");
 				var service = tr.find(".text").val();
-				var params = tr.find(".params").val();
-				if (params == null)
-					params = "";
+				var params = tr.find(".params");
 				hydr.client.start(service, user, function(data) {
 					var ser = tr.find(".ser").html(JSON.stringify(data));
 					var res = tr.find(".res")
@@ -21,9 +19,20 @@
 					    element.setAttribute("type", "button");
 					    element.setAttribute("value", "Invoke");
 					    element.onclick = function() {
-					    	res.attr('src', data.srv + "/" + service + params);
+						    var url = data.srv + "/" + service + params.val();
+						    var start_time = new Date().getTime();
+						    $.ajax({
+								url: url,
+							}).done(function ( data ) {
+								var json = JSON.parse(data);
+								json.request_time = new Date().getTime() - start_time;
+								res.html(JSON.stringify(json));
+							}).error(function ( data ) {
+								res.html("Error");
+							});
 					    };
 					    ser.append(element);
+					    element.click();
 					} else {
 						console.log("Running start error !!!")
 						ser.css("background-color","red");
@@ -48,9 +57,14 @@
 			border: solid 1px;
 			text-align: center;
 		}
-		table iframe {
-			width: 100%;
+		table .res {
+			width: 600px;
+			height: 200px;
 			border: 0;
+		}
+		
+		table .ser {
+			min-width: 400px;
 		}
 	</style>
 </head>
@@ -64,13 +78,15 @@
 		<tbody>
 			<tr class="service">
 				<td>
-					<input class="text" type="text" value="service_time"><br>
+					Service name: <input class="text" type="text" value="service_time"><br>
+					Service params: <input class="params" type="text" value=""><br>
 	 				<input class="buttonStart" type="button" value="Start service">
 	 				<input class="buttonStop" type="button" value="Stop service">
 				</td><td>
-					<span class="ser"> </span>
+					<div class="ser"> </div>
 				</td><td>
-					<iframe class="res" src=""> </iframe>
+					<div class="res"> </div>
+					<!--<iframe class="res" src=""> </iframe>-->
 				</td>
 			</tr>
 			<tr class="service">
@@ -80,20 +96,21 @@
 	 				<input class="buttonStart" type="button" value="Start service">
 	 				<input class="buttonStop" type="button" value="Stop service">
 				</td><td>
-					<span class="ser"> </span>
+					<div class="ser"> </div>
 				</td><td>
-					<iframe class="res" src=""> </iframe>
+					<div class="res"> </div>
 				</td>
 			</tr>
 			<tr class="service">
 				<td>
-					<input class="text" type="text" value="service_uuid"><br>
+					Service name: <input class="text" type="text" value="service_uuid"><br>
+					Service params: <input class="params" type="text" value=""><br>
 	 				<input class="buttonStart" type="button" value="Start service">
 	 				<input class="buttonStop" type="button" value="Stop service">
 				</td><td>
-					<span class="ser"> </span>
+					<div class="ser"> </div>
 				</td><td>
-					<iframe class="res" src=""> </iframe>
+					<div class="res"> </div>
 				</td>
 			</tr>
 		</tbody>
