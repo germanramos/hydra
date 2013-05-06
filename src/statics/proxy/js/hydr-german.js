@@ -165,8 +165,8 @@ var hydr = {};
 
 		var _get_server_from_service = function (){ // Gets the proper server to provide a service to a consumer
 			console.log("Get server from service refresh");
-			var count = hydr._servers.length
-			,	responses = [];
+			var count = hydr._servers.length;
+			var	responses = [];
 			for (var i=0, end=count; i<end; ++i) {
 				var url = hydr._servers[i] + '/post_start/'+_service_id + '/' + _consumer_id;
 				console.log("Refresing: " + url);
@@ -186,7 +186,13 @@ var hydr = {};
 									console.log("Already up to date: " + url + ": " + JSON.stringify(responses[i]));
 								}
 								not_found = false;
-							} // TODO: Other status to be processed
+							} else {
+								server = null;
+								status = responses[i].err;
+								_cbk(responses[i]);
+							}
+							
+							// TODO: Other status to be processed
 						}
 					}
 				});

@@ -12,8 +12,22 @@
 				if (params == null)
 					params = "";
 				hydr.client.start(service, user, function(data) {
-					tr.find(".ser").html(JSON.stringify(data));
-					tr.find(".res").attr('src', data.srv + "/" + service + params);
+					var ser = tr.find(".ser").html(JSON.stringify(data));
+					var res = tr.find(".res")
+					if (data.err == "ok") {
+						console.log("Running start ok !!!")
+						ser.css("background-color","green");
+						var element = document.createElement("input");
+					    element.setAttribute("type", "button");
+					    element.setAttribute("value", "Invoke");
+					    element.onclick = function() {
+					    	res.attr('src', data.srv + "/" + service + params);
+					    };
+					    ser.append(element);
+					} else {
+						console.log("Running start error !!!")
+						ser.css("background-color","red");
+					}
 				});
 			});
 			
@@ -45,7 +59,7 @@
 		<thead>
 			<td>Service</td>
 			<td>Server</td>
-			<td>Answer</td>
+			<td>Last Answer</td>
 		</thead>
 		<tbody>
 			<tr class="service">
