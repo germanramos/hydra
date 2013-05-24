@@ -4,7 +4,8 @@ var commons = require('../../lib/commons'),
 	ObjectID = commons.mongodb.ObjectID,
 	hero	= commons.hero,
 	app		= hero.app,
-	express	= commons.express;
+	express	= commons.express,
+	hydra	= commons.hydra;
 
 module.exports = hero.worker (
 	function(self){
@@ -45,8 +46,7 @@ module.exports = hero.worker (
 					function(done){
 						dbHydra.setup(
 							function(err, client){
-								colServers = new mongodb.Collection(client, 'servers');
-								done(null);
+								hydra.init(client, done);
 							}
 						);
 					}
