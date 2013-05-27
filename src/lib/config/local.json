@@ -12,9 +12,9 @@
 		"secretKey" : "RdGgiunmONiTuJpU0bZxSHAkhwoNEe6x"
 	},
 	"server_api" : {
-
+		"allowedOrigins" : ["http://localhost"]
 	},
 	"client_api" : {
-
+		"allowedOrigins" : ["http://localhost"]
 	}
 }

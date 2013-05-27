@@ -13,7 +13,7 @@ hero.init(
 				hero.error(err,'hydra,server_api,start');
 			} else {
 				app.listen( hero.port() );
-				console.log('listening on port '+hero.port() );
+				console.log('server_api listening on port '+hero.port() );
 			}
 		});
 	}

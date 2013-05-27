@@ -25,7 +25,7 @@ module.exports = hero.worker (
 		});
 
 		function addHeaders(req, res, next){
-			var allowedOrigins = self.config.api.auth.allowedOrigins;
+			var allowedOrigins = self.config.server_api.allowedOrigins;
 
 			var baseurl = req.get('origin');
 			var referer = req.get('Referer');
@@ -46,8 +46,7 @@ module.exports = hero.worker (
 					function(done){
 						dbHydra.setup(
 							function(err, client){
-								colServers = new mongodb.Collection(client, 'servers');
-								done(null);
+								hydra.init(client, done);
 							}
 						);
 					}
@@ -59,3 +58,5 @@ module.exports = hero.worker (
 
 	}
 );
+
+module.exports.hydra = hydra;

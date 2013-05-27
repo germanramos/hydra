@@ -4,7 +4,8 @@
 	"dependencies"	: {
 		"mongodb" 	: "1.2.x",
 		"express" 	: "3.x",
-       	"async"	 	: "0.2.x",
+		"async"	 	: "0.2.x",
+		"pause"		: "0.0.1",
 		"hero"	 : "https://github.com/thegameofcode/hero/archive/stable.tar.gz"
 	},
 	"engines" : {

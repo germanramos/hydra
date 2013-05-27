@@ -25,7 +25,7 @@ module.exports = hero.worker (
 		});
 
 		function addHeaders(req, res, next){
-			var allowedOrigins = self.config.api.auth.allowedOrigins;
+			var allowedOrigins = self.config.client_api.allowedOrigins;
 
 			var baseurl = req.get('origin');
 			var referer = req.get('Referer');
