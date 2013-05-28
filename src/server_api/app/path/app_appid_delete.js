@@ -3,7 +3,7 @@ var server_api = require('../server_api'),
 
 module.exports = function(req, res){
 	var appId = req.params.appId;
-
+	
 	try{
 		hydra.app.remove(appId, function(err){
 			if(err === null){

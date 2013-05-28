@@ -5,84 +5,15 @@ var commons = require('./commons'),
 
 var hydra = module.exports;
 
-var colHydra = null;
+var colServer = null;
 var colApp = null;
 
 hydra.init = function(p_dbClient, p_cbk){
-	colHydra = new mongodb.Collection(p_dbClient, 'hydra');
 	colApp = new mongodb.Collection(p_dbClient, 'app');
+	hydra.app = require('./app')(colApp);
+
+	colServer = new mongodb.Collection(p_dbClient, 'server');
+	hydra.server = require('./server')(colServer);
+
 	p_cbk();
-};
-
-// ----
-// APPS
-// ----
-
-var defaultApp = {
-	id: null,
-	localStrategy: enums.app.localStrategyEnum.INDIFFERENT,
-	cloudStrategy: enums.app.cloudStrategyEnum.INDIFFERENT,
-	servers : []
-};
-
-hydra.app = {
-	create: function(p_app, p_cbk){
-		var app = utils.merge({},defaultApp);
-		app = utils.merge(app, p_app);
-
-		//Si no tenemos id no creamos la app
-		if(app.id === null){
-			p_cbk(null);
-			return;
-		}
-
-		colApp.insert(app, {w:1}, function(err, items){
-			if(err || items.length === 0){
-				p_cbk(null);
-			} else {
-				p_cbk(items[0]);
-			}
-		});
-	},
-
-	getAll: function(p_cbk){
-		colApp.find({}).toArray(function(err, items){
-			p_cbk(items);
-		});
-	},
-
-	getFromId: function(p_id, p_cbk){
-		var find = {
-			id: p_id
-		};
-
-		colApp.findOne(find, {}, function(err, item){
-			p_cbk(item);
-		});
-	},
-
-	update: function(p_app, p_cbk){
-		var find = {
-			id: p_app.id
-		};
-
-		colApp.update(find, p_app, function(err){
-			p_cbk();
-		});
-	},
-
-	remove: function(p_id, p_cbk){
-		var find = {
-			id: p_id
-		};
-
-		colApp.remove(find, function(err, item){
-			if(err) {
-				p_cbk(err);
-			}
-			else {
-				p_cbk(null);
-			}
-		});
-	}
 };

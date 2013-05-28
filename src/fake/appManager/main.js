@@ -40,15 +40,42 @@ var apps = [
 	servers : [
 	{
 		server: 'http://server1/app',
-		status: stateEnum.READY
+		status: {
+			state: stateEnum.READY, //Current state of the server
+			cpuLoad: 50, //Cpu load of the server 0-100
+			memLoad: 50, //Memory load of the server 0-100
+			timeStamp: 42374897239, //UTC time stamp of this info
+			stateEvents: [{
+				state: stateEnum.READY, //Future state of the serve
+				applyTimeStamp: 42374897239 //UTC time stamp of this info
+			}]
+		}
 	},
 	{
 		server: 'http://server2/app',
-		status: stateEnum.READY
+		status: {
+			state: stateEnum.READY, //Current state of the server
+			cpuLoad: 50, //Cpu load of the server 0-100
+			memLoad: 50, //Memory load of the server 0-100
+			timeStamp: 42374897239, //UTC time stamp of this info
+			stateEvents: [{
+				state: stateEnum.READY, //Future state of the serve
+				applyTimeStamp: 42374897239 //UTC time stamp of this info
+			}]
+		}
 	},
 	{
 		server: 'http://server3/app',
-		status: stateEnum.UNAVAILABLE
+		status: {
+			state: stateEnum.READY, //Current state of the server
+			cpuLoad: 50, //Cpu load of the server 0-100
+			memLoad: 50, //Memory load of the server 0-100
+			timeStamp: 42374897239, //UTC time stamp of this info
+			stateEvents: [{
+				state: stateEnum.READY, //Future state of the serve
+				applyTimeStamp: 42374897239 //UTC time stamp of this info
+			}]
+		}
 	}
 	]
 },
