@@ -55,7 +55,7 @@ module.exports = function(colServer){
 
 	self.update = function(p_server, p_cbk){
 		var find = {
-			url: p_app.url
+			url: p_server.url
 		};
 
 		colServer.update(find, p_server, function(err){
