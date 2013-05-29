@@ -1,5 +1,5 @@
-var utils = require('./utils'),
-	enums = require('./enums');
+var utils = require('../utils'),
+	enums = require('../enums');
 
 var defaultServer = {
 	url: null,

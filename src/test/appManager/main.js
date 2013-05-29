@@ -37,11 +37,11 @@ var apps = [
 	appId: 1,
 //	localStrategy: localStrategyEnum.INDIFFERENT,
 //	cloudStrategy: cloudStrategyEnum.ROUND_ROBIN,
-	localStrategyEvents : [{ 
+	localStrategyEvents : [{
 		localStrategy : localStrategyEnum.INDIFFERENT,
 		timestamp : 42374897239
 	}],
-	cloudStrategyEvents : [{ 
+	cloudStrategyEvents : [{
 		cloudStrategy : cloudStrategyEnum.ROUND_ROBIN,
 		timestamp : 42374897239
 	}],
@@ -88,7 +88,7 @@ var apps = [
 	]
 },
 {
-	id: 2
+	appId: 2
 }
 ];
 
@@ -96,29 +96,6 @@ var apps = [
 // TESTS
 // -----
 function main(){
-	for(var appIdx in apps){
-		var app = apps[appIdx];
-		removeApp(app, removeEnd);
-	}
-}
-
-// Removing previous apps
-var removed = 0;
-function removeApp(app, cbk){
-	removed++;
-
-	utils.httpDelete('http://'+server_api.host+':'+server_api.port+'/app/'+app.id, function(status, data){
-		if(status == 200){
-			console.log('OK: App '+app.id+' remove');
-		} else {
-			console.log('FAIL: App '+app.id+' remove');
-		}
-		removed--;
-		if(removed === 0 ) cbk();
-	});
-}
-
-function removeEnd(){
 	for(var appIdx in apps){
 		var app = apps[appIdx];
 		registerApp(app, registerEnd);
@@ -131,17 +108,17 @@ function registerApp(app, cbk){
 	registered++;
 	var data = {
 		app : {
-			localStrategy: app.localStrategy,
-			cloudStrategy: app.cloudStrategy,
+			localStrategyEvents : app.localStrategyEvents,
+			cloudStrategyEvents : app.cloudStrategyEvents,
 			servers: app.servers
 		}
 	};
 
-	utils.httpPost('http://'+server_api.host+':'+server_api.port+'/app/'+app.id, data ,function(status, data){
+	utils.httpPost('http://'+server_api.host+':'+server_api.port+'/app/'+app.appId, data ,function(status, data){
 		if(status == 200){
-			console.log('OK: App '+app.id+' register');
+			console.log('OK: App '+app.appId+' register');
 		} else {
-			console.log('FAIL: App '+app.id+' register');
+			console.log('FAIL: App '+app.appId+' register');
 		}
 		registered--;
 		if(registered === 0){
@@ -166,7 +143,7 @@ function getAllApps(cbk){
 
 				for(var dataIdx in data){
 					var dataApp = data[dataIdx];
-					if(app.id == dataApp.id){
+					if(app.appId == dataApp.appId){
 						found++;
 						break;
 					}
@@ -194,12 +171,25 @@ function getAllEnd(){
 // Removing a server from app
 function removeServers(){
 	var app = apps[0];
-	var serverUrl = encodeURIComponent(app.servers[0].server);
-	utils.httpDelete('http://'+server_api.host+':'+server_api.port+'/app/'+app.id+'/server/'+serverUrl, function(status, data){
-		if(status == 200) {
+	app.servers.shift();
+
+	var data = {
+		app : {
+			localStrategyEvents : app.localStrategyEvents,
+			cloudStrategyEvents : app.cloudStrategyEvents,
+			servers: app.servers
+		}
+	};
+
+	utils.httpPost('http://'+server_api.host+':'+server_api.port+'/app/'+app.appId, data ,function(status, data){
+		if(status == 200){
 			console.log('OK: remove server from app');
 		} else {
 			console.log('FAIL: remove server from app');
+		}
+		registered--;
+		if(registered === 0){
+			cbk();
 		}
 	});
 }

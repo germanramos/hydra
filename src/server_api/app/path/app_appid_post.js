@@ -5,28 +5,15 @@ module.exports = function(req, res){
 	try{
 		var appId = req.params.appId;
 		var app = req.body.app;
-		app.id = appId;
+		app.appId = appId;
 
-		hydra.app.getFromId(appId, function(item){
-			if(item === null){
-				hydra.app.create(app, function(app){
-					if(app === null){
-						res.send(400,'Bad request');
-					} else {
-						res.send(200,{});
-					}
-				});
+		hydra.app.update(app, function(newApp){
+			if(newApp === null){
+				res.send(400,'Bad request');
 			} else {
-				hydra.app.update(app, function(app){
-					if(app === null){
-						res.send(400,'Bad request');
-					} else {
-						res.send(200,{});
-					}
-				});
+				res.send(200,{});
 			}
 		});
-
 	} catch (ex){
 		console.log(ex);
 		res.send(400,'Bad request');
