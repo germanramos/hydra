@@ -2,7 +2,6 @@ var client_api = require('../client_api'),
 	hydra = client_api.hydra;
 
 module.exports = function(req, res){
-
 	try{
 		hydra.server.getAll(appId, function(items){
 			if(items === null){

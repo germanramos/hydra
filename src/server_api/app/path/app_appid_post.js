@@ -2,9 +2,8 @@ var server_api = require('../server_api'),
 	hydra = server_api.hydra;
 
 module.exports = function(req, res){
-	var appId = req.params.appId;
-
 	try{
+		var appId = req.params.appId;
 		var app = req.body.app;
 		app.id = appId;
 
