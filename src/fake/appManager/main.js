@@ -34,9 +34,17 @@ var stateEnum = {
 
 var apps = [
 {
-	id: 1,
-	localStrategy: localStrategyEnum.INDIFFERENT,
-	cloudStrategy: cloudStrategyEnum.ROUND_ROBIN,
+	appId: 1,
+//	localStrategy: localStrategyEnum.INDIFFERENT,
+//	cloudStrategy: cloudStrategyEnum.ROUND_ROBIN,
+	localStrategyEvents : [{ 
+		localStrategy : localStrategyEnum.INDIFFERENT,
+		timestamp : 42374897239
+	}],
+	cloudStrategyEvents : [{ 
+		cloudStrategy : cloudStrategyEnum.ROUND_ROBIN,
+		timestamp : 42374897239
+	}],
 	servers : [
 	{
 		server: 'http://server1/app',
