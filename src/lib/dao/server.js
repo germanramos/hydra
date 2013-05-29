@@ -1,5 +1,5 @@
-var utils = require('./utils'),
-	enums = require('./enums');
+var utils = require('../utils'),
+	enums = require('../enums');
 
 var defaultServer = {
 	url: null,
@@ -23,7 +23,7 @@ module.exports = function(colServer){
 		server = utils.merge(server, p_server);
 
 		//Si no tenemos url no creamos el server
-		if(app.url === null){
+		if(server.url === null){
 			p_cbk(null);
 			return;
 		}
@@ -55,7 +55,7 @@ module.exports = function(colServer){
 
 	self.update = function(p_server, p_cbk){
 		var find = {
-			url: p_app.url
+			url: p_server.url
 		};
 
 		colServer.update(find, p_server, function(err){

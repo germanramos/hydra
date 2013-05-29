@@ -1,10 +1,22 @@
-var utils = require('./utils'),
-enums = require('./enums');
+var utils = require('../utils'),
+enums = require('../enums');
 
 var defaultApp = {
-	id: null,
+	appId: null,
 	localStrategy: enums.app.localStrategyEnum.INDIFFERENT,
 	cloudStrategy: enums.app.cloudStrategyEnum.INDIFFERENT,
+	localStrategyEvents : [
+		//{
+		//	localStrategy : localStrategyEnum.INDIFFERENT,
+		//	timestamp : 42374897239
+		//}
+	],
+	cloudStrategyEvents : [
+		//{
+		//	cloudStrategy : cloudStrategyEnum.ROUND_ROBIN,
+		//	timestamp : 42374897239
+		//}
+	],
 	servers : [
 		//{
 		//	server: 'http://server3/app',
@@ -31,7 +43,7 @@ module.exports = function(colApp){
 		app = utils.merge(app, p_app);
 
 		//Si no tenemos id no creamos la app
-		if(app.id === null){
+		if(app.appId === null){
 			p_cbk(null);
 			return;
 		}
@@ -53,7 +65,7 @@ module.exports = function(colApp){
 
 	self.getFromId = function(p_id, p_cbk){
 		var find = {
-			id: p_id
+			appId: p_id
 		};
 
 		colApp.findOne(find, {}, function(err, item){
@@ -63,17 +75,26 @@ module.exports = function(colApp){
 
 	self.update = function(p_app, p_cbk){
 		var find = {
-			id: p_app.id
+			appId: p_app.appId
 		};
 
-		colApp.update(find, p_app, function(err){
-			p_cbk();
+		console.log('update',p_app);
+		colApp.findOne(find, {}, function(err, oldApp){
+			if(err || oldApp === null){
+				console.log('will create',p_app);
+				self.create(p_app, p_cbk);
+			} else {
+				console.log('will update',p_app);
+				colApp.update(find, p_app, function(err){
+					p_cbk();
+				});
+			}
 		});
 	};
 
 	self.remove = function(p_id, p_cbk){
 		var find = {
-			id: p_id
+			appId: p_id
 		};
 
 		colApp.remove(find, function(err, item){

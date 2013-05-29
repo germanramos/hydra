@@ -2,9 +2,8 @@ var client_api = require('../client_api'),
 	hydra = client_api.hydra;
 
 module.exports = function(req, res){
-	var appId = req.params.appId;
-
 	try{
+		var appId = req.params.appId;
 		hydra.app.getFromId(appId, function(item){
 			if(item === null){
 				res.send(400,'Bad request');

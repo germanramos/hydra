@@ -12,11 +12,6 @@ exports.paths = [
 		"path": "/hydra",
 		"handler": require("./path/hydra_post")
 	},
-	{
-		"method": "DELETE",
-		"path": "/hydra/:url",
-		"handler": require("./path/hydra_url_delete")
-	},
 
 	// APPS
 	{
@@ -33,15 +28,5 @@ exports.paths = [
 		"method": "POST",
 		"path": "/app/:appId",
 		"handler": require("./path/app_appid_post")
-	},
-	{
-		"method": "DELETE",
-		"path": "/app/:appId",
-		"handler": require("./path/app_appid_delete")
-	},
-	{
-		"method": "DELETE",
-		"path": "/app/:appId/server/:serverUrl",
-		"handler": require("./path/app_appid_server_serverurl_delete")
 	}
 ];

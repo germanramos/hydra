@@ -5,7 +5,14 @@ var commons = require('../../lib/commons'),
 	hero	= commons.hero,
 	app		= hero.app,
 	express	= commons.express,
-	hydra	= commons.hydra;
+	hydra	= commons.hydra,
+	hydra_sync = require('./hydra_sync.js')
+;
+
+
+console.log('*************************************');
+console.log(hydra_sync);
+console.log('*************************************');
 
 module.exports = hero.worker (
 	function(self){
@@ -51,6 +58,13 @@ module.exports = hero.worker (
 						);
 					}
 				], function(err){
+
+					if ( err === null ) {
+						// Start to sync hydra
+						hydra_sync.sync();
+						setInterval( hydra_sync.sync, self.config.hydra_sync.timeout );
+					}
+
 					p_cbk(err);
 				}
 			);

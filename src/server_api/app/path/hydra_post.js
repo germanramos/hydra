@@ -1,7 +1,7 @@
-var server_api = require('../server_api');
+var server_api = require('../server_api'),
+	hydra = server_api.hydra;
 
 module.exports = function(req, res){
-
 	try{
 		var server = {
 			url : req.body.url,
