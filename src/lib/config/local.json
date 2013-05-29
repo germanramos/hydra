@@ -18,6 +18,6 @@
 		"allowedOrigins" : ["http://localhost"]
 	},
 	"hydra_sync" : {
-		"timeout" : 1
+		"timeout" : 10000
 	}
 }
