@@ -37,6 +37,12 @@ module.exports = function(colServer){
 		});
 	};
 
+	self.getAll = function(p_cbk){
+		colServer.find({}).toArray(function(err, items){
+			p_cbk(items);
+		});
+	};
+
 	self.getFromUrl = function(p_url, p_cbk){
 		var find = {
 			url: p_url
