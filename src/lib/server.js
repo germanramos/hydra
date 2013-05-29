@@ -23,7 +23,7 @@ module.exports = function(colServer){
 		server = utils.merge(server, p_server);
 
 		//Si no tenemos url no creamos el server
-		if(app.url === null){
+		if(server.url === null){
 			p_cbk(null);
 			return;
 		}
