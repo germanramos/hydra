@@ -58,3 +58,5 @@ module.exports = hero.worker (
 
 	}
 );
+
+module.exports.hydra = hydra;
