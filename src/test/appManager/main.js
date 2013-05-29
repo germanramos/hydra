@@ -37,14 +37,22 @@ var apps = [
 	appId: 1,
 //	localStrategy: localStrategyEnum.INDIFFERENT,
 //	cloudStrategy: cloudStrategyEnum.ROUND_ROBIN,
-	localStrategyEvents : [{
-		localStrategy : localStrategyEnum.INDIFFERENT,
-		timestamp : 42374897239
-	}],
-	cloudStrategyEvents : [{
+	localStrategyEvents : {
+		'42374897259':{
+			localStrategy : localStrategyEnum.INDIFFERENT,
+			timestamp : 42374897259
+		},
+		'42374897240':{
+			localStrategy : localStrategyEnum.INDIFFERENT,
+			timestamp : 42374897240
+		}
+	},
+	cloudStrategyEvents : {
+		'42374897239':{
 		cloudStrategy : cloudStrategyEnum.ROUND_ROBIN,
 		timestamp : 42374897239
-	}],
+		}
+	},
 	servers : [
 	{
 		server: 'http://server1/app',

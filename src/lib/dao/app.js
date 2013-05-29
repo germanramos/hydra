@@ -5,18 +5,18 @@ var defaultApp = {
 	appId: null,
 	localStrategy: enums.app.localStrategyEnum.INDIFFERENT,
 	cloudStrategy: enums.app.cloudStrategyEnum.INDIFFERENT,
-	localStrategyEvents : [
-		//{
+	localStrategyEvents : {
+		//'42374897239' :{
 		//	localStrategy : localStrategyEnum.INDIFFERENT,
 		//	timestamp : 42374897239
 		//}
-	],
-	cloudStrategyEvents : [
-		//{
+	},
+	cloudStrategyEvents : {
+		//'42374897239':{
 		//	cloudStrategy : cloudStrategyEnum.ROUND_ROBIN,
 		//	timestamp : 42374897239
 		//}
-	],
+	},
 	servers : [
 		//{
 		//	server: 'http://server3/app',
@@ -78,14 +78,25 @@ module.exports = function(colApp){
 			appId: p_app.appId
 		};
 
-		console.log('update',p_app);
 		colApp.findOne(find, {}, function(err, oldApp){
+			p_app = utils.merge(defaultApp, p_app);
 			if(err || oldApp === null){
-				console.log('will create',p_app);
+				console.log('create', p_app);
 				self.create(p_app, p_cbk);
 			} else {
-				console.log('will update',p_app);
-				colApp.update(find, p_app, function(err){
+				console.log('update: before:', oldApp);
+				for(var localStrategyEventsIdx in p_app.localStrategyEvents){
+					oldApp.localStrategyEvents[localStrategyEventsIdx] = p_app.localStrategyEvents[localStrategyEventsIdx];
+				}
+				oldApp.localStrategyEvents = utils.sortObj(oldApp.localStrategyEvents);
+
+				for(var cloudStrategyEventsIdx in p_app.cloudStrategyEvents){
+					oldApp.cloudStrategyEvents[cloudStrategyEventsIdx] = p_app.cloudStrategyEvents[cloudStrategyEventsIdx];
+				}
+				oldApp.cloudStrategyEvents = utils.sortObj(oldApp.cloudStrategyEvents);
+
+				console.log('update: after:', oldApp);
+				colApp.update(find, oldApp, function(err){
 					p_cbk();
 				});
 			}

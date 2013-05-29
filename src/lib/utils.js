@@ -104,3 +104,20 @@ exports.httpPut = function(url, data, cbk){
 exports.httpDelete = function(url, cbk){
 	request('DELETE', url, null, cbk);
 };
+
+exports.sortObj = function(obj){
+	var kvs = [];
+	for(var key in obj){
+		kvs.push({k:key,v:obj[key]});
+	}
+
+	kvs.sort(function(a,b){
+		return a.k.localeCompare(b.kvs) * -1;
+	});
+
+	var ret = {};
+	for(var idx in kvs){
+		ret[kvs[idx].k] = kvs[idx].v;
+	}
+	return ret;
+};
