@@ -22,3 +22,5 @@ if len(sys.argv) == 2:
         print psutil.virtual_memory().percent
     else:
         print "1"
+else:
+    print "Usage: {0} PORT_TO_CHECK".format(sys.argv[0])

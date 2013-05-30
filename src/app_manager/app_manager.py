@@ -19,10 +19,7 @@ All these information should be updated periodically. If not, the Hydra server w
 @deffield    updated: Updated
 '''
 
-import config
-
 import time
-import socket
 import sys
 import os
 import json
@@ -30,10 +27,10 @@ import logging
 from logging.config import fileConfig   
 from optparse import OptionParser
 import urllib2
-import subprocess
+import ConfigParser
 
 __all__ = []
-__version__ = 0.3
+__version__ = 1.0
 __date__ = '2013-05-29'
 __updated__ = '2013-05-29'
 
@@ -69,62 +66,65 @@ def main(argv=None):
         if opts.verbose > 0:
             print("verbosity level = %d" % opts.verbose)
                     
-        # MAIN BODY #      
+        # MAIN BODY #
+        config = ConfigParser.ConfigParser()
+        config.read(['app_manager.cfg', os.path.expanduser('~/app_manager.cfg'), '/etc/app_manager.cfg'])  
         while True:
             try:
                 servers = []
                 logging.debug("*** BEGIN ITERATION ***")
-                for server,user,command in config.SERVERS:
+                for key,server in config.items("SERVERS"):
                     logging.debug("Getting info from " + server)
                     try:
-                        if server != "127.0.0.1" and server != "localhost":
-                            wrapper = config.SSH_CMD + " {0}@{1} \"{2}\"".format(user, server, command)
-                        else:
-                            wrapper = command
-                        output = subprocess.check_output(wrapper, stdin=None, stderr=None, shell=False, universal_newlines=False)
+                        response = urllib2.urlopen(server)
+                        output = response.read()
                         lines = output.replace("\r","").split("\n")
                         state = lines[0]
                         cpuLoad = lines[1]
                         memLoad = lines[2]
-                    except:
+                    except Exception, e:
+                        logging.error("Exception: " + str(e))
                         state = stateEnum.UNAVAILABLE
                         cpuLoad = 0
                         memLoad = 0
                     #Create server status object and append to the server list
-                    server_status_item = { 
-                            "state": state,
-                            "cpuLoad": cpuLoad,
-                            "memLoad": memLoad,
-                            "timeStamp": int(round(time.time() * 1000))
-                    }
-                    logging.debug(server_status_item)
+                    timestamp = int(round(time.time() * 1000))
                     server_item = {
-                              "server": server,
-                              "status": server_status_item
+                        "server": server,
+                        "status": {
+                                   "cost": config.get("MAIN", "cost"),
+                                   "cpuLoad": cpuLoad,
+                                   "memLoad": memLoad,
+                                   "timeStamp": timestamp,
+                                   "stateEvents": {
+                                                   timestamp: state
+                                                   }
+                                   }
                     }
+                    logging.debug(server_item)
                     servers.append(server_item)
-                #End for
-                localStrategiesEvents = [{
-                    "localStrategy": config.LOCAL_STRATEGY,
-                    "applyTimeStamp": int(round(time.time() * 1000))
-                }]
-                cloudStrategiesEvents = [{
-                    "cloudStrategy": config.CLOUD_STRATEGY,
-                    "applyTimeStamp": int(round(time.time() * 1000))
-                }]
+                #End servers for
+                timestamp = int(round(time.time() * 1000))
+                localStrategyEvents = {
+                                         timestamp: config.get("MAIN", "local_strategy")
+                }
+                cloudStrategyEvents = {
+                                         timestamp: config.get("MAIN", "cloud_strategy")
+                }
                 data = {
-                        "localStrategiesEvents": localStrategiesEvents,
-                        "cloudStrategiesEvents": cloudStrategiesEvents,
+                        "localStrategyEvents": localStrategyEvents,
+                        "cloudStrategyEvents": cloudStrategyEvents,
                         "servers": servers
                 }
                 answer = json.dumps(data)
                 #logging.debug(answer)
                 #POST
-                for hydra in config.HYDRAS:
+                for key,hydra in config.items("HYDRAS"):
                     logging.debug("Posting to " + hydra)                   
                     opener = urllib2.build_opener(urllib2.HTTPHandler)
-                    request = urllib2.Request(hydra, answer)
-                    request.get_method = lambda: 'POST'
+                    request = urllib2.Request(hydra + "/app/" + config.get("MAIN", "app_id"), answer)
+                    request.add_header("content-type", "application/json")
+                    #request.get_method = lambda: 'POST'
                     url = opener.open(request)
                     if url.code != 200:
                         logging.error("Error connecting with hydra {0}: Code: {1}".format(hydra,url.code))
@@ -132,7 +132,7 @@ def main(argv=None):
                         logging.debug("Posted OK")
             except Exception, e:
                 logging.error("Exception: " + str(e))
-            time.sleep(config.SLEEP_TIME)
+            time.sleep(config.getint("MAIN", "sleep_time"));
         
     except Exception, e:
         indent = len(program_name) * " "
