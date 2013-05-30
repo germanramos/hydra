@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 # encoding: utf-8
 '''
-app_manager -- Generin app manager for hydra
+app_manager -- Generic app manager for hydra
 
 The app manager is in charge of check and monitor one or several servers and update the status information at one or several Hydra Servers using the restful server AP.
 
 The basic functionality is to notify to one Hydra Server when an application is Started, Stopping, or Removed. In addition, it will provide information about the server health status like CPU and memory usage and any useful information like the size of the server or the prefered balance strategy.
 
-All these information should be updated periodically. If not, the hydra server will assume that the servers are shutted down.
+All these information should be updated periodically. If not, the Hydra server will assume that the servers are shutted down.
 
 @author:     German Ramos Garcia
             
-@copyright:  2013 Next Limit Technologies. All rights reserved.
+@copyright:  2013 BBVA. All rights reserved.
             
 @license:    license
 
@@ -22,16 +22,15 @@ All these information should be updated periodically. If not, the hydra server w
 import config
 
 import time
-import psutil
 import socket
 import sys
 import os
 import json
 import logging
-from logging.config import fileConfig 
-import time        
+from logging.config import fileConfig   
 from optparse import OptionParser
 import urllib2
+import subprocess
 
 __all__ = []
 __version__ = 0.3
@@ -41,38 +40,10 @@ __updated__ = '2013-05-29'
 DEBUG = 1
 TESTRUN = 0
 PROFILE = 0
-     
-def isOpen(ip,port):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        s.connect((ip, int(port)))
-        s.shutdown(2)
-        return True
-    except:
-        return False
 
-def remoteRunBackground(vm, command, logfilename, debug=None):
-    return _remoteRun(vm, command, logfilename, debug, True)
-
-def remoteRunForeground(vm, command, logfilename, debug=None):
-    return _remoteRun(vm, command, logfilename, debug, False)
-
-def _remoteRun(vm, command, logfilename, debug=None, background = False):
-    """Execute a background command(command) in a remote virtual machine(vm) logging into logfilename"""
-    if vm.ip == None:
-        raise Exception("Virtual machine with no ip")
-    if logfilename == None:
-        extendedCommand = command + " >/dev/null 2>&1 </dev/null"
-    else:
-        extendedCommand = command + " >" + logfilename + " 2>&1 </dev/null"
-    if background == True:
-        extendedCommand = extendedCommand + " &"
-    if debug:
-        debug(vm.name + ": Launching background command: " + extendedCommand)
-    
-    sshwrapper = "ssh -o StrictHostKeyChecking=no {0}@{1} \"{2}\"".format(vm.userSSH, vm.ip, extendedCommand)
-    returncode = os.system(sshwrapper)
-    return returncode
+class stateEnum:
+    READY = 0
+    UNAVAILABLE = 1
       
 def main(argv=None):
     '''Command line options.'''
@@ -102,39 +73,63 @@ def main(argv=None):
         while True:
             try:
                 servers = []
-                logging.log(logging.DEBUG, "Iteration")
-                for server in config.SERVERS:
-                    logging.log(logging.DEBUG, server)
-                    if server == "127.0.0.1" or server == "localhost":
-                        if isOpen(server, config.PORT):
-                            state = 0
-                            cpuLoad = psutil.cpu_percent(interval=0.1, percpu=False)
-                            memLoad = psutil.virtual_memory().percent
+                logging.debug("*** BEGIN ITERATION ***")
+                for server,user,command in config.SERVERS:
+                    logging.debug("Getting info from " + server)
+                    try:
+                        if server != "127.0.0.1" and server != "localhost":
+                            wrapper = config.SSH_CMD + " {0}@{1} \"{2}\"".format(user, server, command)
                         else:
-                            state = 1
-                            cpuLoad = 0
-                            memLoad = 0
-                    else:
-                        pass
-                        #TODO
-                    #Inform
-                    server_status_item = {
-                            
+                            wrapper = command
+                        output = subprocess.check_output(wrapper, stdin=None, stderr=None, shell=False, universal_newlines=False)
+                        lines = output.replace("\r","").split("\n")
+                        state = lines[0]
+                        cpuLoad = lines[1]
+                        memLoad = lines[2]
+                    except:
+                        state = stateEnum.UNAVAILABLE
+                        cpuLoad = 0
+                        memLoad = 0
+                    #Create server status object and append to the server list
+                    server_status_item = { 
                             "state": state,
                             "cpuLoad": cpuLoad,
                             "memLoad": memLoad,
                             "timeStamp": int(round(time.time() * 1000))
                     }
+                    logging.debug(server_status_item)
                     server_item = {
                               "server": server,
                               "status": server_status_item
                     }
                     servers.append(server_item)
+                #End for
+                localStrategiesEvents = [{
+                    "localStrategy": config.LOCAL_STRATEGY,
+                    "applyTimeStamp": int(round(time.time() * 1000))
+                }]
+                cloudStrategiesEvents = [{
+                    "cloudStrategy": config.CLOUD_STRATEGY,
+                    "applyTimeStamp": int(round(time.time() * 1000))
+                }]
                 data = {
+                        "localStrategiesEvents": localStrategiesEvents,
+                        "cloudStrategiesEvents": cloudStrategiesEvents,
                         "servers": servers
                 }
                 answer = json.dumps(data)
-                print answer;                
+                #logging.debug(answer)
+                #POST
+                for hydra in config.HYDRAS:
+                    logging.debug("Posting to " + hydra)                   
+                    opener = urllib2.build_opener(urllib2.HTTPHandler)
+                    request = urllib2.Request(hydra, answer)
+                    request.get_method = lambda: 'POST'
+                    url = opener.open(request)
+                    if url.code != 200:
+                        logging.error("Error connecting with hydra {0}: Code: {1}".format(hydra,url.code))
+                    else:
+                        logging.debug("Posted OK")
             except Exception, e:
                 logging.error("Exception: " + str(e))
             time.sleep(config.SLEEP_TIME)
@@ -160,7 +155,7 @@ if __name__ == "__main__":
     if PROFILE:
         import cProfile
         import pstats
-        profile_filename = 'app_anager_profile.txt'
+        profile_filename = 'app_manager_profile.txt'
         cProfile.run('main()', profile_filename)
         statsfile = open("profile_stats.txt", "wb")
         p = pstats.Stats(profile_filename, stream=statsfile)
