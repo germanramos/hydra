@@ -32,73 +32,40 @@ var stateEnum = {
 // APPS
 // ----
 
+var now = new Date().getTime();
+
 var apps = [
 {
 	appId: 1,
-//	localStrategy: localStrategyEnum.INDIFFERENT,
-//	cloudStrategy: cloudStrategyEnum.ROUND_ROBIN,
-	localStrategyEvents : {
-		'42374897259':{
-			localStrategy : localStrategyEnum.INDIFFERENT,
-			timestamp : 42374897259
-		},
-		'42374897240':{
-			localStrategy : localStrategyEnum.INDIFFERENT,
-			timestamp : 42374897240
-		}
-	},
-	cloudStrategyEvents : {
-		'42374897239':{
-		cloudStrategy : cloudStrategyEnum.ROUND_ROBIN,
-		timestamp : 42374897239
-		}
-	},
-	servers : [
-	{
-		server: 'http://server1/app',
-		status: {
-			state: stateEnum.READY, //Current state of the server
-			cpuLoad: 50, //Cpu load of the server 0-100
-			memLoad: 50, //Memory load of the server 0-100
-			timeStamp: 42374897239, //UTC time stamp of this info
-			stateEvents: [{
-				state: stateEnum.READY, //Future state of the serve
-				applyTimeStamp: 42374897239 //UTC time stamp of this info
-			}]
-		}
-	},
-	{
-		server: 'http://server2/app',
-		status: {
-			state: stateEnum.READY, //Current state of the server
-			cpuLoad: 50, //Cpu load of the server 0-100
-			memLoad: 50, //Memory load of the server 0-100
-			timeStamp: 42374897239, //UTC time stamp of this info
-			stateEvents: [{
-				state: stateEnum.READY, //Future state of the serve
-				applyTimeStamp: 42374897239 //UTC time stamp of this info
-			}]
-		}
-	},
-	{
-		server: 'http://server3/app',
-		status: {
-			state: stateEnum.READY, //Current state of the server
-			cpuLoad: 50, //Cpu load of the server 0-100
-			memLoad: 50, //Memory load of the server 0-100
-			timeStamp: 42374897239, //UTC time stamp of this info
-			stateEvents: [{
-				state: stateEnum.READY, //Future state of the serve
-				applyTimeStamp: 42374897239 //UTC time stamp of this info
-			}]
-		}
-	}
-	]
+	localStrategyEvents : {},
+	cloudStrategyEvents : {},
+	servers : []
 },
 {
 	appId: 2
 }
 ];
+
+apps[0].localStrategyEvents[now+10000] = localStrategyEnum.INDIFFERENT;
+apps[0].cloudStrategyEvents[now+10000] = cloudStrategyEnum.INDIFFERENT;
+apps[0].servers.push(generateServer('http://server1/app', now + 10000));
+apps[0].servers.push(generateServer('http://server2/app', now + 10000));
+
+function generateServer(url, timeStamp){
+	var server = {
+		server: url,
+		status: {
+			cpuLoad: Math.floor(Math.random()*100), //Cpu load of the server 0-100
+			memLoad: Math.floor(Math.random()*100), //Memory load of the server 0-100
+			timeStamp: timeStamp, //UTC time stamp of this info
+			stateEvents: {}
+		}
+	};
+
+	server.status.stateEvents[timeStamp] = stateEnum.READY; //Future state of the serve
+
+	return server;
+}
 
 // -----
 // TESTS
@@ -115,11 +82,9 @@ var registered = 0;
 function registerApp(app, cbk){
 	registered++;
 	var data = {
-		app : {
-			localStrategyEvents : app.localStrategyEvents,
-			cloudStrategyEvents : app.cloudStrategyEvents,
-			servers: app.servers
-		}
+		localStrategyEvents : app.localStrategyEvents,
+		cloudStrategyEvents : app.cloudStrategyEvents,
+		servers: app.servers
 	};
 
 	utils.httpPost('http://'+server_api.host+':'+server_api.port+'/app/'+app.appId, data ,function(status, data){
@@ -173,31 +138,21 @@ function getAllApps(cbk){
 }
 
 function getAllEnd(){
-	removeServers();
-}
 
-// Removing a server from app
-function removeServers(){
-	var app = apps[0];
-	app.servers.shift();
-
+	//updating server status
 	var data = {
-		app : {
-			localStrategyEvents : app.localStrategyEvents,
-			cloudStrategyEvents : app.cloudStrategyEvents,
-			servers: app.servers
-		}
+		localStrategyEvents : apps[0].localStrategyEvents,
+		cloudStrategyEvents : apps[0].cloudStrategyEvents,
+		servers: [
+			generateServer('http://server2/app', now+15)
+		]
 	};
 
-	utils.httpPost('http://'+server_api.host+':'+server_api.port+'/app/'+app.appId, data ,function(status, data){
+	utils.httpPost('http://'+server_api.host+':'+server_api.port+'/app/'+apps[0].appId, data ,function(status, data){
 		if(status == 200){
-			console.log('OK: remove server from app');
+			console.log('OK: App '+apps[0].appId+' update');
 		} else {
-			console.log('FAIL: remove server from app');
-		}
-		registered--;
-		if(registered === 0){
-			cbk();
+			console.log('FAIL: App '+apps[0].appId+' update');
 		}
 	});
 }

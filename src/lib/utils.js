@@ -112,7 +112,7 @@ exports.sortObj = function(obj){
 	}
 
 	kvs.sort(function(a,b){
-		return a.k.localeCompare(b.kvs) * -1;
+		return a.k.localeCompare(b.k);
 	});
 
 	var ret = {};

@@ -4,7 +4,7 @@ var server_api = require('../server_api'),
 module.exports = function(req, res){
 	try{
 		var appId = req.params.appId;
-		var app = req.body.app;
+		var app = req.body;
 		app.appId = appId;
 
 		hydra.app.update(app, function(newApp){
