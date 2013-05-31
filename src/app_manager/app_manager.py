@@ -77,11 +77,10 @@ def main(argv=None):
                     logging.debug("Getting info from " + server)
                     try:
                         response = urllib2.urlopen(server)
-                        output = response.read()
-                        lines = output.replace("\r","").split("\n")
-                        state = lines[0]
-                        cpuLoad = lines[1]
-                        memLoad = lines[2]
+                        output = json.load(response)
+                        state = output["state"]
+                        cpuLoad = output["cpuLoad"]
+                        memLoad = output["memLoad"]
                     except Exception, e:
                         logging.error("Exception: " + str(e))
                         state = stateEnum.UNAVAILABLE

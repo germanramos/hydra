@@ -6,6 +6,7 @@ import psutil
 import sys
 import BaseHTTPServer
 import time
+import json
 
 if len(sys.argv) != 5:
     print "Usage: {0} CHECK_HOST CHECK_PORT LISTEN_HOST LISTEN_PORT".format(sys.argv[0])
@@ -36,12 +37,16 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/html")
         self.end_headers()     
         if isOpen(CHECK_HOST, CHECK_PORT):
-            self.wfile.write("0\n")
-            self.wfile.write(psutil.cpu_percent(interval=0.1, percpu=False))
-            self.wfile.write("\n")
-            self.wfile.write(psutil.virtual_memory().percent)
+            data = {
+                    "state": 0,
+                    "cpuLoad": psutil.cpu_percent(interval=0.1, percpu=False),
+                    "memLoad": psutil.virtual_memory().percent
+                    }
         else:
-            self.wfile.write("1")
+            data = {
+                    "state": 1
+                    }
+        self.wfile.write(json.dumps(data))
 
 server_class = BaseHTTPServer.HTTPServer
 httpd = server_class((LISTEN_HOST, LISTEN_PORT), MyHandler)
