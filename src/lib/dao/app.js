@@ -4,14 +4,10 @@ enums = require('../enums');
 var defaultApp = {
 	appId: null,
 	localStrategyEvents : {
-		//'42374897239' :{
-		//	localStrategy : localStrategyEnum.INDIFFERENT
-		//}
+		//'42374897239' : localStrategyEnum.INDIFFERENT
 	},
 	cloudStrategyEvents : {
-		//'42374897239':{
-		//	cloudStrategy : cloudStrategyEnum.ROUND_ROBIN
-		//}
+		//'42374897239': cloudStrategyEnum.INDIFFERENT
 	},
 	servers : [
 		//{
@@ -21,9 +17,7 @@ var defaultApp = {
 		//		memLoad: 50, //Memory load of the server 0-100
 		//		timeStamp: 42374897239, //UTC time stamp of this info
 		//		stateEvents: {
-		//			'42374897239' : {
-		//				state: stateEnum.READY, //Future state of the serve
-		//			}
+		//			'42374897239' : state: stateEnum.READY, //Future state of the serve
 		//		}
 		//	}
 		//}
@@ -57,7 +51,7 @@ module.exports = function(colApp){
 		colApp.find({}).toArray(function(err, items){
 			for(var i in items){
 				var modified = clean(items[i]);
-				if(modified) self.update(items[i])
+				if(modified) self.update(items[i]);
 			}
 			p_cbk(items);
 		});
@@ -109,14 +103,14 @@ module.exports = function(colApp){
 		//clean servers
 		for(var serverIdx in p_app.servers){
 			var server = p_app.servers[serverIdx];
-			var previousServer;
+			var previousState;
 			for(var serverState in server.status.stateEvents){
 				if(serverState < now){
-					if(previousServer > 0){
-						delete server.status.stateEvents[previousServer];
+					if(previousState > 0){
+						delete server.status.stateEvents[previousState];
 						modified = true;
 					}
-					previousServer = serverState;
+					previousState = serverState;
 				}
 			}
 		}
@@ -166,7 +160,7 @@ module.exports = function(colApp){
 
 							// Checks timestamp for cpu/mem updates
 							if(newServer.status.timeStamp > oldServer.status.timeStamp){
-								for(var serverStatusFieldIdx in oldServer.status){
+								for(var serverStatusFieldIdx in newServer.status){
 									if(serverStatusFieldIdx == 'stateEvents') continue;
 									oldServer.status[serverStatusFieldIdx] = newServer.status[serverStatusFieldIdx];
 								}

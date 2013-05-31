@@ -3,16 +3,14 @@ var utils = require('../utils'),
 
 var defaultServer = {
 	url: null,
-	sibling: null
+	sibling: false
 	//	status: {
-	//		state: stateEnum.READY, //Current state of the server
 	//		cpuLoad: 50, //Cpu load of the server 0-100
 	//		memLoad: 50, //Memory load of the server 0-100
 	//		timeStamp: 42374897239, //UTC time stamp of this info
-	//		stateEvents: [{
-	//			state: stateEnum.READY, //Future state of the serve
-	//			applyTimeStamp: 42374897239 //UTC time stamp of this info
-	//		}]
+	//		stateEvents: {
+	//			'42374897239' : stateEnum.READY //Future state of the serve
+	//		}
 	//	}
 };
 
@@ -39,6 +37,10 @@ module.exports = function(colServer){
 
 	self.getAll = function(p_cbk){
 		colServer.find({}).toArray(function(err, items){
+			for(var i in items){
+				var modified = clean(items[i]);
+				if(modified) self.update(items[i]);
+			}
 			p_cbk(items);
 		});
 	};
@@ -49,18 +51,66 @@ module.exports = function(colServer){
 		};
 
 		colServer.findOne(find, {}, function(err, item){
+			var modified = clean(item);
+			if(modified){
+				self.update(item);
+			}
 			p_cbk(item);
 		});
 	};
+
+	function clean(p_server){
+		var now = new Date().getTime();
+
+		var modified = false;
+
+		//clean states
+		var previousState;
+		for(var serverState in p_server.status.stateEvents){
+			if(serverState < now){
+				if(previousState > 0){
+					delete p_server.status.stateEvents[previousState];
+					modified = true;
+				}
+				previousState = serverState;
+			}
+		}
+
+		return modified;
+	}
 
 	self.update = function(p_server, p_cbk){
 		var find = {
 			url: p_server.url
 		};
 
-		colServer.update(find, p_server, function(err){
-			p_cbk();
+		colServer.findOne(find, {}, function(err, oldServer){
+			p_server = utils.merge(utils.merge({},defaultServer), p_server);
+			if(err || oldServer === null){
+				self.create(p_server, p_cbk);
+			} else {
+				//merge state schedule
+				for(var stateEventsIdx in p_server.status.stateEvents){
+					oldServer.status.stateEvents[stateEventsIdx] =  p_server.status.stateEvents[stateEventsIdx];
+				}
+				oldServer.status.stateEvents = utils.sortObj(oldServer.status.stateEvents);
+
+				// Checks timestamp for cpu/mem updates
+				if(p_server.status.timeStamp > oldServer.status.timeStamp){
+					for(var serverStatusFieldIdx in p_server.status){
+						if(serverStatusFieldIdx == 'stateEvents') continue;
+						oldServer.status[serverStatusFieldIdx] = p_server.status[serverStatusFieldIdx];
+					}
+				}
+
+				clean(oldServer);
+
+				colServer.update(find, oldServer, function(err){
+					if(p_cbk) p_cbk();
+				});
+			}
 		});
+
 	};
 
 	self.remove = function(p_url, p_cbk){
