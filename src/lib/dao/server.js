@@ -132,5 +132,22 @@ module.exports = function(colServer, config){
 		});
 	};
 
+	self.availableServers = function (p_cbk){
+		self.getAll(function(knownServers){
+			var servers = [];
+			for(var serverIdx in knownServers){
+				var server = knownServers[serverIdx];
+				for(var serverStateIdx in server.status.stateEvents){
+					if(server.status.stateEvents[serverStateIdx] == enums.app.stateEnum.READY){
+						servers.push(server.url);
+					}
+
+					break;
+				}
+			}
+			p_cbk(servers);
+		});
+	};
+
 	return self;
 };

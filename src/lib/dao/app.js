@@ -212,7 +212,7 @@ module.exports = function(colApp, config){
 			for(var serverIdx in app.servers){
 				var server = app.servers[serverIdx];
 				for(var serverStateIdx in server.status.stateEvents){
-					if(server.status.stateEvents[serverStateIdx] != enums.app.stateEnum.UNAVAILABLE){
+					if(server.status.stateEvents[serverStateIdx] == enums.app.stateEnum.READY){
 						servers.push(server.server);
 					}
 
