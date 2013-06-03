@@ -14,7 +14,7 @@ var defaultServer = {
 	//	}
 };
 
-module.exports = function(colServer){
+module.exports = function(colServer, config){
 	var self = {};
 	self.create = function(p_server, p_cbk){
 		var server = utils.merge({},defaultServer);
@@ -68,6 +68,10 @@ module.exports = function(colServer){
 		var previousState;
 		for(var serverState in p_server.status.stateEvents){
 			if(serverState < now){
+				if(serverState < (now - config.server.timeout) && p_server.status.stateEvents[serverState] != enums.server.stateEnum.UNAVAILABLE){
+					p_server.status.stateEvents[now] = enums.server.stateEnum.UNAVAILABLE;
+					modified = true;
+				}
 				if(previousState > 0){
 					delete p_server.status.stateEvents[previousState];
 					modified = true;

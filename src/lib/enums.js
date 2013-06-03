@@ -18,11 +18,11 @@ enums.app = {
 		READY: 0,
 		UNAVAILABLE : 1
 	}
-}
+};
 
 enums.server = {
 	stateEnum : {
 		READY: 0,
 		UNAVAILABLE : 1
-	}	
-}
+	}
+};

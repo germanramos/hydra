@@ -53,7 +53,7 @@ module.exports = hero.worker (
 					function(done){
 						dbHydra.setup(
 							function(err, client){
-								hydra.init(client, done);
+								hydra.init(client, self.config, done);
 							}
 						);
 					}

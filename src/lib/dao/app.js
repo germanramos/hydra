@@ -24,7 +24,7 @@ var defaultApp = {
 	]
 };
 
-module.exports = function(colApp){
+module.exports = function(colApp, config){
 	var self = {};
 
 	self.create = function(p_app, p_cbk){
@@ -106,6 +106,10 @@ module.exports = function(colApp){
 			var previousState;
 			for(var serverState in server.status.stateEvents){
 				if(serverState < now){
+					if(serverState < (now - config.app.timeout) && server.status.stateEvents[serverState] != enums.app.stateEnum.UNAVAILABLE){
+						server.status.stateEvents[now] = enums.app.stateEnum.UNAVAILABLE;
+						modified = true;
+					}
 					if(previousState > 0){
 						delete server.status.stateEvents[previousState];
 						modified = true;
