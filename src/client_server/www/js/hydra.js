@@ -25,13 +25,13 @@ function hydra(appId, cache, f_cbk) {
 	//if ((Date.now() - hydraServers.lasUpdate) > updateHydraDelta);
 
 
-	if(cache === false && (Date.now() - hydraServers.lastUpdate) > updateHydraDelta ){
-		// ask for apps again and call the app
+	if((Date.now() - hydraServers.lastUpdate) > updateHydraDelta ){
+		// ask for apps again and get the app
 		_GetHydraServers(function(err){
 			_GetApp(appId, f_cbk);
 		});
 	} else {
-		// call the app
+		// get the app servers
 		_GetApp(appId, f_cbk);
 	}
 
@@ -42,13 +42,24 @@ function hydra(appId, cache, f_cbk) {
 	//////////////////////////
 
 	function _GetHydraServers(f_callback)	{
-		for(var server in hydraServers.list){
+		_async('GET', 'http://localhost:7001/hydra',
+		function(){
+			console.log('_GetHydraServers response', arguments);
+			f_callback(null);
+		},{});
+
+		/*for(var server in hydraServers.list){
 			console.log('hydraServer', hydraServers.list[server]);
-		}
-		f_callback(null);
+		}*/
 	}
 
 	function _GetApp(appId, f_callback){
+		_async('GET', 'http://localhost:7001/hydra',
+		function(){
+			console.log('_GetHydraServers response', arguments);
+			f_callback(null);
+		},{});
+
 		if(appId in appServers) {
 			for (var server in appServers[appId].list){
 				console.log('appServer', server);
@@ -93,6 +104,7 @@ function hydra(appId, cache, f_cbk) {
 	}
 
 	function _async(p_method, p_url, f_success, data) {
+		console.log('_async', arguments);
 		var req = _instanceHttpReq();
 		req.open(p_method, p_url+'?_='+(new Date().getTime()), true);
 		req.onreadystatechange  = function() {
