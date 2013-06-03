@@ -15,7 +15,7 @@
 		"allowedOrigins" : ["http://localhost"]
 	},
 	"client_api" : {
-		"allowedOrigins" : ["http://localhost"]
+		"allowedOrigins" : ["*"]
 	},
 	"app" : {
 		"timeout" : 60000

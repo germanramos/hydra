@@ -41,12 +41,12 @@ function hydra(appId, cache, f_cbk) {
 	//     HYDRA UTILS      //
 	//////////////////////////
 
-	function _GetHydraServers(f_callback)	{
+	function _GetHydraServers(f_callback) {
 		_async('GET', 'http://localhost:7001/hydra',
-		function(){
-			console.log('_GetHydraServers response', arguments);
-			f_callback(null);
-		},{});
+		function(err, data){
+			console.log('_GetHydraServers response', err, data);
+			f_callback(err);
+		});
 
 		/*for(var server in hydraServers.list){
 			console.log('hydraServer', hydraServers.list[server]);
@@ -54,19 +54,19 @@ function hydra(appId, cache, f_cbk) {
 	}
 
 	function _GetApp(appId, f_callback){
-		_async('GET', 'http://localhost:7001/hydra',
-		function(){
-			console.log('_GetHydraServers response', arguments);
-			f_callback(null);
-		},{});
+		_async('GET', 'http://localhost:7001/app/'+appId,
+		function(err, data){
+			console.log('_GetAppServers response', err, data);
+			f_callback(err, data);
+		});
 
-		if(appId in appServers) {
+		/*if(appId in appServers) {
 			for (var server in appServers[appId].list){
 				console.log('appServer', server);
 			}
 			f_callback(null, null);
 		}
-		f_callback(null, null);
+		f_callback(null, null);*/
 	}
 
 	//////////////////////////
@@ -98,8 +98,8 @@ function hydra(appId, cache, f_cbk) {
 			}
 		}
 
-		httpRequest.overrideMimeType('application/json');
-		httpRequest.withCredentials = true;
+		//httpRequest.overrideMimeType('application/json');
+		//httpRequest.withCredentials = true;
 		return httpRequest;
 	}
 
