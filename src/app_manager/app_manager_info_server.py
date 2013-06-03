@@ -8,14 +8,15 @@ import BaseHTTPServer
 import time
 import json
 
-if len(sys.argv) != 5:
-    print "Usage: {0} CHECK_HOST CHECK_PORT LISTEN_HOST LISTEN_PORT".format(sys.argv[0])
+if len(sys.argv) != 6:
+    print "Usage: {0} CHECK_HOST CHECK_PORT LISTEN_HOST LISTEN_PORT PID".format(sys.argv[0])
     sys.exit()
 else:
     CHECK_HOST = sys.argv[1]
     CHECK_PORT = int(sys.argv[2])
     LISTEN_HOST = sys.argv[3]
     LISTEN_PORT = int(sys.argv[4])
+    PID = int(sys.argv[5])
          
 def isOpen(ip,port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -32,16 +33,28 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/html")
         self.end_headers()
     def do_GET(self):
+        print "Path: " + self.path
         """Respond to a GET request."""
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()     
         if isOpen(CHECK_HOST, CHECK_PORT):
-            data = {
-                    "state": 0,
-                    "cpuLoad": psutil.cpu_percent(interval=0.1, percpu=False),
-                    "memLoad": psutil.virtual_memory().percent
-                    }
+            if (self.path == "/extended"):
+                p = psutil.Process(PID)
+                data = {
+                        "state": 0,
+                        "cpuLoad": psutil.cpu_percent(interval=0.1, percpu=False),
+                        "memLoad": psutil.virtual_memory().percent,
+                        "connections": p.get_connections(kind='inet')
+                        #connection: fd, family, type, local_address=(ip, port), remote_address=(ip, port), status)
+                        }
+                
+            else:
+                data = {
+                        "state": 0,
+                        "cpuLoad": psutil.cpu_percent(interval=0.1, percpu=False),
+                        "memLoad": psutil.virtual_memory().percent
+                        }
         else:
             data = {
                     "state": 1
