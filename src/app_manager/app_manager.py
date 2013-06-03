@@ -89,7 +89,7 @@ def main(argv=None):
                     #Create server status object and append to the server list
                     timestamp = int(round(time.time() * 1000))
                     server_item = {
-                        "server": server,
+                        "server": server[:-4] + config.get("MAIN", "port"),
                         "status": {
                                    "cost": config.get("MAIN", "cost"),
                                    "cpuLoad": cpuLoad,

@@ -28,6 +28,11 @@ def isOpen(ip,port):
         return False
 
 class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+    def do_OPTIONS(self):           
+        self.send_response(200, "ok")       
+        self.send_header('Access-Control-Allow-Origin', '*')                
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With") 
     def do_HEAD(self):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
@@ -36,7 +41,8 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         print "Path: " + self.path
         """Respond to a GET request."""
         self.send_response(200)
-        self.send_header("Content-type", "text/html")
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header("Content-type", "application/json")
         self.end_headers()     
         if isOpen(CHECK_HOST, CHECK_PORT):
             if (self.path == "/extended"):
