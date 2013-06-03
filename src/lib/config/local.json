@@ -17,7 +17,11 @@
 	"client_api" : {
 		"allowedOrigins" : ["http://localhost"]
 	},
-	"hydra_sync" : {
-		"timeout" : 10000
+	"app" : {
+		"timeout" : 60000
+	},
+	"server" : {
+		"sync" : 10000,
+		"timeout" : 60000
 	}
 }

@@ -62,7 +62,7 @@ module.exports = hero.worker (
 					if ( err === null ) {
 						// Start to sync hydra
 						hydra_sync.sync();
-						setInterval( hydra_sync.sync, self.config.hydra_sync.timeout );
+						setInterval( hydra_sync.sync, self.config.server.sync );
 					}
 
 					p_cbk(err);
