@@ -204,5 +204,43 @@ module.exports = function(colApp, config){
 		});
 	};
 
+	self.availableServers = function (p_id, p_cbk){
+		self.getFromId(p_id, function(app){
+			var servers = [];
+
+			//get online servers
+			for(var serverIdx in app.servers){
+				var server = app.servers[serverIdx];
+				for(var serverStateIdx in server.status.stateEvents){
+					if(server.status.stateEvents[serverStateIdx] != enums.app.stateEnum.UNAVAILABLE){
+						servers.push(server.server);
+					}
+
+					break;
+				}
+			}
+
+			//current strategy
+			var currentStrategy = enums.app.localStrategyEnum.INDIFFERENT;
+			for(var localStrategyIdx in app.localStrategyEvents){
+				currentStrategy = app.localStrategyEvents[localStrategyIdx];
+				break;
+			}
+
+			self.balanceServers(servers, currentStrategy, p_cbk);
+		});
+	};
+
+	self.balanceServers = function(p_servers, p_strategy, p_cbk){
+		switch(p_strategy){
+			case enums.app.localStrategyEnum.INDIFFERENT:
+				p_cbk(p_servers);
+				break;
+			default:
+				p_cbk(p_servers);
+				break;
+		}
+	};
+
 	return self;
 };

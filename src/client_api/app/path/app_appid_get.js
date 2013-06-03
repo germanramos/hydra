@@ -4,11 +4,11 @@ var client_api = require('../client_api'),
 module.exports = function(req, res){
 	try{
 		var appId = req.params.appId;
-		hydra.app.getFromId(appId, function(item){
-			if(item === null){
+		hydra.app.availableServers(appId, function(servers){
+			if(servers === null){
 				res.send(400,'Bad request');
 			} else {
-				res.send(200,item);
+				res.send(200,servers);
 			}
 		});
 	} catch (ex){

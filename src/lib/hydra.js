@@ -4,6 +4,7 @@ var commons = require('./commons'),
 	enums = require('./enums');
 
 var hydra = module.exports;
+hydra.enums = enums;
 
 var colServer = null;
 var colApp = null;
