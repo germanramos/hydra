@@ -102,10 +102,11 @@ module.exports = function(colApp, config){
 		}
 
 		//clean servers
+		var server, previousState
 		var s, S = p_app.servers.length;
 		for(s=0;s<S;s++){
-			var server = p_app.servers[s];
-			var previousState;
+			server = p_app.servers[s];
+			previousState = -1;
 			for(var serverState in server.status.stateEvents){
 				if(serverState < now){
 					if(serverState < (now - config.app.timeout) && server.status.stateEvents[serverState] != enums.app.stateEnum.UNAVAILABLE){
@@ -152,12 +153,15 @@ module.exports = function(colApp, config){
 				oldApp.cloudStrategyEvents = utils.sortObj(oldApp.cloudStrategyEvents);
 
 				//merging servers
-				for(var newServerIdx in p_app.servers){
-					var newServer = p_app.servers[newServerIdx];
+				var newServer, serverFound, oldServer;
+				var ns, NS = p_app.servers.length;
+				var os, OS = oldApp.servers.length;
+				for(ns=0;ns<NS;ns++){
+					newServer = p_app.servers[ns];
 
-					var serverFound = false;
-					for(var oldServerIdx in oldApp.servers){
-						var oldServer = oldApp.servers[oldServerIdx];
+					serverFound = false;
+					for(os=0;os<OS;os++){
+						oldServer = oldApp.servers[os];
 						if(newServer.server == oldServer.server){
 							for(var stateEventsIdx in newServer.status.stateEvents){
 								oldServer.status.stateEvents[stateEventsIdx] = newServer.status.stateEvents[stateEventsIdx];
