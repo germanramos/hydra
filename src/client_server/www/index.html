@@ -12,7 +12,7 @@
 			var overrideCache = false;
 
 			var count = 0;
-			var max = 2;
+			var max = 10;
 			var interval = null;
 
 			function getServers() {
@@ -20,14 +20,14 @@
 					console.log('App Servers for', app, result, err,',\n');
 				});
 
-				/*count++;
+				count++;
 				if(count >= max) {
 					clearInterval(interval);
-				}*/
+				}
 			}
 
 			getServers();
-			//interval = setInterval(getServers, 2000);
+			interval = setInterval(getServers, 2000);
 		});
 	</script>
 </head>

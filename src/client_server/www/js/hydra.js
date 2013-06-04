@@ -1,31 +1,26 @@
 var hydraServers = {
 	list : ['http://localhost:7001'],
 	lastUpdate : 0
-};
-
-var appServers = {
+},
+	appServers = {
 	/* 
 	app : {
 		list : [],
 		lastUpdate : Date.now();
 	}
 	*/
-};
-
-var updateHydraDelta = 60000;
-var updateAppDelta = 6000;
+},
+	updateHydraDelta = 60000,
+	updateAppDelta = 10000,
+	retryOnFail = 2000;
 
 var	_HTTP_STATE_DONE = 0,
-_HTTP_SUCCESS	= 200;
+	_HTTP_SUCCESS	= 200;
 
-function hydra(appId, overrideCache, f_cbk) {
+function hydra (appId, overrideCache, f_cbk) {
 
-	_GetHydraServers(function(err){
-		if(!err) {
-			_GetApp(appId, f_cbk);
-		} else {
-			console.log('Hydra head have been chopped off!');
-		}
+	_GetHydraServers(function(){
+		_GetApp(appId, f_cbk);
 	});
 
 	//////////////////////////
@@ -39,10 +34,16 @@ function hydra(appId, overrideCache, f_cbk) {
 				if(!err) {
 					hydraServers.list = data;
 					hydraServers.lastUpdate = Date.now();
-					console.log('Hydra Servers', hydraServers);
-					f_callback(null);
+
+					f_callback();
 				} else {
-					f_callback(err);
+					// In case hydra server doesn't reply, push it to the back 
+					// of the list and try another
+					var srv = hydraServers.list.shift();
+					hydraServers.list.push(srv);
+
+					_GetHydraServers(f_callback);
+					//f_callback(err);
 				}
 			});
 		} else {
@@ -52,11 +53,15 @@ function hydra(appId, overrideCache, f_cbk) {
 	}
 
 	function _GetApp(appId, f_callback){
-		if(overrideCache || !(appId in appServers) || (Date.now() - appServers[appId].lastUpdate > updateAppDelta)) {
+		// Get Apps from server if we specify to override the cache, it's not on the list or the cache is outdated
+		var getFromServer = overrideCache || !(appId in appServers) || (Date.now() - appServers[appId].lastUpdate > updateAppDelta);
+
+		if(getFromServer) {
 			_async('GET', hydraServers.list[0] + '/app/'+ appId,
 			function(err, data){
 				console.log('_GetAppServers response', err, data);
 				if(!err) {
+					// Store the app in the local cache
 					appServers[appId] = {
 						list: data,
 						lastUpdate: Date.now()
@@ -64,11 +69,12 @@ function hydra(appId, overrideCache, f_cbk) {
 
 					f_callback(err, data);
 				} else {
+					// In case hydra server doesn't reply, push it to the back 
+					// of the list and try another
 					var srv = hydraServers.list.shift();
 					hydraServers.list.push(srv);
-					setTimeout(function() {
-						_GetApp(appId, f_callback);
-					}, 2000);
+
+					_GetApp(appId, f_callback);
 				}
 			});
 		} else {

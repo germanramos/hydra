@@ -143,7 +143,8 @@ module.exports = function(colServer, config){
 				var server = knownServers[serverIdx];
 				for(var serverStateIdx in server.status.stateEvents){
 					if(server.status.stateEvents[serverStateIdx] == enums.app.stateEnum.READY){
-						servers.push(server.url);
+						var clientPort = (server.clientPort ? ':' + server.clientPort : '');
+						servers.push(server.url + clientPort);
 					}
 
 					break;
