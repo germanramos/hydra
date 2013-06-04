@@ -8,9 +8,25 @@
 	<script src="js/hydra.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
-			hydra('localhost', false, function(result){
-				console.log('This is doing something', result);
-			});
+			var app = 'mongo';
+			var overrideCache = false;
+
+			var count = 0;
+			var max = 2;
+			var interval = null;
+
+			function getServers() {
+				hydra(app, overrideCache, function(err, result){
+					console.log('App Servers for', app, result, err,',\n');
+				});
+
+				count++;
+				if(count >= max) {
+					clearInterval(interval);
+				}
+			}
+
+			interval = setInterval(getServers, 2000);
 		});
 	</script>
 </head>

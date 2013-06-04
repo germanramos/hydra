@@ -6,6 +6,12 @@ exports.paths = [
 		"handler": require("./path/hydra_options")
 	},
 
+		{
+		"method": "OPTIONS",
+		"path": "/app/:appId",
+		"handler": require("./path/app_appid_options")
+	},
+
 	// HYDRA SERVERS
 	{
 		"method": "GET",

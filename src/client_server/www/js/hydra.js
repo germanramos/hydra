@@ -1,72 +1,78 @@
-function hydra(appId, cache, f_cbk) {
-	var self = this;
-	var hydraServers = {
-		list : ['http://localhost:7001'],
-		lastUpdate : 0
-	};
+var hydraServers = {
+	list : ['http://localhost:7001'],
+	lastUpdate : 0
+};
 
-	var appServers = {
-		/* 
-		app : {
-			list : [],
-			lastUpdate : Date.now();
-		}
-
-		*/
-	};
-
-	var updateHydraDelta = 60000;
-	var updateAppDelta = 6000;
-
-	var	_HTTP_STATE_DONE = 0,
-	_HTTP_SUCCESS	= 200;
-
-	// Update hydra servers if needed
-	//if ((Date.now() - hydraServers.lasUpdate) > updateHydraDelta);
-
-
-	if((Date.now() - hydraServers.lastUpdate) > updateHydraDelta ){
-		// ask for apps again and get the app
-		_GetHydraServers(function(err){
-			_GetApp(appId, f_cbk);
-		});
-	} else {
-		// get the app servers
-		_GetApp(appId, f_cbk);
+var appServers = {
+	/* 
+	app : {
+		list : [],
+		lastUpdate : Date.now();
 	}
+	*/
+};
 
+var updateHydraDelta = 60000;
+var updateAppDelta = 6000;
 
+var	_HTTP_STATE_DONE = 0,
+_HTTP_SUCCESS	= 200;
+
+function hydra(appId, overrideCache, f_cbk) {
+
+	_GetHydraServers(function(err){
+		if(!err) {
+			_GetApp(appId, f_cbk);
+		} else {
+			console.log('Hydra head have been chopped off!');
+		}
+	});
 
 	//////////////////////////
 	//     HYDRA UTILS      //
 	//////////////////////////
-
 	function _GetHydraServers(f_callback) {
-		_async('GET', 'http://localhost:7001/hydra',
-		function(err, data){
-			console.log('_GetHydraServers response', err, data);
-			f_callback(err);
-		});
-
-		/*for(var server in hydraServers.list){
-			console.log('hydraServer', hydraServers.list[server]);
-		}*/
+		if((Date.now() - hydraServers.lastUpdate) > updateHydraDelta ){
+			_async('GET', hydraServers.list[0] + '/hydra',
+			function(err, data){
+				console.log('_GetHydraServers response', err, data);
+				if(!err) {
+					hydraServers.list = data;
+					hydraServers.lastUpdate = Date.now();
+					console.log('Hydra Servers', hydraServers);
+					f_callback(null);
+				} else {
+					f_callback(err);
+				}
+			});
+		} else {
+			console.log('_GetHydraServers cache response', null, hydraServers.list);
+			f_callback(null);
+		}
 	}
 
 	function _GetApp(appId, f_callback){
-		_async('GET', 'http://localhost:7001/app/'+appId,
-		function(err, data){
-			console.log('_GetAppServers response', err, data);
-			f_callback(err, data);
-		});
+		if(overrideCache || !(appId in appServers) || (Date.now() - appServers[appId].lastUpdate > updateAppDelta)) {
+			_async('GET', hydraServers.list[0] + '/'+appId,
+			function(err, data){
+				console.log('_GetAppServers response', err, data);
+				if(!err) {
+					appServers[appId] = {
+						list: data,
+						lastUpdate: Date.now()
+					};
 
-		/*if(appId in appServers) {
-			for (var server in appServers[appId].list){
-				console.log('appServer', server);
-			}
-			f_callback(null, null);
+					f_callback(err, data);
+				} else {
+					var srv = hydraServers.list.shift();
+					hydraServers.list.push(srv);
+					_GetApp(appId, f_callback);
+				}
+			});
+		} else {
+			console.log('_GetAppServers cache response', null, appServers[appId].list);
+			f_callback(null, appServers[appId].list);
 		}
-		f_callback(null, null);*/
 	}
 
 	//////////////////////////
