@@ -72,7 +72,7 @@ module.exports = function(colApp, config){
 	};
 
 	function clean(p_app){
-		if(app === null) return false;
+		if(p_app === null) return false;
 		var now = new Date().getTime();
 
 		var modified = false;
