@@ -102,8 +102,9 @@ module.exports = function(colApp, config){
 		}
 
 		//clean servers
-		for(var serverIdx in p_app.servers){
-			var server = p_app.servers[serverIdx];
+		var s, S = p_app.servers.length;
+		for(s=0;s<S;s++){
+			var server = p_app.servers[s];
 			var previousState;
 			for(var serverState in server.status.stateEvents){
 				if(serverState < now){
