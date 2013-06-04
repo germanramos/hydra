@@ -16,7 +16,7 @@
 			var interval = null;
 
 			function getServers() {
-				hydra(app, overrideCache, function(err, result){
+				hydra.get(app, overrideCache, function(err, result){
 					console.log('App Servers for', app, result, err,',\n');
 				});
 

@@ -1,27 +1,33 @@
-var hydraServers = {
-	list : ['http://localhost:7001'],
-	lastUpdate : 0
-},
-	appServers = {
-	/* 
-	app : {
-		list : [],
-		lastUpdate : Date.now();
+var hydra = hydra || function () {
+	var hydraServers = {
+		list : ['http://localhost:7001'],
+		lastUpdate : 0
+	},
+		appServers = {
+		/* 
+		app : {
+			list : [],
+			lastUpdate : Date.now();
+		}
+		*/
+	},
+		updateHydraDelta = 60000,
+		updateAppDelta = 10000,
+		retryOnFail = 2000,
+		overrideCache = false;
+
+	var	_HTTP_STATE_DONE = 0,
+		_HTTP_SUCCESS	= 200;
+
+	//////////////////////////
+	//     HYDRA  ENTRY     //
+	//////////////////////////
+	function _get(appId, override, f_cbk) {
+		overrideCache = override;
+		_GetHydraServers(function(){
+			_GetApp(appId, f_cbk);
+		});
 	}
-	*/
-},
-	updateHydraDelta = 60000,
-	updateAppDelta = 10000,
-	retryOnFail = 2000;
-
-var	_HTTP_STATE_DONE = 0,
-	_HTTP_SUCCESS	= 200;
-
-function hydra (appId, overrideCache, f_cbk) {
-
-	_GetHydraServers(function(){
-		_GetApp(appId, f_cbk);
-	});
 
 	//////////////////////////
 	//     HYDRA UTILS      //
@@ -43,7 +49,6 @@ function hydra (appId, overrideCache, f_cbk) {
 					hydraServers.list.push(srv);
 
 					_GetHydraServers(f_callback);
-					//f_callback(err);
 				}
 			});
 		} else {
@@ -145,4 +150,11 @@ function hydra (appId, overrideCache, f_cbk) {
 
 		req.send(data);
 	}
-}
+
+	//////////////////////////////
+	//     EXTERNAL METHODS     //
+	//////////////////////////////
+	return {
+		get: _get
+	};
+}();
