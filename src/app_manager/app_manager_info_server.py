@@ -4,6 +4,7 @@
 import socket
 import psutil
 import sys
+from SocketServer import ThreadingMixIn
 import BaseHTTPServer
 import time
 import json
@@ -67,7 +68,11 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                     }
         self.wfile.write(json.dumps(data))
 
-server_class = BaseHTTPServer.HTTPServer
+class ThreadedHTTPServer(ThreadingMixIn, BaseHTTPServer.HTTPServer):
+    pass
+
+#server_class = BaseHTTPServer.HTTPServer
+server_class = ThreadedHTTPServer
 httpd = server_class((LISTEN_HOST, LISTEN_PORT), MyHandler)
 print time.asctime(), "Server Starts - %s:%s" % (LISTEN_HOST, LISTEN_PORT)
 try:
