@@ -1,0 +1,29 @@
+#refreshButton {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.server {
+    border: solid 1px;
+    float: left;
+    border-radius: 20px;
+    padding: 5px;
+    margin: 5px;
+    width: 250px;
+    height: 140px;
+    overflow: hidden;
+}
+
+.server p {
+    margin: 5px;
+    white-space: nowrap;
+}
+
+.server .key {
+    display: inline-block;
+    width: 50px;
+    float: left;
+}

@@ -74,9 +74,10 @@ def main(argv=None):
                 servers = []
                 logging.debug("*** BEGIN ITERATION ***")
                 for key,server in config.items("SERVERS"):
-                    logging.debug("Getting info from " + server)
+                    server_public,server_private = server.split(",")
+                    logging.debug("Getting info from " + server_private)
                     try:
-                        response = urllib2.urlopen(server)
+                        response = urllib2.urlopen(server_private)
                         output = json.load(response)
                         state = output["state"]
                         cpuLoad = output["cpuLoad"]
@@ -89,7 +90,7 @@ def main(argv=None):
                     #Create server status object and append to the server list
                     timestamp = int(round(time.time() * 1000))
                     server_item = {
-                        "server": server[:-4] + config.get("MAIN", "port"),
+                        "server": server_public,
                         "status": {
                                    "cost": config.get("MAIN", "cost"),
                                    "cpuLoad": cpuLoad,
@@ -116,7 +117,8 @@ def main(argv=None):
                         "servers": servers
                 }
                 answer = json.dumps(data)
-                #logging.debug(answer)
+                logging.debug("Data to post:")
+                logging.debug(answer)
                 #POST
                 for key,hydra in config.items("HYDRAS"):
                     logging.debug("Posting to " + hydra)                   
