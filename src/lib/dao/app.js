@@ -171,11 +171,11 @@ module.exports = function(colApp, config){
 								}
 							}
 
-							found = true;
+							serverFound = true;
 							break;
 						}
 					}
-					if(!found) {
+					if(!serverFound) {
 						oldApp.servers.push(newServer);
 					}
 
