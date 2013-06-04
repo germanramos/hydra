@@ -60,6 +60,7 @@ module.exports = function(colServer, config){
 	};
 
 	function clean(p_server){
+		if(p_server === null) return false;
 		var now = new Date().getTime();
 
 		var modified = false;
