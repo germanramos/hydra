@@ -53,7 +53,7 @@ function hydra(appId, overrideCache, f_cbk) {
 
 	function _GetApp(appId, f_callback){
 		if(overrideCache || !(appId in appServers) || (Date.now() - appServers[appId].lastUpdate > updateAppDelta)) {
-			_async('GET', hydraServers.list[0] + '/'+appId,
+			_async('GET', hydraServers.list[0] + '/app/'+ appId,
 			function(err, data){
 				console.log('_GetAppServers response', err, data);
 				if(!err) {
@@ -66,7 +66,9 @@ function hydra(appId, overrideCache, f_cbk) {
 				} else {
 					var srv = hydraServers.list.shift();
 					hydraServers.list.push(srv);
-					_GetApp(appId, f_callback);
+					setTimeout(function() {
+						_GetApp(appId, f_callback);
+					}, 2000);
 				}
 			});
 		} else {

@@ -20,13 +20,14 @@
 					console.log('App Servers for', app, result, err,',\n');
 				});
 
-				count++;
+				/*count++;
 				if(count >= max) {
 					clearInterval(interval);
-				}
+				}*/
 			}
 
-			interval = setInterval(getServers, 2000);
+			getServers();
+			//interval = setInterval(getServers, 2000);
 		});
 	</script>
 </head>
