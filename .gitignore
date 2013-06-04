@@ -146,6 +146,9 @@ Thumbs.db
 # Folder config file
 Desktop.ini
 
+# Log files
+*.log*
+
 
 #############
 ## Python
