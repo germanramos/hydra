@@ -1,30 +1,23 @@
-var commons = require('../../lib/commons')
-,	hero	= commons.hero
-,	hydra	= commons.hydra
-,	utils 	= require('../../lib/utils')
-;
+var commons = require('../../lib/commons'),
+	hero	= commons.hero,
+	hydra	= commons.hydra,
+	utils	= require('../../lib/utils');
 
 module.exports = new function (){
-
 	var _Servers;
 	var _Siblings;
 
 	function _httpGet(p_url, f_done, f_fail){
 		console.log("synchronizing with", p_url);
-		utils.httpGet(
-			p_url
-		, 
-			function(status, data){
-				if(status === 200){
-					data = JSON.parse(data);
-					f_done(data);
-				} 
-				else {
-					console.log('FAIL: get all apps');
-					f_fail(status);
-				}
+		utils.httpGet( p_url, function(status, data){
+			if(status === 200){
+				data = JSON.parse(data);
+				f_done(data);
+			} else {
+				console.log('FAIL: get all apps');
+				f_fail(status);
 			}
-		);
+		});
 	}
 
 	function _getServer(p_url, f_done, f_fail){
@@ -48,7 +41,7 @@ module.exports = new function (){
 			else {
 				p_servers[f].sibling = false;		// Force not sibling any server that is not currently as sibling
 			}
-			hero.server.update( p_server[f] );
+			hydra.server.update( p_servers[f] );
 		}
 	}
 
@@ -58,7 +51,7 @@ module.exports = new function (){
 
 	function _appsDone(p_apps){
 		for(var f=0, F=p_apps.length; f<F; f++) {
-			hero.app.update( p_apps[f] );
+			hydra.app.update( p_apps[f] );
 		}
 	}
 
@@ -77,7 +70,7 @@ module.exports = new function (){
 			if ( p_json[f].sibling === true ) {
 				_Siblings.push( p_json[f].url );		// Save siblings
 			}
-			_syncServer(p_json[f].url);
+			_syncServer(p_json[f].url + ':' + p_json[f].serverPort);
 		}
 	}
 
@@ -85,6 +78,6 @@ module.exports = new function (){
 		hydra.server.getAll(
 			_syncDone
 		);
-	}
+	};
 
-}
+};

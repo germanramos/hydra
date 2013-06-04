@@ -3,7 +3,7 @@ var server_api = require('../server_api'),
 
 module.exports = function(req, res){
 	try{
-		hydra.server.getAll(appId, function(items){
+		hydra.server.getAll(function(items){
 			if(items === null){
 				res.send(400,'Bad request');
 			} else {

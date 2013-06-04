@@ -9,11 +9,6 @@ var commons = require('../../lib/commons'),
 	hydra_sync = require('./hydra_sync.js')
 ;
 
-
-console.log('*************************************');
-console.log(hydra_sync);
-console.log('*************************************');
-
 module.exports = hero.worker (
 	function(self){
 		var dbHydra = self.db('config', self.config.db);

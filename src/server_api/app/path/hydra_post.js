@@ -9,9 +9,10 @@ module.exports = function(req, res){
 			status : req.body.status
 		};
 
-		hydra.server.getFromUrl(url, function(item){
+		hydra.server.getFromUrl(server.url, function(item){
 			if(item === null){
 				hydra.server.create(server, function(item){
+					console.log('created', item);
 					if(item === null){
 						res.send(400,'Bad request');
 					} else {
@@ -20,6 +21,7 @@ module.exports = function(req, res){
 				});
 			} else {
 				hydra.server.update(server, function(item){
+					console.log('updated', item);
 					if(item === null){
 						res.send(400,'Bad request');
 					} else {

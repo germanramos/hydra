@@ -3,7 +3,10 @@ var utils = require('../utils'),
 
 var defaultServer = {
 	url: null,
-	sibling: false
+	sibling: false,
+	clientPort: 7001,
+	serverPort: 7002
+
 	//	status: {
 	//		cpuLoad: 50, //Cpu load of the server 0-100
 	//		memLoad: 50, //Memory load of the server 0-100
