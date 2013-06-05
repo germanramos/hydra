@@ -48,7 +48,9 @@ var hydra = hydra || function () {
 					var srv = hydraServers.list.shift();
 					hydraServers.list.push(srv);
 
-					_GetHydraServers(f_callback);
+					setTimeout(function() {
+						_GetHydraServers(f_callback);
+					}, 100);
 				}
 			});
 		} else {
@@ -79,7 +81,9 @@ var hydra = hydra || function () {
 					var srv = hydraServers.list.shift();
 					hydraServers.list.push(srv);
 
-					_GetApp(appId, f_callback);
+					setTimeout(function() {
+						_get(appId, overrideCache, f_callback);
+					}, 100);
 				}
 			});
 		} else {

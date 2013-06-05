@@ -1,4 +1,5 @@
 {
+	"url": "http://localhost",
 	"db" : {
 		"host" : "localhost",
 		"port" : "27017",
@@ -22,6 +23,7 @@
 	},
 	"server" : {
 		"sync" : 10000,
-		"timeout" : 60000
+		"timeout" : 60000,
+		"update"  : 20000
 	}
 }
