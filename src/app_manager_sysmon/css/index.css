@@ -8,6 +8,7 @@
     right: 0px;
     font-weight: bold;
     cursor: pointer;
+    z-index: 99;
 }
 
 #infoServer {
@@ -15,6 +16,25 @@
     top: 0px;
     left: 0px;
     width: 400px;
+    background-color: lightgray;
+    border: solid 1px;
+    z-index: 99;
+}
+
+#configDiv {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    border: solid 1px;
+    z-index: 99;
+    background-color: lightgray;
+}
+
+#addWatcherButton {
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+    z-index: 99;  
 }
 
 #title {
@@ -25,12 +45,14 @@
 }
 
 .cloud {
-    border: solid 1px;
+    border: solid 3px;
     float: left;
     border-radius: 20px;
     padding: 5px;
     margin: 5px;
     overflow: hidden;
+    background-color: RGB(164,194,244);
+    border-color: RGB(17,85,204);
     /*
     background-image: url("../img/Simple_Cloud.svg");
     background-position: center center;
@@ -40,13 +62,26 @@
     */
 }
 
+.cloud .title {
+    font-weight: bold;
+    text-align: center;
+}
+
+.server.active {
+    border-color: RGB(56,118,29);
+    background-color: RGB(182,215,168);
+}
+
 .server {
-    border: solid 1px;
+    border-color: RGB(204,0,0);
+    background-color: RGB(234,153,153);
+    
+    border: solid 3px;
     float: left;
     border-radius: 20px;
     padding: 5px;
     margin: 5px;
-    width: 280px;
+    width: 276px;
     overflow: hidden;
 }
 
@@ -59,4 +94,27 @@
     display: inline-block;
     width: 50px;
     float: left;
+}
+
+.watcher {
+    border-color: RGB(192,144,0);
+    background-color: RGB(255,229,153);
+    
+    border: solid 3px;
+    float: left;
+    border-radius: 20px;
+    padding: 5px;
+    margin: 5px;
+    width: auto;
+    max-width: 276px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.watcher .ip {
+    font-weight: bold;
+}
+
+.watcher .ip, .watcher .where {
+    display: block;
 }

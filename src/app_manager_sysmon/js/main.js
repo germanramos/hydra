@@ -3,6 +3,7 @@ INIT_HYDRA_URL = "http://localhost:7002/app/time";
 
 var refresh = true;
 var interval;
+var watch = [];
 
 $(document).ajaxStop(function() {
 	console.log("Removing obsolete servers");
@@ -10,7 +11,7 @@ $(document).ajaxStop(function() {
 	$(".server").each(function() {
 		if (this.getAttribute('checked') == 'false') {
 			parent = this.parentNode;
-			if (parent.childNodes.length < 6) {
+			if ($(parent).find(".server").length < 2) {
 				parent.parentNode.removeChild(parent) //Remove the cloud
 			} else {
 				parent.removeChild(this); //Remove the server
@@ -53,6 +54,8 @@ function process_app(app) {
 		for (var key in server.status.stateEvents) {
 			if (server.status.stateEvents[key] == 0) {
 				process_server(app, server, server_sysmon);
+			} else if ($("#configShowUnavailable:checked").length > 0) {
+			    paint_server(app, server, [], false);
 			}
 			break;
 		}
@@ -64,7 +67,7 @@ function process_server(app, server, server_sysmon) {
         url: server_sysmon,
         success: function ( data ) {
         	console.log("Getted statics from server " + server_sysmon)
-        	paint_server(app, server, data.connections);
+        	paint_server(app, server, data.connections, true);
         },
         error: function ( data ) {
         	console.log("Error when getting static from server " + server_sysmon);
@@ -72,12 +75,12 @@ function process_server(app, server, server_sysmon) {
     })
 }
 
-function paint_server(app, server, connections) { 
+function paint_server(app, server, connections, alive) { 
 	console.log("Painting server: " + server.server);
 	var serverElement = document.getElementById(server.server)
 	if (serverElement == null) {
 		serverElement = document.createElement("div");
-		create_server(app, serverElement, server, connections);
+		create_server(app, serverElement, server, connections, alive);
 		//Create cloud if needed
 		cloud = parseCloud(server.server);
 		var cloudElement = document.getElementById(cloud)
@@ -85,8 +88,9 @@ function paint_server(app, server, connections) {
 			cloudElement = document.createElement("div");
 			cloudElement.setAttribute('id', cloud);
 			cloudElement.setAttribute('class', 'cloud');
+			cloudElement.ondblclick = function() { $(this).remove(); }
 			divElement = document.createElement("div");
-			divElement.setAttribute('class', 'center');
+			divElement.setAttribute('class', 'title');
 			divElement.appendChild(document.createTextNode(cloud));
 			cloudElement.appendChild(divElement);
 			document.body.appendChild(cloudElement);
@@ -96,14 +100,14 @@ function paint_server(app, server, connections) {
 		//Append server
 		cloudElement.appendChild(serverElement);
 		//Set an appropiate width to cloud div if it is no manual resized and have more than one server
-		if (cloudElement.childNodes.length > 6 && cloudElement.style.width == "" ) {
-			cloudElement.style.width = "610px";
+		if ($(cloudElement).find(".server").length > 1 && cloudElement.style.width == "" ) {
+			cloudElement.style.width = "605px";
 		}
 	} else {
 		while (serverElement.hasChildNodes()) {
 			serverElement.removeChild(serverElement.lastChild);
 		}
-		create_server(app, serverElement, server, connections);
+		create_server(app, serverElement, server, connections, alive);
 	}  	
 }
 
@@ -119,18 +123,41 @@ function parseCloud(url) {
 	}
 }
 
-function create_server(app, serverElement, server, connections) {
+function create_server(app, serverElement, server, connections, alive) {
 	serverElement.setAttribute('id', server.server);
-	serverElement.setAttribute('class', 'server');
 	serverElement.setAttribute('checked', 'true');
-	serverElement.appendChild(create_row("ID", app.appId));
-	serverElement.appendChild(create_row("URL", server.server));
-	serverElement.appendChild(create_row("CPU", server.status.cpuLoad));
-	serverElement.appendChild(create_row("MEM", server.status.memLoad));
-	filtered = connections.filter(function(element, index, array) {
-		return element[5]=="ESTABLISHED"
-		});
-	serverElement.appendChild(create_row("CON", filtered.length));
+    serverElement.appendChild(create_row("ID", app.appId));
+    serverElement.appendChild(create_row("URL", server.server));
+    serverElement.ondblclick = function(e) { $(this).remove(); e.stopPropagation(); return false;}
+    $(serverElement).draggable();
+	if (alive) {
+	   serverElement.setAttribute('class', 'server active');
+	   serverElement.appendChild(create_row("CPU", server.status.cpuLoad));
+	   serverElement.appendChild(create_row("MEM", server.status.memLoad));
+	   filtered = connections.filter(function(element, index, array) {
+	       //TODO: make lines
+	        //console.log(connections);
+            for (var i=0; i < connections.length; i++) {
+                if (connections[i][5]=="ESTABLISHED") {
+	                var ip = connections[i][4][0];
+	                if ($.inArray(ip, watch) >= 0) {
+	                    $('#'+ ip.replace(/\./g,"\\.") + " .where").each(function () {
+	                        this.innerHTML = server.server;
+	                    }); 
+	                    //break;
+	                }
+	                return true;
+                } else {
+                    return false;
+                }
+            } 
+	       //End make lines
+	       //return element[5]=="ESTABLISHED"
+	   });
+	   serverElement.appendChild(create_row("CON", filtered.length));
+	} else {
+	   serverElement.setAttribute('class', 'server');
+	}
 }
 
 function create_row(key, value) {
@@ -154,19 +181,50 @@ window.onload = function() {
 	$("#title").html("Hydra System Monitor");	
 	
 	$("#refreshButton").click(function () {
-		if (this.innerHTML == "Start Refresh") {
+		if (this.value == "Start Refresh") {
 			init_refresh();
 			refresh = true;
-			this.innerHTML = "Stop Refresh"
+			this.value = "Stop Refresh"
 			this.style.backgroundColor = "Red";
 		} else {
 			clearInterval(interval);
 			refresh = false;
-			this.innerHTML = "Start Refresh";
+			this.value = "Start Refresh";
 			this.style.backgroundColor = "Green"
 		}
 	});
 	
+	$("#addWatcherButton").click(function () {
+	    var ip = window.prompt("Enter client ip:", "127.0.0.1");
+	    if (document.getElementById(ip) != null) {
+	       alert("Watcher already exists");
+	       return;
+	    }
+	    
+	    watch.push(ip);
+	    watcherElement = document.createElement("div");
+	    watcherElement.setAttribute('id', ip);
+	    watcherElement.setAttribute('class', 'watcher');
+	    
+	    var ipElement = document.createElement("span");
+        ipElement.setAttribute('class', 'ip');
+        ipElement.appendChild(document.createTextNode(ip));
+        watcherElement.appendChild(ipElement);
+        
+        var whereElement = document.createElement("span");
+        whereElement.setAttribute('class', 'where');
+        whereElement.appendChild(document.createTextNode("unknown"));
+        watcherElement.appendChild(whereElement);
+        
+        watcherElement.ondblclick = function() {
+            var index = watch.indexOf(ip)
+            watch.splice(index, 1);
+            $(this).remove();
+        }
+	    
+        document.body.appendChild(watcherElement);
+        $(watcherElement).draggable();
+    });
+	
     init_refresh();
-    
 }
