@@ -9,25 +9,13 @@ module.exports = function(req, res){
 			status : req.body.status
 		};
 
-		hydra.server.getFromUrl(server.url, function(item){
-			if(item === null){
-				hydra.server.create(server, function(item){
-					console.log('created', item);
-					if(item === null){
-						res.send(400,'Bad request');
-					} else {
-						res.send(200,{});
-					}
-				});
+
+		hydra.server.update(server, function(err){
+			console.log('updated', item);
+			if(err !== null){
+				res.send(400,'Bad request');
 			} else {
-				hydra.server.update(server, function(item){
-					console.log('updated', item);
-					if(item === null){
-						res.send(400,'Bad request');
-					} else {
-						res.send(200,{});
-					}
-				});
+				res.send(200,{});
 			}
 		});
 	} catch (ex){

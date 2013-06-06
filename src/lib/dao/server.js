@@ -134,7 +134,7 @@ module.exports = function(colServer, config){
 				clean(oldServer);
 
 				colServer.update(find, oldServer, function(err){
-					if(p_cbk) p_cbk();
+					if(p_cbk) p_cbk(err);
 				});
 			}
 		});
