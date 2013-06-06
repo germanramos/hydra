@@ -5,8 +5,8 @@ var defaultServer = {
 	url: null,
 	sibling: false,
 	clientPort: 7001,
-	serverPort: 7002
-
+	serverPort: 7002,
+	cloud: ''
 	//	status: {
 	//		cpuLoad: 50, //Cpu load of the server 0-100
 	//		memLoad: 50, //Memory load of the server 0-100
@@ -29,16 +29,14 @@ module.exports = function(colServer, config){
 			return;
 		}
 
-		// Clean up the server to be inserted
 		// If the server is not available in any remaining event
 		// we skip the insert
-		var modified = clean(p_server);
 		var events = p_server.status.stateEvents;
 
 		var available = false;
 		for(var key in events) {
 			var eventState = events[key];
-			if(eventState === enums.server.stateEnum.READY){
+			if(eventState !== enums.server.stateEnum.UNAVAILABLE){
 				available = true;
 				break;
 			}
