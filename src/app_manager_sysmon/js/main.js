@@ -7,18 +7,24 @@ var watch = [];
 
 $(document).ajaxStop(function() {
 	console.log("Removing obsolete servers");
-	//Delete all non refreshed servers
+	// Delete all non refreshed servers
 	$(".server").each(function() {
 		if (this.getAttribute('checked') == 'false') {
 			parent = this.parentNode;
 			if ($(parent).find(".server").length < 2) {
-				parent.parentNode.removeChild(parent) //Remove the cloud
+				parent.parentNode.removeChild(parent) // Remove the cloud
 			} else {
-				parent.removeChild(this); //Remove the server
+				parent.removeChild(this); // Remove the server
 			}
 		}
 	});
-	//Set up refresh interval
+	// Update all non refreshed watchers
+	$(".watcher").each(function() {
+		if (this.getAttribute('checked') == 'false') {
+			$(this).find(".where").html("unknown");
+		}
+	});
+	// Set up refresh interval
 	if (refresh) {
 		interval = setInterval(init_refresh, INTERVAL);
 	}
@@ -26,69 +32,78 @@ $(document).ajaxStop(function() {
 
 function init_refresh() {
 	clearInterval(interval);
-	
-	//Mark all server as not refreshed
+
+	// Mark all server as not refreshed
 	$(".server").each(function() {
 		this.setAttribute('checked', 'false');
 	});
-	//Get app info from hydra
-    $.ajax({
-        url: $("#infoServer").val(),
-        success: function ( data ) {
-        	console.log("Getted app from hydra succesfully")
-        	process_app(data)
-        },
-        error: function ( data ) {
-        	console.log("Error when getting app from hydra: " + data);
-        }
-    });
+	
+	// Mark all watchers as not refreshed
+	$(".watcher").each(function() {
+		this.setAttribute('checked', 'false');
+	});
+	
+	// Get app info from hydra
+	$.ajax({
+		url : $("#infoServer").val(),
+		success : function(data) {
+			console.log("Getted app from hydra succesfully")
+			process_app(data)
+		},
+		error : function(data) {
+			console.log("Error when getting app from hydra: " + data);
+		}
+	});
 }
 
 function process_app(app) {
 	servers = app.servers
-	for (var i=0; i<servers.length; i++) {
+	for ( var i = 0; i < servers.length; i++) {
 		var server = servers[i];
 		console.log("Detected server: " + server.server);
 		var splitted = server.server.split(":");
-		var server_sysmon = splitted[0] + ":" + splitted[1]+ ":7777/extended"
-		for (var key in server.status.stateEvents) {
+		var server_sysmon = splitted[0] + ":" + splitted[1] + ":7777/extended"
+		for ( var key in server.status.stateEvents) {
 			if (server.status.stateEvents[key] == 0) {
 				process_server(app, server, server_sysmon);
 			} else if ($("#configShowUnavailable:checked").length > 0) {
-			    paint_server(app, server, [], false);
+				paint_server(app, server, [], false);
 			}
 			break;
 		}
-	}	
+	}
 }
 
-function process_server(app, server, server_sysmon) {   	
+function process_server(app, server, server_sysmon) {
 	$.ajax({
-        url: server_sysmon,
-        success: function ( data ) {
-        	console.log("Getted statics from server " + server_sysmon)
-        	paint_server(app, server, data.connections, true);
-        },
-        error: function ( data ) {
-        	console.log("Error when getting static from server " + server_sysmon);
-        }
-    })
+		url : server_sysmon,
+		success : function(data) {
+			console.log("Getted statics from server " + server_sysmon)
+			paint_server(app, server, data.connections, true);
+		},
+		error : function(data) {
+			console.log("Error when getting static from server "
+					+ server_sysmon);
+		}
+	})
 }
 
-function paint_server(app, server, connections, alive) { 
+function paint_server(app, server, connections, alive) {
 	console.log("Painting server: " + server.server);
 	var serverElement = document.getElementById(server.server)
 	if (serverElement == null) {
 		serverElement = document.createElement("div");
 		create_server(app, serverElement, server, connections, alive);
-		//Create cloud if needed
+		// Create cloud if needed
 		cloud = parseCloud(server.server);
 		var cloudElement = document.getElementById(cloud)
 		if (cloudElement == null) {
 			cloudElement = document.createElement("div");
 			cloudElement.setAttribute('id', cloud);
 			cloudElement.setAttribute('class', 'cloud');
-			cloudElement.ondblclick = function() { $(this).remove(); }
+			cloudElement.ondblclick = function() {
+				$(this).remove();
+			}
 			divElement = document.createElement("div");
 			divElement.setAttribute('class', 'title');
 			divElement.appendChild(document.createTextNode(cloud));
@@ -97,10 +112,12 @@ function paint_server(app, server, connections, alive) {
 			$(cloudElement).resizable();
 			$(cloudElement).draggable();
 		}
-		//Append server
+		// Append server
 		cloudElement.appendChild(serverElement);
-		//Set an appropiate width to cloud div if it is no manual resized and have more than one server
-		if ($(cloudElement).find(".server").length > 1 && cloudElement.style.width == "" ) {
+		// Set an appropiate width to cloud div if it is no manual resized and
+		// have more than one server
+		if ($(cloudElement).find(".server").length > 1
+				&& cloudElement.style.width == "") {
 			cloudElement.style.width = "605px";
 		}
 	} else {
@@ -108,16 +125,16 @@ function paint_server(app, server, connections, alive) {
 			serverElement.removeChild(serverElement.lastChild);
 		}
 		create_server(app, serverElement, server, connections, alive);
-	}  	
+	}
 }
 
 function parseCloud(url) {
 	var found = 0;
-	for (var i=url.length-1; i>=0; i--) {
+	for ( var i = url.length - 1; i >= 0; i--) {
 		if (url[i] == '.') {
 			found++
 			if (found == 2) {
-				return url.substring(i+1, url.lastIndexOf(':'));
+				return url.substring(i + 1, url.lastIndexOf(':'));
 			}
 		}
 	}
@@ -126,51 +143,54 @@ function parseCloud(url) {
 function create_server(app, serverElement, server, connections, alive) {
 	serverElement.setAttribute('id', server.server);
 	serverElement.setAttribute('checked', 'true');
-    serverElement.appendChild(create_row("ID", app.appId));
-    serverElement.appendChild(create_row("URL", server.server));
-    serverElement.ondblclick = function(e) { $(this).remove(); e.stopPropagation(); return false;}
-    $(serverElement).draggable();
+	serverElement.appendChild(create_row("ID", app.appId));
+	serverElement.appendChild(create_row("URL", server.server));
+	serverElement.ondblclick = function(e) {
+		$(this).remove();
+		e.stopPropagation();
+		return false;
+	}
+	$(serverElement).draggable();
 	if (alive) {
-	   serverElement.setAttribute('class', 'server active');
-	   serverElement.appendChild(create_row("CPU", server.status.cpuLoad));
-	   serverElement.appendChild(create_row("MEM", server.status.memLoad));
-	   filtered = connections.filter(function(element, index, array) {
-	       //TODO: make lines
-	        //console.log(connections);
-            for (var i=0; i < connections.length; i++) {
-                if (connections[i][5]=="ESTABLISHED") {
-	                var ip = connections[i][4][0];
-	                if ($.inArray(ip, watch) >= 0) {
-	                    $('#'+ ip.replace(/\./g,"\\.") + " .where").each(function () {
-	                        this.innerHTML = server.server;
-	                    }); 
-	                    //break;
-	                }
-	                return true;
-                } else {
-                    return false;
-                }
-            } 
-	       //End make lines
-	       //return element[5]=="ESTABLISHED"
-	   });
-	   serverElement.appendChild(create_row("CON", filtered.length));
+		serverElement.setAttribute('class', 'server active');
+		serverElement.appendChild(create_row("CPU", server.status.cpuLoad));
+		serverElement.appendChild(create_row("MEM", server.status.memLoad));
+		filtered = connections.filter(function(element, index, array) {
+			// TODO: make lines
+			// console.log(connections);
+			if (element[5] == "ESTABLISHED") {
+				var ip = element[4][0];
+				if ($.inArray(ip, watch) >= 0) {
+					$('#' + ip.replace(/\./g, "\\.") + " .where").each(
+							function() {
+								this.innerHTML = server.server;
+								this.parentNode.setAttribute('checked', 'true');
+							});
+				}
+				return true;
+			} else {
+				return false;
+			}
+			// End make lines
+			// return element[5]=="ESTABLISHED"
+		});
+		serverElement.appendChild(create_row("CON", filtered.length));
 	} else {
-	   serverElement.setAttribute('class', 'server');
+		serverElement.setAttribute('class', 'server');
 	}
 }
 
 function create_row(key, value) {
 	var pElement = document.createElement("p");
-	
+
 	var keyElement = document.createElement("span");
 	keyElement.setAttribute('class', 'key');
-	keyElement.appendChild(document.createTextNode(key));	
-	
+	keyElement.appendChild(document.createTextNode(key));
+
 	var valueElement = document.createElement("span");
 	valueElement.setAttribute('class', 'value');
 	valueElement.appendChild(document.createTextNode(value));
-	
+
 	pElement.appendChild(keyElement);
 	pElement.appendChild(valueElement);
 	return pElement
@@ -178,9 +198,9 @@ function create_row(key, value) {
 
 window.onload = function() {
 	$("#infoServer").val(INIT_HYDRA_URL);
-	$("#title").html("Hydra System Monitor");	
-	
-	$("#refreshButton").click(function () {
+	$("#title").html("Hydra System Monitor");
+
+	$("#refreshButton").click(function() {
 		if (this.value == "Start Refresh") {
 			init_refresh();
 			refresh = true;
@@ -193,38 +213,39 @@ window.onload = function() {
 			this.style.backgroundColor = "Green"
 		}
 	});
-	
-	$("#addWatcherButton").click(function () {
-	    var ip = window.prompt("Enter client ip:", "127.0.0.1");
-	    if (document.getElementById(ip) != null) {
-	       alert("Watcher already exists");
-	       return;
-	    }
-	    
-	    watch.push(ip);
-	    watcherElement = document.createElement("div");
-	    watcherElement.setAttribute('id', ip);
-	    watcherElement.setAttribute('class', 'watcher');
-	    
-	    var ipElement = document.createElement("span");
-        ipElement.setAttribute('class', 'ip');
-        ipElement.appendChild(document.createTextNode(ip));
-        watcherElement.appendChild(ipElement);
-        
-        var whereElement = document.createElement("span");
-        whereElement.setAttribute('class', 'where');
-        whereElement.appendChild(document.createTextNode("unknown"));
-        watcherElement.appendChild(whereElement);
-        
-        watcherElement.ondblclick = function() {
-            var index = watch.indexOf(ip)
-            watch.splice(index, 1);
-            $(this).remove();
-        }
-	    
-        document.body.appendChild(watcherElement);
-        $(watcherElement).draggable();
-    });
-	
-    init_refresh();
+
+	$("#addWatcherButton").click(function() {
+		var ip = window.prompt("Enter client ip:", "127.0.0.1");
+		if (document.getElementById(ip) != null) {
+			alert("Watcher already exists");
+			return;
+		}
+
+		watch.push(ip);
+		watcherElement = document.createElement("div");
+		watcherElement.setAttribute('id', ip);
+		watcherElement.setAttribute('class', 'watcher');
+		watcherElement.setAttribute('checked', 'true');
+
+		var ipElement = document.createElement("span");
+		ipElement.setAttribute('class', 'ip');
+		ipElement.appendChild(document.createTextNode(ip));
+		watcherElement.appendChild(ipElement);
+
+		var whereElement = document.createElement("span");
+		whereElement.setAttribute('class', 'where');
+		whereElement.appendChild(document.createTextNode("unknown"));
+		watcherElement.appendChild(whereElement);
+
+		watcherElement.ondblclick = function() {
+			var index = watch.indexOf(ip)
+			watch.splice(index, 1);
+			$(this).remove();
+		}
+
+		document.body.appendChild(watcherElement);
+		$(watcherElement).draggable();
+	});
+
+	init_refresh();
 }
