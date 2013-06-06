@@ -91,9 +91,9 @@ def main(argv=None):
                     timestamp = int(round(time.time() * 1000))
                     server_item = {
                         "server": server_public,
+                        "cost": config.get("MAIN", "cost"),
+                        "cloud": config.get("MAIN", "cloud"),
                         "status": {
-                                   "cost": config.get("MAIN", "cost"),
-                                   "cloud": config.get("MAIN", "cloud"),
                                    "cpuLoad": cpuLoad,
                                    "memLoad": memLoad,
                                    "timeStamp": timestamp,
