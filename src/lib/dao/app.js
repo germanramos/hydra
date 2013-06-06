@@ -39,11 +39,7 @@ module.exports = function(colApp, config){
 		}
 
 		colApp.insert(app, {w:1}, function(err, items){
-			if(err || items.length === 0){
-				p_cbk(null);
-			} else {
-				p_cbk(items[0]);
-			}
+			p_cbk(err);
 		});
 	};
 

@@ -48,14 +48,16 @@ var apps = [
 
 apps[0].localStrategyEvents[now+10000] = localStrategyEnum.SERVER_LOAD;
 apps[0].cloudStrategyEvents[now+10000] = cloudStrategyEnum.INDIFFERENT;
-apps[0].servers.push(generateServer('http://server1/app', now + 10000, 40));
-apps[0].servers.push(generateServer('http://server2/app', now + 10000, 11));
-apps[0].servers.push(generateServer('http://server3/app', now + 10000, 10));
-apps[0].servers.push(generateServer('http://server4/app', now + 10000, 10));
+apps[0].servers.push(generateServer('http://server1/app', 'cloudB', 1, now, 40));
+apps[0].servers.push(generateServer('http://server2/app', 'cloudA', 1, now + 10000, 30));
+apps[0].servers.push(generateServer('http://server3/app', 'cloudA', 1, now + 10000, 20));
+apps[0].servers.push(generateServer('http://server4/app', 'cloudA', 1, now + 10000, 10));
 
-function generateServer(url, timeStamp, load){
+function generateServer(url, cloud, cost, timeStamp, load){
 	var server = {
 		server: url,
+		cloud: cloud,
+		cost: cost,
 		status: {
 			cpuLoad: load, //Cpu load of the server 0-100
 			memLoad: load, //Memory load of the server 0-100
@@ -83,11 +85,7 @@ function main(){
 var registered = 0;
 function registerApp(app, cbk){
 	registered++;
-	var data = {
-		localStrategyEvents : app.localStrategyEvents,
-		cloudStrategyEvents : app.cloudStrategyEvents,
-		servers: app.servers
-	};
+	var data = utils.merge({}, app);
 
 	utils.httpPost('http://'+server_api.host+':'+server_api.port+'/app/'+app.appId, data ,function(status, data){
 		if(status == 200){
@@ -140,15 +138,10 @@ function getAllApps(cbk){
 }
 
 function getAllEnd(){
-
 	//updating server status
-	var data = {
-		localStrategyEvents : apps[0].localStrategyEvents,
-		cloudStrategyEvents : apps[0].cloudStrategyEvents,
-		servers: [
-			generateServer('http://server2/app', now+15)
-		]
-	};
+
+	var data = utils.merge({}, apps[0]);
+	data.servers = [generateServer('http://server2/app', 'cloudA', 1, now + 10000, 30)];
 
 	utils.httpPost('http://'+server_api.host+':'+server_api.port+'/app/'+apps[0].appId, data ,function(status, data){
 		if(status == 200){
