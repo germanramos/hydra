@@ -189,7 +189,7 @@ module.exports = function(colApp, config){
 				clean(oldApp);
 
 				colApp.update(find, oldApp, function(err){
-					if(p_cbk) p_cbk();
+					if(p_cbk) p_cbk(err);
 				});
 			}
 		});

@@ -7,8 +7,8 @@ module.exports = function(req, res){
 		var app = req.body;
 		app.appId = appId;
 
-		hydra.app.update(app, function(newApp){
-			if(newApp === null){
+		hydra.app.update(app, function(err){
+			if(err !== null){
 				res.send(400,'Bad request');
 			} else {
 				res.send(200,{});
