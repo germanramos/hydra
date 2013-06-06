@@ -147,26 +147,3 @@ exports.addHeaders = function addHeaders(allowedOrigins){
 		}
 	};
 };
-
-// Count the number of items on an array
-// or keys in an object
-exports.count = function (item) {
-	if('length' in item){
-		return item.length;
-	}
-
-	var c = 0;
-	for(var key in item){
-		c++;
-	}
-	return c;
-};
-
-// Return the keys in an object
-exports.keys = function (item) {
-	var k = [];
-	for(var key in item){
-		k.push(key);
-	}
-	return k;
-};
