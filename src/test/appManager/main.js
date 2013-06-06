@@ -46,19 +46,19 @@ var apps = [
 }
 ];
 
-apps[0].localStrategyEvents[now+10000] = localStrategyEnum.ROUND_ROBIN;
-apps[0].cloudStrategyEvents[now+10000] = cloudStrategyEnum.ROUND_ROBIN;
-apps[0].servers.push(generateServer('http://server1/app', now + 10000));
-apps[0].servers.push(generateServer('http://server2/app', now + 10000));
-apps[0].servers.push(generateServer('http://server3/app', now + 10000));
-apps[0].servers.push(generateServer('http://server4/app', now + 10000));
+apps[0].localStrategyEvents[now+10000] = localStrategyEnum.SERVER_LOAD;
+apps[0].cloudStrategyEvents[now+10000] = cloudStrategyEnum.INDIFFERENT;
+apps[0].servers.push(generateServer('http://server1/app', now + 10000, 40));
+apps[0].servers.push(generateServer('http://server2/app', now + 10000, 11));
+apps[0].servers.push(generateServer('http://server3/app', now + 10000, 10));
+apps[0].servers.push(generateServer('http://server4/app', now + 10000, 10));
 
-function generateServer(url, timeStamp){
+function generateServer(url, timeStamp, load){
 	var server = {
 		server: url,
 		status: {
-			cpuLoad: Math.floor(Math.random()*100), //Cpu load of the server 0-100
-			memLoad: Math.floor(Math.random()*100), //Memory load of the server 0-100
+			cpuLoad: load, //Cpu load of the server 0-100
+			memLoad: load, //Memory load of the server 0-100
 			timeStamp: timeStamp, //UTC time stamp of this info
 			stateEvents: {}
 		}

@@ -210,6 +210,17 @@ module.exports = function(colApp, config){
 		});
 	};
 
+	self.availableServers = function (p_appId, p_cbk){
+		self.getFromId(p_appId, function(app){
+			if(app === null){
+				p_cbk(null);
+				return;
+			}
+
+			self.balanceServers(app, p_cbk);
+		});
+	};
+
 	function onlineServers(p_app){
 		var servers = [];
 
@@ -226,6 +237,22 @@ module.exports = function(colApp, config){
 		return servers;
 	}
 
+	function onlineServersLoad(p_app){
+		var servers = [];
+
+		for(var serverIdx in p_app.servers){
+			var server = p_app.servers[serverIdx];
+			for(var serverStateIdx in server.status.stateEvents){
+				if(server.status.stateEvents[serverStateIdx] == enums.app.stateEnum.READY){
+					servers.push(server.status.cpuLoad + server.status.memLoad);
+				}
+
+				break;
+			}
+		}
+		return servers;
+	}
+
 	function localStrategy(p_app){
 		//current strategy
 		var currentStrategy = enums.app.localStrategyEnum.INDIFFERENT;
@@ -233,20 +260,8 @@ module.exports = function(colApp, config){
 			currentStrategy = p_app.localStrategyEvents[localStrategyIdx];
 			break;
 		}
-		return currentStrategy;		
+		return currentStrategy;
 	}
-
-	self.availableServers = function (p_appId, p_cbk){
-		self.getFromId(p_appId, function(app){
-			if(app === null){
-				p_cbk(null);
-				return;
-			}
-
-			self.balanceServers(app, p_cbk);
-		});
-	};
-
 
 	var localCurrentRoundRobin = {};
 	self.balanceServers = function(p_app, p_cbk){
@@ -255,9 +270,12 @@ module.exports = function(colApp, config){
 		var currentLocalStrategy = localStrategy(p_app);
 
 		switch(currentLocalStrategy){
+
+			//LOCAL INDIFFERENT
 			case enums.app.localStrategyEnum.INDIFFERENT:
 				break;
 
+			//LOCAL ROUND ROBIN
 			case enums.app.localStrategyEnum.ROUND_ROBIN:
 				if(localCurrentRoundRobin[appId] === undefined){
 					localCurrentRoundRobin[appId] = 0;
@@ -267,10 +285,32 @@ module.exports = function(colApp, config){
 					localCurrentRoundRobin[appId] = 0;
 				}
 
+				//cortamos la baraja :)
 				var pre = servers.slice(0,localCurrentRoundRobin[appId]);
 				var post = servers.slice(localCurrentRoundRobin[appId]);
 				servers = post.concat(pre);
 				localCurrentRoundRobin[appId]++;
+				break;
+
+			//LOCAL SERVER LOAD
+			case enums.app.localStrategyEnum.SERVER_LOAD:
+				var loads = onlineServersLoad(p_app);
+
+				var serverLoads = [];
+				var s,S = servers.length;
+				for(s=0;s<S;s++){
+					serverLoads.push({k:servers[s],v:loads[s]});
+				}
+				console.log('pre', serverLoads);
+				serverLoads.sort(function(a,b){
+					return a.v - b.v;
+				});
+				console.log('post', serverLoads);
+				servers = [];
+				for(s=0;s<S;s++){
+					servers.push(serverLoads[s].k);
+				}
+
 				break;
 
 			default:
