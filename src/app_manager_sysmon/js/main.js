@@ -95,7 +95,8 @@ function paint_server(app, server, connections, alive) {
 		serverElement = document.createElement("div");
 		create_server(app, serverElement, server, connections, alive);
 		// Create cloud if needed
-		cloud = parseCloud(server.server);
+		cloud = server.cloud;
+		//cloud= parseCloud(server.server);
 		var cloudElement = document.getElementById(cloud)
 		if (cloudElement == null) {
 			cloudElement = document.createElement("div");
