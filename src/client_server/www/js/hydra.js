@@ -11,8 +11,8 @@ var hydra = hydra || function () {
 		}
 		*/
 	},
-		updateHydraDelta = 60000,
-		updateAppDelta = 10000,
+		updateHydraDelta = 60000, //timeout de cache de hydra servers
+		updateAppDelta = 10000, //timeout de cache de app servers
 		retryOnFail = 2000,
 		overrideCache = false;
 
@@ -36,7 +36,6 @@ var hydra = hydra || function () {
 		if((Date.now() - hydraServers.lastUpdate) > updateHydraDelta ){
 			_async('GET', hydraServers.list[0] + '/hydra',
 			function(err, data){
-				console.log('_GetHydraServers response', err, data);
 				if(!err) {
 					hydraServers.list = data;
 					hydraServers.lastUpdate = Date.now();
@@ -50,11 +49,10 @@ var hydra = hydra || function () {
 
 					setTimeout(function() {
 						_GetHydraServers(f_callback);
-					}, 100);
+					}, retryOnFail);
 				}
 			});
 		} else {
-			console.log('_GetHydraServers cache response', null, hydraServers.list);
 			f_callback(null);
 		}
 	}
@@ -66,7 +64,6 @@ var hydra = hydra || function () {
 		if(getFromServer) {
 			_async('GET', hydraServers.list[0] + '/app/'+ appId,
 			function(err, data){
-				console.log('_GetAppServers response', err, data);
 				if(!err) {
 					// Store the app in the local cache
 					appServers[appId] = {
@@ -83,11 +80,10 @@ var hydra = hydra || function () {
 
 					setTimeout(function() {
 						_get(appId, overrideCache, f_callback);
-					}, 100);
+					}, retryOnFail);
 				}
 			});
 		} else {
-			console.log('_GetAppServers cache response', null, appServers[appId].list);
 			f_callback(null, appServers[appId].list);
 		}
 	}
@@ -127,7 +123,6 @@ var hydra = hydra || function () {
 	}
 
 	function _async(p_method, p_url, f_success, data) {
-		console.log('_async', arguments);
 		var req = _instanceHttpReq();
 		req.open(p_method, p_url+'?_='+(new Date().getTime()), true);
 		req.onreadystatechange  = function() {
