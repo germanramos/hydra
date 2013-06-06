@@ -57,9 +57,9 @@ module.exports = function(colApp, config){
 		});
 	};
 
-	self.getFromId = function(p_id, p_cbk){
+	self.getFromId = function(p_appId, p_cbk){
 		var find = {
-			appId: p_id
+			appId: p_appId
 		};
 
 		colApp.findOne(find, {}, function(err, item){
@@ -210,46 +210,73 @@ module.exports = function(colApp, config){
 		});
 	};
 
-	self.availableServers = function (p_id, p_cbk){
-		self.getFromId(p_id, function(app){
-			var servers = [];
+	function onlineServers(p_app){
+		var servers = [];
+
+		for(var serverIdx in p_app.servers){
+			var server = p_app.servers[serverIdx];
+			for(var serverStateIdx in server.status.stateEvents){
+				if(server.status.stateEvents[serverStateIdx] == enums.app.stateEnum.READY){
+					servers.push(server.server);
+				}
+
+				break;
+			}
+		}
+		return servers;
+	}
+
+	function localStrategy(p_app){
+		//current strategy
+		var currentStrategy = enums.app.localStrategyEnum.INDIFFERENT;
+		for(var localStrategyIdx in p_app.localStrategyEvents){
+			currentStrategy = p_app.localStrategyEvents[localStrategyIdx];
+			break;
+		}
+		return currentStrategy;		
+	}
+
+	self.availableServers = function (p_appId, p_cbk){
+		self.getFromId(p_appId, function(app){
 			if(app === null){
 				p_cbk(null);
 				return;
 			}
 
-			//get online servers
-			for(var serverIdx in app.servers){
-				var server = app.servers[serverIdx];
-				for(var serverStateIdx in server.status.stateEvents){
-					if(server.status.stateEvents[serverStateIdx] == enums.app.stateEnum.READY){
-						servers.push(server.server);
-					}
-
-					break;
-				}
-			}
-
-			//current strategy
-			var currentStrategy = enums.app.localStrategyEnum.INDIFFERENT;
-			for(var localStrategyIdx in app.localStrategyEvents){
-				currentStrategy = app.localStrategyEvents[localStrategyIdx];
-				break;
-			}
-
-			self.balanceServers(servers, currentStrategy, p_cbk);
+			self.balanceServers(app, p_cbk);
 		});
 	};
 
-	self.balanceServers = function(p_servers, p_strategy, p_cbk){
-		switch(p_strategy){
+
+	var localCurrentRoundRobin = {};
+	self.balanceServers = function(p_app, p_cbk){
+		var appId = p_app.appId;
+		var servers = onlineServers(p_app);
+		var currentLocalStrategy = localStrategy(p_app);
+
+		switch(currentLocalStrategy){
 			case enums.app.localStrategyEnum.INDIFFERENT:
-				p_cbk(p_servers);
 				break;
+
+			case enums.app.localStrategyEnum.ROUND_ROBIN:
+				if(localCurrentRoundRobin[appId] === undefined){
+					localCurrentRoundRobin[appId] = 0;
+				}
+
+				if(localCurrentRoundRobin[appId] >= servers.length){
+					localCurrentRoundRobin[appId] = 0;
+				}
+
+				var pre = servers.slice(0,localCurrentRoundRobin[appId]);
+				var post = servers.slice(localCurrentRoundRobin[appId]);
+				servers = post.concat(pre);
+				localCurrentRoundRobin[appId]++;
+				break;
+
 			default:
-				p_cbk(p_servers);
 				break;
 		}
+		p_cbk(servers);
 	};
 
 	return self;

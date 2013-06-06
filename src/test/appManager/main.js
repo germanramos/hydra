@@ -46,10 +46,12 @@ var apps = [
 }
 ];
 
-apps[0].localStrategyEvents[now+10000] = localStrategyEnum.INDIFFERENT;
-apps[0].cloudStrategyEvents[now+10000] = cloudStrategyEnum.INDIFFERENT;
+apps[0].localStrategyEvents[now+10000] = localStrategyEnum.ROUND_ROBIN;
+apps[0].cloudStrategyEvents[now+10000] = cloudStrategyEnum.ROUND_ROBIN;
 apps[0].servers.push(generateServer('http://server1/app', now + 10000));
 apps[0].servers.push(generateServer('http://server2/app', now + 10000));
+apps[0].servers.push(generateServer('http://server3/app', now + 10000));
+apps[0].servers.push(generateServer('http://server4/app', now + 10000));
 
 function generateServer(url, timeStamp){
 	var server = {
