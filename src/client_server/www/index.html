@@ -8,31 +8,30 @@
 	<script src="js/hydra.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
-			var app = 'mongo';
-			var overrideCache = false;
-
-			var count = 0;
-			var max = 10;
-			var interval = null;
-
-			function getServers() {
+			function getServers(app, overrideCache) {
 				hydra.get(app, overrideCache, function(err, result){
 					console.log('App Servers for', app, result, err,',\n');
+					$('#results').append('<div style="border: 1px solid black; margin: 5px;"><div> ----- ' + app + '</div>' + '<div> *** ' + (result || 'No Servers') + '</div>' + '<div> *** '+ (err ? err.status : 200) +'</div></div>');
 				});
-
-				count++;
-				if(count >= max) {
-					clearInterval(interval);
-				}
 			}
 
-			getServers();
+			$('#get').click(function(){
+				$('#results').html('');
+				var apps = $('#apps').val().split(' ');
+				var override = $('override').is(':checked');
 
-			app = 'fail';
-			getServers();
-			//interval = setInterval(getServers, 2000);
+				$.each(apps, function(index, val){
+					if(val.length > 0) getServers(val, override);
+				});
+			});
 		});
 	</script>
 </head>
-<body></body>
+<body>
+	Apps: <input type='text' id='apps' value='test mongo app' />
+	<button id='get'>Get</button>
+	<input type='checkbox' id='override' /> Override Cache
+	<br />
+	<div id='results'></div>
+</body>
 </html>

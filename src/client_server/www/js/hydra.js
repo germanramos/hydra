@@ -1,6 +1,7 @@
 var hydra = hydra || function () {
 	var hydraServers = {
 		list : ['http://localhost:7001'],
+		failed : [],
 		lastUpdate : 0
 	},
 		appServers = {
@@ -13,8 +14,9 @@ var hydra = hydra || function () {
 	},
 		updateHydraDelta	= 60000, //timeout de cache de hydra servers
 		updateAppDelta		= 10000, //timeout de cache de app servers
-		retryOnFail			= 2000,
-		overrideCache		= false;
+		retryOnFail			= 500,
+		overrideCache		= false,
+		retryTimeout		= null;
 
 	var	_HTTP_STATE_DONE	= 0,
 		_HTTP_SUCCESS		= 200,
@@ -42,14 +44,18 @@ var hydra = hydra || function () {
 						hydraServers.list = data;
 						hydraServers.lastUpdate = Date.now();
 					}
+
+					retryTimeout = null;
 					f_callback();
 				} else {
 					// In case hydra server doesn't reply, push it to the back 
 					// of the list and try another
-					var srv = hydraServers.list.shift();
-					hydraServers.list.push(srv);
+					if(!retryTimeout) {
+						_RotateHydraServer();
+					}
 
-					setTimeout(function() {
+					retryTimeout = setTimeout(function() {
+						retryTimeout = null;
 						_GetHydraServers(f_callback);
 					}, retryOnFail);
 				}
@@ -73,6 +79,7 @@ var hydra = hydra || function () {
 						lastUpdate: Date.now()
 					};
 
+					retryTimeout = null;
 					f_callback(err, data);
 				} else {
 					// If the app doesn't exist return the error
@@ -81,10 +88,12 @@ var hydra = hydra || function () {
 					} else {
 						// In case hydra server doesn't reply, push it to the back 
 						// of the list and try another
-						var srv = hydraServers.list.shift();
-						hydraServers.list.push(srv);
+						if(!retryTimeout) {
+							_RotateHydraServer();
+						}
 
-						setTimeout(function() {
+						retryTimeout = setTimeout(function() {
+							retryTimeout = null;
 							_get(appId, overrideCache, f_callback);
 						}, retryOnFail);
 					}
@@ -92,6 +101,16 @@ var hydra = hydra || function () {
 			});
 		} else {
 			f_callback(null, appServers[appId].list);
+		}
+	}
+
+	function _RotateHydraServer() {
+		if(hydraServers.list.length > 0) {
+			var srv = hydraServers.list.shift();
+			hydraServers.failed.push(srv);
+		}
+		if(hydraServers.list.length === 0) {
+			hydraServers.list = hydraServers.failed.splice(0, hydraServers.fail - 1);
 		}
 	}
 
