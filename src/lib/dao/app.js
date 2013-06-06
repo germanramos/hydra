@@ -360,6 +360,7 @@ module.exports = function(colApp, config){
 		var currentLocalStrategy = localStrategy(p_app);
 		var currentCloudStrategy = cloudStrategy(p_app);
 
+		var cutPoint,pre,post,loads;
 
 		var c,C;
 		// -------------
@@ -368,6 +369,11 @@ module.exports = function(colApp, config){
 
 		switch(currentCloudStrategy){
 			case enums.app.cloudStrategyEnum.INDIFFERENT:
+				cutPoint = Math.floor(Math.random()*clouds.length);
+				//cortamos la baraja :)
+				pre = clouds.slice(0,cutPoint);
+				post = clouds.slice(cutPoint);
+				clouds = post.concat(pre);
 				break;
 
 			case enums.app.cloudStrategyEnum.ROUND_ROBIN:
@@ -380,8 +386,8 @@ module.exports = function(colApp, config){
 				}
 
 				//cortamos la baraja :)
-				var pre = clouds.slice(0,cloudCurrentRoundRobin[appId]);
-				var post = clouds.slice(cloudCurrentRoundRobin[appId]);
+				pre = clouds.slice(0,cloudCurrentRoundRobin[appId]);
+				post = clouds.slice(cloudCurrentRoundRobin[appId]);
 				clouds = post.concat(pre);
 				cloudCurrentRoundRobin[appId]++;
 				break;
@@ -405,7 +411,7 @@ module.exports = function(colApp, config){
 				break;
 
 			case enums.app.cloudStrategyEnum.CLOUD_LOAD:
-				var loads = onlineCloudsLoad(p_app);
+				loads = onlineCloudsLoad(p_app);
 
 				var cloudLoads = [];
 				C = clouds.length;
@@ -436,6 +442,11 @@ module.exports = function(colApp, config){
 
 			//LOCAL INDIFFERENT
 			case enums.app.localStrategyEnum.INDIFFERENT:
+				cutPoint = Math.floor(Math.random()*servers.length);
+				//cortamos la baraja :)
+				pre = servers.slice(0,cutPoint);
+				post = servers.slice(cutPoint);
+				servers = post.concat(pre);
 				break;
 
 			//LOCAL ROUND ROBIN
@@ -452,15 +463,15 @@ module.exports = function(colApp, config){
 				}
 
 				//cortamos la baraja :)
-				var pre = servers.slice(0,localCurrentRoundRobin[appId][clouds[0]]);
-				var post = servers.slice(localCurrentRoundRobin[appId][clouds[0]]);
+				pre = servers.slice(0,localCurrentRoundRobin[appId][clouds[0]]);
+				post = servers.slice(localCurrentRoundRobin[appId][clouds[0]]);
 				servers = post.concat(pre);
 				localCurrentRoundRobin[appId][clouds[0]]++;
 				break;
 
 			//LOCAL SERVER LOAD
 			case enums.app.localStrategyEnum.SERVER_LOAD:
-				var loads = onlineServersLoad(p_app, clouds[0]);
+				loads = onlineServersLoad(p_app, clouds[0]);
 
 				var serverLoads = [];
 				var s,S = servers.length;
