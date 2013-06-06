@@ -40,32 +40,6 @@ module.exports = function(colApp, config){
 			return;
 		}
 
-		// Iterate over the server list,
-		// if the server is not available in any event, delete it.
-		// If there are no servers, skip the insert
-		var servers = app.servers;
-		for(var server in servers){
-			var events = servers[server].status.stateEvents;
-
-			var available = false;
-			for(var key in events) {
-				var eventState = events[key];
-				if(eventState !== enums.server.stateEnum.UNAVAILABLE){
-					available = true;
-					break;
-				}
-			}
-
-			if (!available){
-				servers.splice(server,1);
-			}
-		}
-
-		if (servers.length === 0) {
-			p_cbk(null);
-			return;
-		}
-
 		colApp.insert(app, {w:1}, function(err, items){
 			p_cbk(err);
 		});

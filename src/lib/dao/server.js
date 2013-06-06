@@ -29,24 +29,6 @@ module.exports = function(colServer, config){
 			return;
 		}
 
-		// If the server is not available in any remaining event
-		// we skip the insert
-		var events = p_server.status.stateEvents;
-
-		var available = false;
-		for(var key in events) {
-			var eventState = events[key];
-			if(eventState !== enums.server.stateEnum.UNAVAILABLE){
-				available = true;
-				break;
-			}
-		}
-
-		if (!available){
-			p_cbk(null);
-			return;
-		}
-
 		colServer.insert(server, {w:1}, function(err, items){
 			p_cbk(err);
 		});
