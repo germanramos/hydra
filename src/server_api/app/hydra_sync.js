@@ -35,7 +35,7 @@ module.exports = new function (){
 
 	function _serverDone(p_servers){
 		for(var f=0, F=p_servers.length; f<F; f++) {
-			if ( _Servers.indexOf(p_servers[f].url) > -1 ){
+			if ( _Siblings.indexOf(p_servers[f].url) > -1 ){
 				p_servers[f].sibling = true;		// Force sibling any server that is currently as sibling
 			}
 			else {
