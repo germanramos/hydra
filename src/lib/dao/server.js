@@ -50,11 +50,7 @@ module.exports = function(colServer, config){
 		}
 
 		colServer.insert(server, {w:1}, function(err, items){
-			if(err || items.length === 0){
-				p_cbk(null);
-			} else {
-				p_cbk(items[0]);
-			}
+			p_cbk(err);
 		});
 	};
 
