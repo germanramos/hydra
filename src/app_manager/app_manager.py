@@ -93,6 +93,7 @@ def main(argv=None):
                         "server": server_public,
                         "status": {
                                    "cost": config.get("MAIN", "cost"),
+                                   "cloud": config.get("MAIN", "cloud"),
                                    "cpuLoad": cpuLoad,
                                    "memLoad": memLoad,
                                    "timeStamp": timestamp,
