@@ -6,13 +6,16 @@ module.exports = function(req, res){
 		var server = {
 			url : req.body.url,
 			sibling : req.body.sibling,
-			status : req.body.status
+			status : req.body.status,
+			clientPort : req.body.clientPort,
+			serverPort : req.body.serverPort,
+			cloud : req.body.cloud,
+			cost : req.body.cost
 		};
-
 
 		hydra.server.update(server, function(err){
 			console.log('updated', item);
-			if(err !== null){
+			if(err){
 				res.send(400,'Bad request');
 			} else {
 				res.send(200,{});

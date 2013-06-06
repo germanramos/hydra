@@ -46,27 +46,28 @@ var apps = [
 }
 ];
 
+apps[0].cloudStrategyEvents[now+10000] = cloudStrategyEnum.ROUND_ROBIN;
 apps[0].localStrategyEvents[now+10000] = localStrategyEnum.SERVER_LOAD;
-apps[0].cloudStrategyEvents[now+10000] = cloudStrategyEnum.INDIFFERENT;
-apps[0].servers.push(generateServer('http://server1/app', 'cloudB', 1, now, 40));
-apps[0].servers.push(generateServer('http://server2/app', 'cloudA', 1, now + 10000, 30));
-apps[0].servers.push(generateServer('http://server3/app', 'cloudA', 1, now + 10000, 20));
-apps[0].servers.push(generateServer('http://server4/app', 'cloudA', 1, now + 10000, 10));
+apps[0].servers.push(generateServer('http://server1/app', 'cloudA', 1, now, 50));
+apps[0].servers.push(generateServer('http://server2/app', 'cloudA', 1, now + 10000, 40));
+apps[0].servers.push(generateServer('http://server3/app', 'cloudA', 1, now + 10000, 30));
+apps[0].servers.push(generateServer('http://server4/app', 'cloudB', 1, now + 10000, 20));
+apps[0].servers.push(generateServer('http://server5/app', 'cloudB', 1, now + 10000, 10));
 
-function generateServer(url, cloud, cost, timeStamp, load){
+function generateServer(p_url, p_cloud, p_cost, p_timeStamp, p_load){
 	var server = {
-		server: url,
-		cloud: cloud,
-		cost: cost,
+		server: p_url,
+		cloud: p_cloud,
+		cost: p_cost,
 		status: {
-			cpuLoad: load, //Cpu load of the server 0-100
-			memLoad: load, //Memory load of the server 0-100
-			timeStamp: timeStamp, //UTC time stamp of this info
+			cpuLoad: p_load, //Cpu load of the server 0-100
+			memLoad: p_load, //Memory load of the server 0-100
+			timeStamp: p_timeStamp, //UTC time stamp of this info
 			stateEvents: {}
 		}
 	};
 
-	server.status.stateEvents[timeStamp] = stateEnum.READY; //Future state of the serve
+	server.status.stateEvents[p_timeStamp] = stateEnum.READY; //Future state of the serve
 
 	return server;
 }

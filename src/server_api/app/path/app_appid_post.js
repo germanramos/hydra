@@ -11,7 +11,6 @@ module.exports = function(req, res){
 		};
 
 		hydra.app.update(app, function(err){
-			console.log(err);
 			if(err){
 				res.send(400,'Bad request');
 			} else {

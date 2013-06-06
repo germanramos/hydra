@@ -12,6 +12,8 @@ var defaultApp = {
 	servers : [
 		//{
 		//	server: 'http://server3/app',
+		//	cloud : 'nubeA',
+		//  cost : 0,
 		//	status: {
 		//		cpuLoad: 50, //Cpu load of the server 0-100
 		//		memLoad: 50, //Memory load of the server 0-100
@@ -164,6 +166,12 @@ module.exports = function(colApp, config){
 							}
 							oldServer.status.stateEvents = utils.sortObj(oldServer.status.stateEvents);
 
+							// Copies info
+							for(var info in newServer){
+								if(info == 'status') continue;
+								oldServer[info] = newServer[info];
+							}
+
 							// Checks timestamp for cpu/mem updates
 							if(newServer.status.timeStamp > oldServer.status.timeStamp){
 								for(var serverStatusFieldIdx in newServer.status){
@@ -217,11 +225,28 @@ module.exports = function(colApp, config){
 		});
 	};
 
-	function onlineServers(p_app){
+	function onlineClouds(p_app){
+		var clouds = [];
+
+		for(var serverIdx in p_app.servers){
+			var server = p_app.servers[serverIdx];
+			for(var serverStateIdx in server.status.stateEvents){
+				if(server.status.stateEvents[serverStateIdx] == enums.app.stateEnum.READY){
+					if(clouds.indexOf(server.cloud) == -1) clouds.push(server.cloud);
+				}
+
+				break;
+			}
+		}
+		return clouds;
+	}
+
+	function onlineServers(p_app, p_cloud){
 		var servers = [];
 
 		for(var serverIdx in p_app.servers){
 			var server = p_app.servers[serverIdx];
+			if(p_cloud && server.cloud != p_cloud) continue; // not in current cloud
 			for(var serverStateIdx in server.status.stateEvents){
 				if(server.status.stateEvents[serverStateIdx] == enums.app.stateEnum.READY){
 					servers.push(server.server);
@@ -230,14 +255,18 @@ module.exports = function(colApp, config){
 				break;
 			}
 		}
+
+		console.log(p_cloud, servers);
+
 		return servers;
 	}
 
-	function onlineServersLoad(p_app){
+	function onlineServersLoad(p_app, p_cloud){
 		var servers = [];
 
 		for(var serverIdx in p_app.servers){
 			var server = p_app.servers[serverIdx];
+			if(p_cloud && server.cloud != p_cloud) continue; // not in current cloud
 			for(var serverStateIdx in server.status.stateEvents){
 				if(server.status.stateEvents[serverStateIdx] == enums.app.stateEnum.READY){
 					servers.push(server.status.cpuLoad + server.status.memLoad);
@@ -259,11 +288,69 @@ module.exports = function(colApp, config){
 		return currentStrategy;
 	}
 
+	function cloudStrategy(p_app){
+		//current strategy
+		var currentStrategy = enums.app.cloudStrategyEnum.INDIFFERENT;
+		for(var cloudStrategyIdx in p_app.cloudStrategyEvents){
+			currentStrategy = p_app.cloudStrategyEvents[cloudStrategyIdx];
+			break;
+		}
+		return currentStrategy;
+	}
+
+	var cloudCurrentRoundRobin = {};
 	var localCurrentRoundRobin = {};
 	self.balanceServers = function(p_app, p_cbk){
 		var appId = p_app.appId;
-		var servers = onlineServers(p_app);
+		var servers = [];
+		var clouds = onlineClouds(p_app);
 		var currentLocalStrategy = localStrategy(p_app);
+		var currentCloudStrategy = cloudStrategy(p_app);
+
+
+		// -------------
+		// CLOUD BALANCE
+		// -------------
+
+		switch(currentCloudStrategy){
+			case enums.app.cloudStrategyEnum.INDIFFERENT:
+				servers = onlineServers(p_app);
+				break;
+
+			case enums.app.cloudStrategyEnum.ROUND_ROBIN:
+				if(cloudCurrentRoundRobin[appId] === undefined) {
+					cloudCurrentRoundRobin[appId] = 0;
+				}
+
+				if(cloudCurrentRoundRobin[appId] >= clouds.length) {
+					cloudCurrentRoundRobin[appId] = 0;
+				}
+
+				//cortamos la baraja :)
+				var pre = clouds.slice(0,cloudCurrentRoundRobin[appId]);
+				var post = clouds.slice(cloudCurrentRoundRobin[appId]);
+				clouds = post.concat(pre);
+				cloudCurrentRoundRobin[appId]++;
+
+				servers = onlineServers(p_app, clouds[0]);
+				break;
+
+			case enums.app.cloudStrategyEnum.CHEAPEST:
+				servers = onlineServers(p_app);
+				break;
+
+			case enums.app.cloudStrategyEnum.CLOUD_LOAD:
+				servers = onlineServers(p_app);
+				break;
+
+			default:
+				servers = onlineServers(p_app);
+				break;
+		}
+
+		// --------------
+		// SERVER BALANCE
+		// --------------
 
 		switch(currentLocalStrategy){
 
@@ -274,34 +361,37 @@ module.exports = function(colApp, config){
 			//LOCAL ROUND ROBIN
 			case enums.app.localStrategyEnum.ROUND_ROBIN:
 				if(localCurrentRoundRobin[appId] === undefined){
-					localCurrentRoundRobin[appId] = 0;
+					localCurrentRoundRobin[appId] = {};
+				}
+				if(localCurrentRoundRobin[appId][clouds[0]] === undefined){
+					localCurrentRoundRobin[appId][clouds[0]] = 0;
 				}
 
-				if(localCurrentRoundRobin[appId] >= servers.length){
-					localCurrentRoundRobin[appId] = 0;
+				if(localCurrentRoundRobin[appId][clouds[0]] >= servers.length){
+					localCurrentRoundRobin[appId][clouds[0]] = 0;
 				}
 
 				//cortamos la baraja :)
-				var pre = servers.slice(0,localCurrentRoundRobin[appId]);
-				var post = servers.slice(localCurrentRoundRobin[appId]);
+				var pre = servers.slice(0,localCurrentRoundRobin[appId][clouds[0]]);
+				var post = servers.slice(localCurrentRoundRobin[appId][clouds[0]]);
 				servers = post.concat(pre);
-				localCurrentRoundRobin[appId]++;
+				localCurrentRoundRobin[appId][clouds[0]]++;
 				break;
 
 			//LOCAL SERVER LOAD
 			case enums.app.localStrategyEnum.SERVER_LOAD:
-				var loads = onlineServersLoad(p_app);
+				var loads = onlineServersLoad(p_app, clouds[0]);
 
 				var serverLoads = [];
 				var s,S = servers.length;
 				for(s=0;s<S;s++){
 					serverLoads.push({k:servers[s],v:loads[s]});
 				}
-				console.log('pre', serverLoads);
+
 				serverLoads.sort(function(a,b){
 					return a.v - b.v;
 				});
-				console.log('post', serverLoads);
+
 				servers = [];
 				for(s=0;s<S;s++){
 					servers.push(serverLoads[s].k);
