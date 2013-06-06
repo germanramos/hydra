@@ -7,7 +7,7 @@ var commons = require('../../lib/commons'),
 	express	= commons.express,
 	hydra	= commons.hydra,
 	hydra_sync = require('./hydra_sync.js'),
-	utisl	= commons.utisl;
+	utils	= commons.utils;
 
 module.exports = hero.worker (
 	function(self){
