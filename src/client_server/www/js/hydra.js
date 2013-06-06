@@ -11,13 +11,14 @@ var hydra = hydra || function () {
 		}
 		*/
 	},
-		updateHydraDelta = 60000, //timeout de cache de hydra servers
-		updateAppDelta = 10000, //timeout de cache de app servers
-		retryOnFail = 2000,
-		overrideCache = false;
+		updateHydraDelta	= 60000, //timeout de cache de hydra servers
+		updateAppDelta		= 10000, //timeout de cache de app servers
+		retryOnFail			= 2000,
+		overrideCache		= false;
 
-	var	_HTTP_STATE_DONE = 0,
-		_HTTP_SUCCESS	= 200;
+	var	_HTTP_STATE_DONE	= 0,
+		_HTTP_SUCCESS		= 200,
+		_HTTP_BAD_REQUEST	= 400;
 
 	//////////////////////////
 	//     HYDRA  ENTRY     //
@@ -37,9 +38,10 @@ var hydra = hydra || function () {
 			_async('GET', hydraServers.list[0] + '/hydra',
 			function(err, data){
 				if(!err) {
-					hydraServers.list = data;
-					hydraServers.lastUpdate = Date.now();
-
+					if (data.length > 0) {
+						hydraServers.list = data;
+						hydraServers.lastUpdate = Date.now();
+					}
 					f_callback();
 				} else {
 					// In case hydra server doesn't reply, push it to the back 
@@ -73,14 +75,19 @@ var hydra = hydra || function () {
 
 					f_callback(err, data);
 				} else {
-					// In case hydra server doesn't reply, push it to the back 
-					// of the list and try another
-					var srv = hydraServers.list.shift();
-					hydraServers.list.push(srv);
+					// If the app doesn't exist return the error
+					if(err.status === _HTTP_BAD_REQUEST) {
+						f_callback(err, null);
+					} else {
+						// In case hydra server doesn't reply, push it to the back 
+						// of the list and try another
+						var srv = hydraServers.list.shift();
+						hydraServers.list.push(srv);
 
-					setTimeout(function() {
-						_get(appId, overrideCache, f_callback);
-					}, retryOnFail);
+						setTimeout(function() {
+							_get(appId, overrideCache, f_callback);
+						}, retryOnFail);
+					}
 				}
 			});
 		} else {
