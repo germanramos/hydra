@@ -5,7 +5,8 @@ var commons = require('../../lib/commons'),
 	hero	= commons.hero,
 	app		= hero.app,
 	express	= commons.express,
-	hydra	= commons.hydra;
+	hydra	= commons.hydra
+	utils	= commons.utils;
 
 module.exports = hero.worker (
 	function(self){
@@ -16,34 +17,13 @@ module.exports = hero.worker (
 		// Configuration
 		app.configure(function() {
 			app.use(express.bodyParser());
-			app.use(addHeaders);
+			app.use(utils.addHeaders(self.config.client_api.allowedOrigins));
 			app.use(app.router);
 			app.use(express.errorHandler({
 				dumpExceptions : true,
 				showStack : true
 			}));
 		});
-
-		function addHeaders(req, res, next){
-			var allowedOrigins = self.config.client_api.allowedOrigins;
-
-			var baseurl = req.get('origin');
-			var referer = req.get('Referer');
-			var i;I=allowedOrigins.length;
-			if(allowedOrigins[0] == "*"){
-				res.header('Access-Control-Allow-Origin',baseurl);
-				res.header('Access-Control-Allow-Headers','content-type');
-				//res.header('Access-Control-Allow-Credentials', true);
-			} else {
-				for(i = 0; i < I; i++){
-					if((baseurl && baseurl.indexOf(allowedOrigins[i]) !== -1) || (referer && referer.indexOf(allowedOrigins[i]) !== -1)){
-						res.header('Access-Control-Allow-Origin',baseurl);
-						res.header('Access-Control-Allow-Credentials', true);
-					}
-				}
-			}
-			next();
-		}
 
 		self.ready = function(p_cbk){
 			async.parallel (

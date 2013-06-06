@@ -121,3 +121,29 @@ exports.sortObj = function(obj){
 	}
 	return ret;
 };
+
+exports.addHeaders = function addHeaders(allowedOrigins){
+	return function (req, res, next){
+		var baseurl = req.get('origin');
+		var referer = req.get('Referer');
+		var i;I=allowedOrigins.length;
+		if(allowedOrigins[0] == "*"){
+			res.header('Access-Control-Allow-Origin',baseurl);
+			res.header('Access-Control-Allow-Headers','content-type');
+			//res.header('Access-Control-Allow-Credentials', true);
+		} else {
+			for(i = 0; i < I; i++){
+				if((baseurl && baseurl.indexOf(allowedOrigins[i]) !== -1) || (referer && referer.indexOf(allowedOrigins[i]) !== -1)){
+					res.header('Access-Control-Allow-Origin',baseurl);
+					res.header('Access-Control-Allow-Credentials', true);
+				}
+			}
+		}
+
+		if(req.method == 'OPTIONS'){
+			res.send(200,{});
+		} else {
+			next();
+		}
+	}
+}

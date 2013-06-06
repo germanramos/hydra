@@ -213,6 +213,10 @@ module.exports = function(colApp, config){
 	self.availableServers = function (p_id, p_cbk){
 		self.getFromId(p_id, function(app){
 			var servers = [];
+			if(app === null){
+				p_cbk(null);
+				return;
+			}
 
 			//get online servers
 			for(var serverIdx in app.servers){

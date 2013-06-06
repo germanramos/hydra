@@ -6,8 +6,8 @@ var commons = require('../../lib/commons'),
 	app		= hero.app,
 	express	= commons.express,
 	hydra	= commons.hydra,
-	hydra_sync = require('./hydra_sync.js')
-;
+	hydra_sync = require('./hydra_sync.js'),
+	utisl	= commons.utisl;
 
 module.exports = hero.worker (
 	function(self){
@@ -18,28 +18,13 @@ module.exports = hero.worker (
 		// Configuration
 		app.configure(function() {
 			app.use(express.bodyParser());
-			app.use(addHeaders);
+			app.use(utils.addHeaders(self.config.server_api.allowedOrigins));
 			app.use(app.router);
 			app.use(express.errorHandler({
 				dumpExceptions : true,
 				showStack : true
 			}));
 		});
-
-		function addHeaders(req, res, next){
-			var allowedOrigins = self.config.server_api.allowedOrigins;
-
-			var baseurl = req.get('origin');
-			var referer = req.get('Referer');
-			var i;I=allowedOrigins.length;
-			for(i = 0; i < I; i++){
-				if((baseurl && baseurl.indexOf(allowedOrigins[i]) !== -1) || (referer && referer.indexOf(allowedOrigins[i]) !== -1)){
-					res.header('Access-Control-Allow-Origin',baseurl);
-					res.header('Access-Control-Allow-Credentials', true);
-				}
-			}
-			next();
-		}
 
 		self.ready = function(p_cbk){
 			async.parallel (
