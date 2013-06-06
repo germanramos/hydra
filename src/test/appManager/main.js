@@ -46,7 +46,7 @@ var apps = [
 }
 ];
 
-apps[0].cloudStrategyEvents[now+10000] = cloudStrategyEnum.ROUND_ROBIN;
+apps[0].cloudStrategyEvents[now+10000] = cloudStrategyEnum.CLOUD_LOAD;
 apps[0].localStrategyEvents[now+10000] = localStrategyEnum.SERVER_LOAD;
 apps[0].servers.push(generateServer('http://server1/app', 'cloudA', 1, now, 50));
 apps[0].servers.push(generateServer('http://server2/app', 'cloudA', 1, now + 10000, 40));

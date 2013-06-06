@@ -241,6 +241,25 @@ module.exports = function(colApp, config){
 		return clouds;
 	}
 
+	function onlineCloudsLoad(p_app){
+		var clouds = onlineClouds(p_app);
+		var loads = [];
+
+		var servers, load;
+		var c,C= clouds.length;
+		for(c=0;c<C;c++){
+			servers = onlineServersLoad(p_app, clouds[c]);
+			load = 0;
+			var s,S=servers.length;
+			for(s=0;s<S;s++){
+				load += servers[s];
+			}
+			loads.push(load);
+		}
+		return loads;
+	}
+
+
 	function onlineServers(p_app, p_cloud){
 		var servers = [];
 
@@ -255,8 +274,6 @@ module.exports = function(colApp, config){
 				break;
 			}
 		}
-
-		console.log(p_cloud, servers);
 
 		return servers;
 	}
@@ -340,7 +357,22 @@ module.exports = function(colApp, config){
 				break;
 
 			case enums.app.cloudStrategyEnum.CLOUD_LOAD:
-				servers = onlineServers(p_app);
+				var loads = onlineCloudsLoad(p_app);
+
+				var cloudLoads = [];
+				var c,C = clouds.length;
+				for(c=0;c<C;c++){
+					cloudLoads.push({k:clouds[c],v:loads[c]});
+				}
+				cloudLoads.sort(function(a,b){
+					return a.v - b.v;
+				});
+				clouds=[];
+				for(c=0;c<C;c++){
+					clouds.push(cloudLoads[c].k);
+				}
+
+				servers = onlineServers(p_app, clouds[0]);
 				break;
 
 			default:
