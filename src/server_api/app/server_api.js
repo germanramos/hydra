@@ -41,14 +41,18 @@ module.exports = hero.worker (
 
 					if ( err === null ) {
 						// Start to sync hydra
-						hydra_sync.sync();
-						setInterval( hydra_sync.sync, self.config.server.sync );
+						hydraSync();
+						setInterval( hydraSync, self.config.server.sync );
 					}
 
 					p_cbk(err);
 				}
 			);
 		};
+
+		function hydraSync(){
+			hydra_sync.sync(self.config);
+		}
 
 	}
 );

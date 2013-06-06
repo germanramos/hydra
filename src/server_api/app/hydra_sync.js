@@ -6,6 +6,7 @@ var commons = require('../../lib/commons'),
 module.exports = new function (){
 	var _Servers;
 	var _Siblings;
+	var _config;
 
 	function _httpGet(p_url, f_done, f_fail){
 		console.log("synchronizing with", p_url);
@@ -67,6 +68,8 @@ module.exports = new function (){
 		}
 
 		for ( var f=0, F=p_json.length; f<F;  f++ ) {
+			if(p_json[f].url == _config.url) continue; //ignoring self on sync servers
+
 			if ( p_json[f].sibling === true ) {
 				_Siblings.push( p_json[f].url );		// Save siblings
 			}
@@ -74,7 +77,8 @@ module.exports = new function (){
 		}
 	}
 
-	this.sync = function () {
+	this.sync = function (config) {
+		_config = config;
 		hydra.server.getAll(
 			_syncDone
 		);
