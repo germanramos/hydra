@@ -13,7 +13,7 @@
 		"secretKey" : "RdGgiunmONiTuJpU0bZxSHAkhwoNEe6x"
 	},
 	"server_api" : {
-		"allowedOrigins" : ["http://localhost", "http://127.0.0.1"]
+		"allowedOrigins" : ["*"]
 	},
 	"client_api" : {
 		"allowedOrigins" : ["*"]
