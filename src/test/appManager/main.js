@@ -46,13 +46,13 @@ var apps = [
 }
 ];
 
-apps[0].cloudStrategyEvents[now+10000] = cloudStrategyEnum.CLOUD_LOAD;
+apps[0].cloudStrategyEvents[now+10000] = cloudStrategyEnum.CHEAPEST;
 apps[0].localStrategyEvents[now+10000] = localStrategyEnum.SERVER_LOAD;
 apps[0].servers.push(generateServer('http://server1/app', 'cloudA', 1, now, 50));
-apps[0].servers.push(generateServer('http://server2/app', 'cloudA', 1, now + 10000, 40));
-apps[0].servers.push(generateServer('http://server3/app', 'cloudA', 1, now + 10000, 30));
-apps[0].servers.push(generateServer('http://server4/app', 'cloudB', 1, now + 10000, 20));
-apps[0].servers.push(generateServer('http://server5/app', 'cloudB', 1, now + 10000, 10));
+apps[0].servers.push(generateServer('http://server2/app', 'cloudA', 2, now + 10000, 40));
+apps[0].servers.push(generateServer('http://server3/app', 'cloudA', 3, now + 10000, 30));
+apps[0].servers.push(generateServer('http://server4/app', 'cloudB', 4, now + 10000, 20));
+apps[0].servers.push(generateServer('http://server5/app', 'cloudB', 5, now + 10000, 10));
 
 function generateServer(p_url, p_cloud, p_cost, p_timeStamp, p_load){
 	var server = {

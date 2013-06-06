@@ -259,6 +259,25 @@ module.exports = function(colApp, config){
 		return loads;
 	}
 
+	function onlineCloudsCost(p_app){
+		var clouds = onlineClouds(p_app);
+		var costs = [];
+
+		var servers, cost;
+		var c,C= clouds.length;
+		for(c=0;c<C;c++){
+			servers = onlineServersCost(p_app, clouds[c]);
+			cost = 0;
+			var s,S=servers.length;
+			for(s=0;s<S;s++){
+				cost += servers[s];
+			}
+			cost = cost / S;
+			costs.push(cost);
+		}
+		return costs;
+	}
+
 
 	function onlineServers(p_app, p_cloud){
 		var servers = [];
@@ -287,6 +306,23 @@ module.exports = function(colApp, config){
 			for(var serverStateIdx in server.status.stateEvents){
 				if(server.status.stateEvents[serverStateIdx] == enums.app.stateEnum.READY){
 					servers.push(server.status.cpuLoad + server.status.memLoad);
+				}
+
+				break;
+			}
+		}
+		return servers;
+	}
+
+	function onlineServersCost(p_app, p_cloud){
+		var servers = [];
+
+		for(var serverIdx in p_app.servers){
+			var server = p_app.servers[serverIdx];
+			if(p_cloud && server.cloud != p_cloud) continue; // not in current cloud
+			for(var serverStateIdx in server.status.stateEvents){
+				if(server.status.stateEvents[serverStateIdx] == enums.app.stateEnum.READY){
+					servers.push(server.cost);
 				}
 
 				break;
@@ -325,13 +361,13 @@ module.exports = function(colApp, config){
 		var currentCloudStrategy = cloudStrategy(p_app);
 
 
+		var c,C;
 		// -------------
 		// CLOUD BALANCE
 		// -------------
 
 		switch(currentCloudStrategy){
 			case enums.app.cloudStrategyEnum.INDIFFERENT:
-				servers = onlineServers(p_app);
 				break;
 
 			case enums.app.cloudStrategyEnum.ROUND_ROBIN:
@@ -348,19 +384,31 @@ module.exports = function(colApp, config){
 				var post = clouds.slice(cloudCurrentRoundRobin[appId]);
 				clouds = post.concat(pre);
 				cloudCurrentRoundRobin[appId]++;
-
-				servers = onlineServers(p_app, clouds[0]);
 				break;
 
 			case enums.app.cloudStrategyEnum.CHEAPEST:
-				servers = onlineServers(p_app);
+				var costs = onlineCloudsCost(p_app);
+
+				var cloudCosts = [];
+				C = clouds.length;
+				for(c=0;c<C;c++){
+					cloudCosts.push({k:clouds[c],v:costs[c]});
+				}
+				cloudCosts.sort(function(a,b){
+					return a.v - b.v;
+				});
+				clouds=[];
+				for(c=0;c<C;c++){
+					clouds.push(cloudCosts[c].k);
+				}
+
 				break;
 
 			case enums.app.cloudStrategyEnum.CLOUD_LOAD:
 				var loads = onlineCloudsLoad(p_app);
 
 				var cloudLoads = [];
-				var c,C = clouds.length;
+				C = clouds.length;
 				for(c=0;c<C;c++){
 					cloudLoads.push({k:clouds[c],v:loads[c]});
 				}
@@ -372,13 +420,13 @@ module.exports = function(colApp, config){
 					clouds.push(cloudLoads[c].k);
 				}
 
-				servers = onlineServers(p_app, clouds[0]);
 				break;
 
 			default:
-				servers = onlineServers(p_app);
 				break;
 		}
+
+		servers = onlineServers(p_app, clouds[0]);
 
 		// --------------
 		// SERVER BALANCE
