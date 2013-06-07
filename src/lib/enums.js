@@ -4,7 +4,8 @@ enums.app = {
 	localStrategyEnum : {
 		INDIFFERENT: 0,
 		ROUND_ROBIN: 1,
-		SERVER_LOAD: 2
+		SERVER_LOAD: 2,
+		CHEAPEST: 3
 	},
 
 	cloudStrategyEnum : {

@@ -13,7 +13,8 @@ var server_api = {
 var localStrategyEnum = {
 	INDIFFERENT: 0,
 	ROUND_ROBIN: 1,
-	SERVER_LOAD: 2
+	SERVER_LOAD: 2,
+	CHEAPEST: 3
 };
 
 var cloudStrategyEnum = {
@@ -46,8 +47,8 @@ var apps = [
 }
 ];
 
-apps[0].cloudStrategyEvents[now+10000] = cloudStrategyEnum.INDIFFERENT;
-apps[0].localStrategyEvents[now+10000] = localStrategyEnum.INDIFFERENT;
+apps[0].cloudStrategyEvents[now+10000] = cloudStrategyEnum.CHEAPEST;
+apps[0].localStrategyEvents[now+10000] = localStrategyEnum.CHEAPEST;
 apps[0].servers.push(generateServer('http://server1/app', 'cloudA', 1, now, 50));
 apps[0].servers.push(generateServer('http://server2/app', 'cloudA', 2, now + 10000, 40));
 apps[0].servers.push(generateServer('http://server3/app', 'cloudA', 3, now + 10000, 30));

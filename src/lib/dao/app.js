@@ -360,7 +360,7 @@ module.exports = function(colApp, config){
 		var currentLocalStrategy = localStrategy(p_app);
 		var currentCloudStrategy = cloudStrategy(p_app);
 
-		var cutPoint,pre,post,loads;
+		var cutPoint,pre,post,loads, costs;
 
 		var c,C;
 		// -------------
@@ -393,7 +393,7 @@ module.exports = function(colApp, config){
 				break;
 
 			case enums.app.cloudStrategyEnum.CHEAPEST:
-				var costs = onlineCloudsCost(p_app);
+				costs = onlineCloudsCost(p_app);
 
 				var cloudCosts = [];
 				C = clouds.length;
@@ -486,6 +486,26 @@ module.exports = function(colApp, config){
 				servers = [];
 				for(s=0;s<S;s++){
 					servers.push(serverLoads[s].k);
+				}
+
+				break;
+
+			case enums.app.localStrategyEnum.CHEAPEST:
+				costs = onlineServersCost(p_app, clouds[0]);
+
+				var serverCosts = [];
+				var s,S = servers.length;
+				for(s=0;s<S;s++){
+					serverCosts.push({k:servers[s],v:costs[s]});
+				}
+
+				serverCosts.sort(function(a,b){
+					return a.v - b.v;
+				});
+
+				servers = [];
+				for(s=0;s<S;s++){
+					servers.push(serverCosts[s].k);
 				}
 
 				break;
