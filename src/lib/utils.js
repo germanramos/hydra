@@ -82,6 +82,11 @@ function request(method, url, data, cbk){
 		});
 	});
 
+	req.on('error', function(e) {
+		cbk(404, null);
+		console.log('Error connecting to server: ' + e.message);
+	});
+
 	if(method == 'POST'){
 		req.write(sData);
 	}
