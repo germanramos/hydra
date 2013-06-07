@@ -41,7 +41,7 @@ module.exports = function(colApp, config){
 		}
 
 		colApp.insert(app, {w:1}, function(err, items){
-			p_cbk(err);
+			if(p_cbk) p_cbk(err);
 		});
 	};
 
@@ -100,7 +100,7 @@ module.exports = function(colApp, config){
 		}
 
 		//clean servers
-		var server, previousState
+		var server, previousState;
 		var s, S = p_app.servers.length;
 		for(s=0;s<S;s++){
 			server = p_app.servers[s];

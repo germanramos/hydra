@@ -30,7 +30,7 @@ module.exports = function(colServer, config){
 		}
 
 		colServer.insert(server, {w:1}, function(err, items){
-			p_cbk(err);
+			if (p_cbk) p_cbk(err);
 		});
 	};
 
