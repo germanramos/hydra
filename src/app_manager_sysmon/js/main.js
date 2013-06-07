@@ -47,7 +47,7 @@ function init_refresh() {
 	$.ajax({
 		url : $("#infoServer").val(),
 		success : function(data) {
-			console.log("Getted app from hydra succesfully")
+			console.log("Got app from hydra succesfully")
 			process_app(data)
 		},
 		error : function(data) {
