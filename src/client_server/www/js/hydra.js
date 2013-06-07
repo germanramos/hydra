@@ -15,7 +15,6 @@ var hydra = hydra || function () {
 		updateHydraDelta	= 60000, //timeout de cache de hydra servers
 		updateAppDelta		= 10000, //timeout de cache de app servers
 		retryOnFail			= 500,
-		overrideCache		= false,
 		retryTimeout		= null;
 
 	var	_HTTP_STATE_DONE	= 0,
@@ -26,22 +25,23 @@ var hydra = hydra || function () {
 	//     HYDRA  ENTRY     //
 	//////////////////////////
 	function _get(appId, override, f_cbk) {
-		overrideCache = override;
+		//overrideCache = override;
 		_GetHydraServers(function(){
-			_GetApp(appId, f_cbk);
+			_GetApp(appId, override, f_cbk);
 		});
 	}
 
 	//////////////////////////
 	//     HYDRA UTILS      //
 	//////////////////////////
-	function _GetHydraServers(f_callback) {
+	function _GetHydraServers(f_callback, refresh) {
 		if((Date.now() - hydraServers.lastUpdate) > updateHydraDelta ){
 			_async('GET', hydraServers.list[0] + '/hydra',
 			function(err, data){
 				if(!err) {
 					if (data.length > 0) {
 						hydraServers.list = data;
+						hydraServers.failed = [];
 						hydraServers.lastUpdate = Date.now();
 					}
 
@@ -65,7 +65,7 @@ var hydra = hydra || function () {
 		}
 	}
 
-	function _GetApp(appId, f_callback){
+	function _GetApp(appId, overrideCache, f_callback){
 		// Get Apps from server if we specify to override the cache, it's not on the list or the cache is outdated
 		var getFromServer = overrideCache || !(appId in appServers) || (Date.now() - appServers[appId].lastUpdate > updateAppDelta);
 
@@ -110,7 +110,7 @@ var hydra = hydra || function () {
 			hydraServers.failed.push(srv);
 		}
 		if(hydraServers.list.length === 0) {
-			hydraServers.list = hydraServers.failed.splice(0, hydraServers.fail - 1);
+			hydraServers.list = hydraServers.failed.splice(0, hydraServers.failed.length - 1);
 		}
 	}
 
