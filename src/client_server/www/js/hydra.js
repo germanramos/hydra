@@ -12,9 +12,9 @@ var hydra = hydra || function () {
 		}
 		*/
 	},
-		updateHydraDelta	= 60000, //timeout de cache de hydra servers
-		updateAppDelta		= 10000, //timeout de cache de app servers
-		retryOnFail			= 500,
+		updateHydraDelta	= 360000, //timeout de cache de hydra servers
+		updateAppDelta		= 60000,  //timeout de cache de app servers
+		retryOnFail			= 1000,
 		retryTimeout		= null;
 
 	var	_HTTP_STATE_DONE	= 0,
@@ -41,7 +41,6 @@ var hydra = hydra || function () {
 				if(!err) {
 					if (data.length > 0) {
 						hydraServers.list = data;
-						hydraServers.failed = [];
 						hydraServers.lastUpdate = Date.now();
 					}
 
@@ -105,13 +104,8 @@ var hydra = hydra || function () {
 	}
 
 	function _RotateHydraServer() {
-		if(hydraServers.list.length > 0) {
-			var srv = hydraServers.list.shift();
-			hydraServers.failed.push(srv);
-		}
-		if(hydraServers.list.length === 0) {
-			hydraServers.list = hydraServers.failed.splice(0, hydraServers.failed.length - 1);
-		}
+		var srv = hydraServers.list.shift();
+		hydraServers.list.push(srv);
 	}
 
 	//////////////////////////

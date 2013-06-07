@@ -11,7 +11,7 @@
 			function getServers(app, overrideCache) {
 				hydra.get(app, overrideCache, function(err, result){
 					console.log('App Servers for', app, result, err,',\n');
-					$('#results').append('<div style="border: 1px solid black; margin: 5px;"><div> ----- ' + app + '</div>' + '<div> *** ' + (result || 'No Servers') + '</div>' + '<div> *** '+ (err ? err.status : 200) +'</div></div>');
+					$('#results').append('<div style="border: 1px solid black; margin: 5px;"><div> ----- ' + app + '</div>' + '<div> *** ' + (result || 'Unknown App') + '</div>' + '<div> *** '+ (err ? err.status : 200) +'</div></div>');
 				});
 			}
 
