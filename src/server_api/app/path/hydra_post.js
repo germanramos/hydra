@@ -25,6 +25,4 @@ module.exports = function(req, res){
 		console.log(ex);
 		res.send(400,'Bad request');
 	}
-
-	res.send(400,'Bad request');
 };
