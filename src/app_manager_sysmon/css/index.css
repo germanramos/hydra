@@ -72,6 +72,11 @@
     background-color: RGB(182,215,168);
 }
 
+.server.warning {
+    border-color: RGB(192,144,0);
+    background-color: RGB(255,229,153);
+}
+
 .server {
     border-color: RGB(204,0,0);
     background-color: RGB(234,153,153);

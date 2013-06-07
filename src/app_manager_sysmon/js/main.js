@@ -78,8 +78,8 @@ function process_server(app, server, server_sysmon) {
 	$.ajax({
 		url : server_sysmon,
 		success : function(data) {
-			console.log("Getted statics from server " + server_sysmon)
-			paint_server(app, server, data.connections, true);
+			console.log("Getted statics from server " + server_sysmon);
+			paint_server(app, server, data, true);
 		},
 		error : function(data) {
 			console.log("Error when getting static from server "
@@ -88,12 +88,12 @@ function process_server(app, server, server_sysmon) {
 	})
 }
 
-function paint_server(app, server, connections, alive) {
+function paint_server(app, server, data, alive) {
 	console.log("Painting server: " + server.server);
 	var serverElement = document.getElementById(server.server)
 	if (serverElement == null) {
 		serverElement = document.createElement("div");
-		create_server(app, serverElement, server, connections, alive);
+		create_server(app, serverElement, server, data, alive);
 		// Create cloud if needed
 		cloud = server.cloud;
 		//cloud= parseCloud(server.server);
@@ -125,7 +125,7 @@ function paint_server(app, server, connections, alive) {
 		while (serverElement.hasChildNodes()) {
 			serverElement.removeChild(serverElement.lastChild);
 		}
-		create_server(app, serverElement, server, connections, alive);
+		create_server(app, serverElement, server, data, alive);
 	}
 }
 
@@ -141,7 +141,7 @@ function parseCloud(url) {
 	}
 }
 
-function create_server(app, serverElement, server, connections, alive) {
+function create_server(app, serverElement, server, data, alive) {
 	serverElement.setAttribute('id', server.server);
 	serverElement.setAttribute('checked', 'true');
 	serverElement.appendChild(create_row("ID", app.appId));
@@ -152,30 +152,32 @@ function create_server(app, serverElement, server, connections, alive) {
 		return false;
 	}
 	$(serverElement).draggable();
-	if (alive) {
-		serverElement.setAttribute('class', 'server active');
+	if (alive) {		
 		serverElement.appendChild(create_row("CPU", server.status.cpuLoad));
 		serverElement.appendChild(create_row("MEM", server.status.memLoad));
-		filtered = connections.filter(function(element, index, array) {
-			// TODO: make lines
-			// console.log(connections);
-			if (element[5] == "ESTABLISHED") {
-				var ip = element[4][0];
-				if ($.inArray(ip, watch) >= 0) {
-					$('#' + ip.replace(/\./g, "\\.") + " .where").each(
-							function() {
-								this.innerHTML = server.server;
-								this.parentNode.setAttribute('checked', 'true');
-							});
+		if (data.state == 0) {
+			serverElement.setAttribute('class', 'server active');
+			filtered = data.connections.filter(function(element, index, array) {
+				if (element[5] == "ESTABLISHED") {
+					var ip = element[4][0];
+					if ($.inArray(ip, watch) >= 0) {
+						$('#' + ip.replace(/\./g, "\\.") + " .where").each(
+								function() {
+									this.innerHTML = server.server;
+									this.parentNode.setAttribute('checked', 'true');
+								});
+					}
+					return true;
+				} else {
+					return false;
 				}
-				return true;
-			} else {
-				return false;
-			}
-			// End make lines
-			// return element[5]=="ESTABLISHED"
-		});
-		serverElement.appendChild(create_row("CON", filtered.length));
+			});
+			serverElement.appendChild(create_row("CON", filtered.length));
+		} else {
+			serverElement.setAttribute('class', 'server warning');
+		}
+		
+		
 	} else {
 		serverElement.setAttribute('class', 'server');
 	}
