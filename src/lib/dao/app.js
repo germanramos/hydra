@@ -357,8 +357,8 @@ module.exports = function(colApp, config){
 		var appId = p_app.appId;
 		var servers = [];
 		var clouds = onlineClouds(p_app);
-		var currentLocalStrategy = localStrategy(p_app);
-		var currentCloudStrategy = cloudStrategy(p_app);
+		var currentLocalStrategy = parseInt(localStrategy(p_app));
+		var currentCloudStrategy = parseInt(cloudStrategy(p_app));
 
 		var cutPoint,pre,post,loads, costs;
 
