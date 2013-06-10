@@ -518,7 +518,8 @@ module.exports = function(colApp, config){
 		C = clouds.length;
 		var cloudServers = [];
 		for(c = 1; c<C;c++){
-			servers = servers.concat(onlineServers(clouds[c]));
+			cloudServers = onlineServers(p_app,clouds[c]);
+			servers = servers.concat(cloudServers);
 		}
 
 		p_cbk(servers);
