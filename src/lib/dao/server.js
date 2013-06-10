@@ -95,7 +95,7 @@ module.exports = function(colServer, config){
 			} else {
 				//merge state schedule
 				for(var stateEventsIdx in p_server.status.stateEvents){
-					oldServer.status.stateEvents[stateEventsIdx] =  p_server.status.stateEvents[stateEventsIdx];
+					oldServer.status.stateEvents[stateEventsIdx] =  parseInt(p_server.status.stateEvents[stateEventsIdx]);
 				}
 				oldServer.status.stateEvents = utils.sortObj(oldServer.status.stateEvents);
 
