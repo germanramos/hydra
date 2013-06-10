@@ -305,7 +305,7 @@ module.exports = function(colApp, config){
 			if(p_cloud && server.cloud != p_cloud) continue; // not in current cloud
 			for(var serverStateIdx in server.status.stateEvents){
 				if(server.status.stateEvents[serverStateIdx] == enums.app.stateEnum.READY){
-					servers.push(server.status.cpuLoad + server.status.memLoad);
+					servers.push(parseFloat(server.status.cpuLoad) + parseFloat(server.status.memLoad));
 				}
 
 				break;
@@ -322,7 +322,7 @@ module.exports = function(colApp, config){
 			if(p_cloud && server.cloud != p_cloud) continue; // not in current cloud
 			for(var serverStateIdx in server.status.stateEvents){
 				if(server.status.stateEvents[serverStateIdx] == enums.app.stateEnum.READY){
-					servers.push(server.cost);
+					servers.push(parseInt(server.cost));
 				}
 
 				break;
