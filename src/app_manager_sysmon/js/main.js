@@ -46,6 +46,7 @@ function init_refresh() {
 	// Get app info from hydra
 	$.ajax({
 		url : $("#infoServer").val(),
+		timeout : 3000,
 		success : function(data) {
 			console.log("Got app from hydra succesfully")
 			process_app(data)
@@ -77,6 +78,7 @@ function process_app(app) {
 function process_server(app, server, server_sysmon) {
 	$.ajax({
 		url : server_sysmon,
+		timeout : 3000,
 		success : function(data) {
 			console.log("Getted statics from server " + server_sysmon);
 			paint_server(app, server, data, true);
@@ -84,6 +86,7 @@ function process_server(app, server, server_sysmon) {
 		error : function(data) {
 			console.log("Error when getting static from server "
 					+ server_sysmon);
+			paint_server(app, server, {state: 1}, true);
 		}
 	})
 }
