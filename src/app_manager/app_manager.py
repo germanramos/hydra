@@ -79,9 +79,9 @@ def main(argv=None):
                     try:
                         response = urllib2.urlopen(server_private)
                         output = json.load(response)
-                        state = output["state"]
-                        cpuLoad = output["cpuLoad"]
-                        memLoad = output["memLoad"]
+                        state = int(output["state"])
+                        cpuLoad = float(output["cpuLoad"])
+                        memLoad = float(output["memLoad"])
                     except Exception, e:
                         logging.error("Exception: " + str(e))
                         state = stateEnum.UNAVAILABLE
@@ -91,7 +91,7 @@ def main(argv=None):
                     timestamp = int(round(time.time() * 1000))
                     server_item = {
                         "server": server_public,
-                        "cost": config.get("MAIN", "cost"),
+                        "cost": int(config.get("MAIN", "cost")),
                         "cloud": config.get("MAIN", "cloud"),
                         "status": {
                                    "cpuLoad": cpuLoad,
