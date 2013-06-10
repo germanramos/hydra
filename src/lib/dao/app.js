@@ -162,7 +162,7 @@ module.exports = function(colApp, config){
 						oldServer = oldApp.servers[os];
 						if(newServer.server == oldServer.server){
 							for(var stateEventsIdx in newServer.status.stateEvents){
-								oldServer.status.stateEvents[stateEventsIdx] = parseInt(newServer.status.stateEvents[stateEventsIdx]);
+								oldServer.status.stateEvents[stateEventsIdx] = newServer.status.stateEvents[stateEventsIdx];
 							}
 							oldServer.status.stateEvents = utils.sortObj(oldServer.status.stateEvents);
 
