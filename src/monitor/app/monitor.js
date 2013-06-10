@@ -20,14 +20,14 @@ module.exports = hero.worker (
 				status: {
 					cpuLoad : os.loadavg()[0] * 100,
 					memLoad : os.freemem() * 100 / os.totalmem(),
-					timestamp : now,
+					timeStamp : now,
 					stateEvents : {}
 				}
 			};
 			server.status.stateEvents[now] = hydra.enums.server.stateEnum.READY;
 
-			hydra.server.update(server, function(){
-				//console.log('>>>>> update Status\n', server,'\n--------------------------\n');
+			hydra.server.update(server, function(err){
+				console.log('>>>>> update Status\n', server,'\n--------------------------\n');
 			});
 		}
 
