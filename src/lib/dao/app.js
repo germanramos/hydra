@@ -362,7 +362,7 @@ module.exports = function(colApp, config){
 
 		var cutPoint,pre,post,loads, costs;
 
-		var c,C;
+		var c,C, currentCloud;
 		// -------------
 		// CLOUD BALANCE
 		// -------------
@@ -513,6 +513,14 @@ module.exports = function(colApp, config){
 			default:
 				break;
 		}
+
+		//adding servers of other clouds
+		C = clouds.length;
+		var cloudServers = [];
+		for(c = 1; c<C;c++){
+			servers = servers.concat(onlineServers(clouds[c]));
+		}
+
 		p_cbk(servers);
 	};
 
