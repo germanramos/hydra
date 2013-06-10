@@ -11,8 +11,8 @@ var hydra = hydra || function () {
 		}
 		*/
 	},
-		hydraTimeOut		= 360000, //timeout de cache de hydra servers
-		appTimeOut			= 60000,  //timeout de cache de app servers
+		hydraTimeOut		= 60000, //timeout de cache de hydra servers
+		appTimeOut			= 30000,  //timeout de cache de app servers
 		retryOnFail			= 1000,
 		retryTimeout		= null;
 
@@ -33,9 +33,9 @@ var hydra = hydra || function () {
 		p_options = p_options || {};
 
 		hydraServers.list = p_servers;
-		hydraTimeOut	= p_options.hydraTimeOut	|| hydraTimeOut;
-		appTimeOut		= p_options.appTimeOut		|| appTimeOut;
-		retryOnFail		= p_options.retryOnFail		|| retryOnFail;
+		hydraTimeOut	= (p_options.hydraTimeOut && p_options.hydraTimeOut	>= 60000 ? p_options.hydraTimeOut : hydraTimeOut);
+		appTimeOut		= (p_options.appTimeOut   && p_options.appTimeOut   >= 30000 ? p_options.appTimeOut   : appTimeOut);
+		retryOnFail		= (p_options.retryOnFail  && p_options.retryOnFail	>= 1000  ? p_options.retryOnFail  : retryOnFail);
 	}
 
 	//////////////////////////
