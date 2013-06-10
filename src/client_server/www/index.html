@@ -8,6 +8,15 @@
 	<script src="js/hydra.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
+			hydra.config(
+				['http://localhost:7001'] 
+				/*, { 
+					hydraTimeOut: 10000, 
+					appTimeOut: 1000, 
+					retryOnFail: 5000 
+				}*/
+			);
+
 			function getServers(app, overrideCache) {
 				hydra.get(app, overrideCache, function(err, result){
 					console.log('App Servers for', app, result, err,',\n');

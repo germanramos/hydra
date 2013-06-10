@@ -1,7 +1,6 @@
 var hydra = hydra || function () {
 	var hydraServers = {
-		list : ['http://localhost:7001'],
-		failed : [],
+		list : [document.URL.substring(0, document.URL.length - 1)],
 		lastUpdate : 0
 	},
 		appServers = {
@@ -12,8 +11,8 @@ var hydra = hydra || function () {
 		}
 		*/
 	},
-		updateHydraDelta	= 360000, //timeout de cache de hydra servers
-		updateAppDelta		= 60000,  //timeout de cache de app servers
+		hydraTimeOut		= 360000, //timeout de cache de hydra servers
+		appTimeOut			= 60000,  //timeout de cache de app servers
 		retryOnFail			= 1000,
 		retryTimeout		= null;
 
@@ -25,17 +24,25 @@ var hydra = hydra || function () {
 	//     HYDRA  ENTRY     //
 	//////////////////////////
 	function _get(appId, override, f_cbk) {
-		//overrideCache = override;
 		_GetHydraServers(function(){
 			_GetApp(appId, override, f_cbk);
 		});
+	}
+
+	function _config(p_servers, p_options) {
+		p_options = p_options || {};
+
+		hydraServers.list = p_servers;
+		hydraTimeOut	= p_options.hydraTimeOut	|| hydraTimeOut;
+		appTimeOut		= p_options.appTimeOut		|| appTimeOut;
+		retryOnFail		= p_options.retryOnFail		|| retryOnFail;
 	}
 
 	//////////////////////////
 	//     HYDRA UTILS      //
 	//////////////////////////
 	function _GetHydraServers(f_callback, refresh) {
-		if((Date.now() - hydraServers.lastUpdate) > updateHydraDelta ){
+		if((Date.now() - hydraServers.lastUpdate) > hydraTimeOut ){
 			_async('GET', hydraServers.list[0] + '/hydra',
 			function(err, data){
 				if(!err) {
@@ -66,7 +73,7 @@ var hydra = hydra || function () {
 
 	function _GetApp(appId, overrideCache, f_callback){
 		// Get Apps from server if we specify to override the cache, it's not on the list or the cache is outdated
-		var getFromServer = overrideCache || !(appId in appServers) || (Date.now() - appServers[appId].lastUpdate > updateAppDelta);
+		var getFromServer = overrideCache || !(appId in appServers) || (Date.now() - appServers[appId].lastUpdate > appTimeOut);
 
 		if(getFromServer) {
 			_async('GET', hydraServers.list[0] + '/app/'+ appId,
@@ -174,6 +181,7 @@ var hydra = hydra || function () {
 	//     EXTERNAL METHODS     //
 	//////////////////////////////
 	return {
-		get: _get
+		get: _get,
+		config: _config
 	};
 }();
