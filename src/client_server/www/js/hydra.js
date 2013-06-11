@@ -1,6 +1,6 @@
 var hydra = hydra || function () {
 	var hydraServers = {
-		list : [document.URL.substring(0, document.URL.length - 1)],
+		list : [_getJSUrl('hydra.js')],
 		lastUpdate : 0
 	},
 		appServers = {
@@ -144,8 +144,6 @@ var hydra = hydra || function () {
 			}
 		}
 
-		//httpRequest.overrideMimeType('application/json');
-		//httpRequest.withCredentials = true;
 		return httpRequest;
 	}
 
@@ -175,6 +173,19 @@ var hydra = hydra || function () {
 		}
 
 		req.send(data);
+	}
+
+	function _getJSUrl(file){
+		var scripts = document.getElementsByTagName('script');
+		for (var i = 0, L = scripts.length; i<L; i++){
+			var url = scripts[i].src || '';
+			//if(url.indexOf(file) > -1 && (url.indexOf(file) + file.length ===  url.length)){
+			if(url.indexOf(file) > -1){
+				var fields = url.match( /(.*)[:/]{3}([^:/]+)[:]?([^/]*)([^?]*)[?]?(.*)/ );
+				return fields[1] + '://' + fields[2] + (fields[3].length > 0 ? ':' + fields[3] : '');
+			}
+		}
+		return null;
 	}
 
 	//////////////////////////////
