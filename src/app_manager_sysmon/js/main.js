@@ -1,5 +1,5 @@
 INTERVAL = 5000;
-INIT_HYDRA_URL = "http://localhost:7002/app/time";
+INIT_HYDRA_URL = "http://localhost:7002/app";
 
 var refresh = true;
 var interval;
@@ -49,7 +49,10 @@ function init_refresh() {
 		timeout : 3000,
 		success : function(data) {
 			console.log("Got app from hydra succesfully")
-			process_app(data)
+			data = [].concat(data);
+			for (var i=0; i < data.length; i++) {
+				process_app(data[i]);
+			}
 		},
 		error : function(data) {
 			console.log("Error when getting app from hydra: " + data);
