@@ -26,7 +26,7 @@ module.exports = hero.worker (
 			};
 			server.status.stateEvents[now] = hydra.enums.server.stateEnum.READY;
 
-			hydra.server.update(server, function(err){
+			hydra.app.update(server, function(err){
 				console.log('>>>>> update Status\n', server,'\n--------------------------\n');
 			});
 		}

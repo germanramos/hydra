@@ -16,8 +16,5 @@ hydra.init = function(p_dbClient, p_config, p_cbk){
 	colApp = new mongodb.Collection(p_dbClient, 'app');
 	hydra.app = require('./dao/app')(colApp, config);
 
-	colServer = new mongodb.Collection(p_dbClient, 'server');
-	hydra.server = require('./dao/server')(colServer, config);
-
 	p_cbk();
 };

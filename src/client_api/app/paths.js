@@ -1,11 +1,4 @@
 exports.paths = [
-	// HYDRA SERVERS
-	{
-		"method": "GET",
-		"path": "/hydra",
-		"handler": require("./path/hydra_get")
-	},
-
 	// APPS
 	{
 		"method": "GET",

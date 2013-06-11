@@ -61,9 +61,12 @@ module.exports = function(colApp, config){
 		};
 
 		colApp.findOne(find, {}, function(err, item){
-			var modified = clean(item);
-			if(modified){
-				self.update(item);
+			console.log(item);
+			if(item !== null) {
+				var modified = clean(item);
+				if(modified){
+					self.update(item);
+				}
 			}
 			p_cbk(item);
 		});

@@ -53,7 +53,7 @@ var hydra = hydra || function () {
 
 
 	function _GetHydraServers() {
-		_Async('GET', hydraServers.list[0] + '/hydra',
+		_Async('GET', hydraServers.list[0] + '/app/hydra',
 		function(err, data){
 			if(!err) {
 				if (data.length > 0) {
