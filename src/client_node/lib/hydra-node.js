@@ -1,17 +1,11 @@
-var http = require('http');
+var request = require('request');
 
 module.exports =  function () {
-	var hydraServers = {
-		list : [],
-		lastUpdate : 0
-	},
-		appServers = {
-		/* 
-		app : {
-			list : [],
-			lastUpdate : Date.now();
+	var appServers = {
+		hydra : {
+			list: [],
+			lastUpdate : 0
 		}
-		*/
 	},
 		hydraTimeOut		= 60000,  //timeout de cache de hydra servers
 		appTimeOut			= 20000,  //timeout de cache de app servers
@@ -37,7 +31,8 @@ module.exports =  function () {
 	function _Config(p_servers, p_options) {
 		p_options = p_options || {};
 
-		hydraServers.list = p_servers;
+		appServers['hydra'].list = p_servers;
+
 		hydraTimeOut	= (p_options.hydraTimeOut && p_options.hydraTimeOut	> hydraTimeOut ? p_options.hydraTimeOut : hydraTimeOut);
 		appTimeOut		= (p_options.appTimeOut   && p_options.appTimeOut   > appTimeOut ? p_options.appTimeOut   : appTimeOut);
 		retryOnFail		= (p_options.retryOnFail  && p_options.retryOnFail	> retryOnFail  ? p_options.retryOnFail  : retryOnFail);
@@ -58,12 +53,13 @@ module.exports =  function () {
 
 
 	function _GetHydraServers() {
-		http.get(hydraServers.list[0] + '/app/hydra',
-		function(err, data){
-			if(!err) {
+		request.get(appServers['hydra'].list[0] + '/app/hydra',
+		function(err, res, data){
+			if(!err && res.statusCode === _HTTP_SUCCESS) {
+				data = JSON.parse(data);
 				if (data.length > 0) {
-					hydraServers.list = data;
-					hydraServers.lastUpdate = Date.now();
+					appServers['hydra'].list = data;
+					appServers['hydra'].lastUpdate = Date.now();
 				}
 
 				retryTimeout = null;
@@ -90,10 +86,11 @@ module.exports =  function () {
 							(Date.now() - appServers[appId].lastUpdate > appTimeOut);
 
 		if(getFromServer) {
-			_Async('GET', hydraServers.list[0] + '/app/'+ appId,
-			function(err, data){
-				if(!err) {
+			request.get(appServers['hydra'].list[0] + '/app/'+ appId,
+			function(err, res, data){
+				if(!err && res.statusCode === _HTTP_SUCCESS) {
 					// Store the app in the local cache
+					data = JSON.parse(data);
 					appServers[appId] = {
 						list: data,
 						lastUpdate: Date.now()
@@ -101,22 +98,20 @@ module.exports =  function () {
 
 					retryTimeout = null;
 					f_callback(err, data);
-				} else {
+				} else if(!err && res.statusCode === _HTTP_BAD_REQUEST){
 					// If the app doesn't exist return the error
-					if(err.status === _HTTP_BAD_REQUEST) {
-						f_callback(err, null);
-					} else {
-						// In case hydra server doesn't reply, push it to the back 
-						// of the list and try another
-						if(!retryTimeout) {
-							_CycleHydraServer();
-						}
-
-						retryTimeout = setTimeout(function() {
-							retryTimeout = null;
-							_Get(appId, overrideCache, f_callback);
-						}, retryOnFail);
+					f_callback(new Error(data), null);
+				} else if(err) {
+					// In case hydra server doesn't reply, push it to the back 
+					// of the list and try another
+					if(!retryTimeout) {
+						_CycleHydraServer();
 					}
+
+					retryTimeout = setTimeout(function() {
+						retryTimeout = null;
+						_Get(appId, overrideCache, f_callback);
+					}, retryOnFail);
 				}
 			});
 		} else {
@@ -125,68 +120,8 @@ module.exports =  function () {
 	}
 
 	function _CycleHydraServer() {
-		var srv = hydraServers.list.shift();
-		hydraServers.list.push(srv);
-	}
-
-	//////////////////////////
-	//    GENERIC UTILS     //
-	//////////////////////////
-	function _InstanceHttpReq(){
-		var httpRequest;
-		if ( window.XMLHttpRequest ) {
-			httpRequest = new XMLHttpRequest();
-		}
-		else if ( window.ActiveXObject ) {
-			try {
-				httpRequest = new ActiveXObject('MSXML2.XMLHTTP');
-			}
-			catch (err1) {
-				try {
-					httpRequest = new ActiveXObject('Microsoft.XMLHTTP');
-				}
-				catch (err2) {
-					if ( window.console && window.console.error ) {
-						console.error('Fatal error', err2);
-					}
-				}
-			}
-		}
-		if ( !httpRequest ) {
-			if ( window.console && window.console.error ) {
-				console.error('Fatal error, object httpRequest is not available');
-			}
-		}
-
-		return httpRequest;
-	}
-
-	function _Async(p_method, p_url, f_success, data) {
-		var req = _InstanceHttpReq();
-		req.open(p_method, p_url+'?_='+(new Date().getTime()), true);
-		req.onreadystatechange  = function() {
-			if ( req.readyState === 0 || req.readyState === 4 ){
-				if (req.status === _HTTP_SUCCESS) {
-					if ( req.responseText !== null ) {
-						f_success( null, JSON.parse(req.responseText) );
-					}
-					else {
-						f_success(null, null);
-					}
-				}
-				else {
-					f_success({ "status" : req.status, req : req },null);
-				}
-			}
-		};
-
-		if(data !== null)
-		{
-			req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-			data = JSON.stringify(data);
-		}
-
-		req.send(data);
+		var srv = appServers['hydra'].list.shift();
+		appServers['hydra'].list.push(srv);
 	}
 
 	//////////////////////////////
