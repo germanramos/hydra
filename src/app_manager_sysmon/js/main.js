@@ -1,4 +1,4 @@
-INTERVAL = 5000;
+INTERVAL = 0; //5000;
 INIT_HYDRA_URL = "http://localhost:7002/app";
 
 var refresh = true;
@@ -27,6 +27,7 @@ $(document).ajaxStop(function() {
 	// Set up refresh interval
 	if (refresh) {
 		interval = setInterval(init_refresh, INTERVAL);
+		
 	}
 });
 
@@ -214,12 +215,10 @@ window.onload = function() {
 			init_refresh();
 			refresh = true;
 			this.value = "Stop Refresh"
-			this.style.backgroundColor = "Red";
 		} else {
 			clearInterval(interval);
 			refresh = false;
 			this.value = "Start Refresh";
-			this.style.backgroundColor = "Green"
 		}
 	});
 
