@@ -397,14 +397,18 @@ module.exports = function(colApp, config){
 
 			case enums.app.cloudStrategyEnum.CHEAPEST:
 				costs = onlineCloudsCost(p_app);
+				loads = onlineCloudsLoad(p_app);
 
 				var cloudCosts = [];
 				C = clouds.length;
 				for(c=0;c<C;c++){
-					cloudCosts.push({k:clouds[c],v:costs[c]});
+					cloudCosts.push({k:clouds[c],c:costs[c],l:loads[c]});
 				}
 				cloudCosts.sort(function(a,b){
-					return a.v - b.v;
+					// if(a.l > 160 && b.l > 160) return a.c - b.c;
+					if(a.l > 160 && b.l < 160) return 1;
+					if(a.l < 160 && b.l > 160) return -1;
+					return a.c - b.c;
 				});
 				clouds=[];
 				for(c=0;c<C;c++){
