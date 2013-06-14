@@ -48,7 +48,7 @@ module.exports = new function (){
 		}
 
 		for ( var f=0, F=_Servers.length; f<F;  f++ ) {
-			if(_Servers[f].url.indexof(_config.url) > -1) continue; //ignoring self on sync servers
+			if(_Servers[f].url.indexOf(_config.url) > -1) continue; //ignoring self on sync servers
 			var urlParts = utils.splitUrl(_Servers[f].url);
 			var url = urlParts.protocol + '://' + urlParts.host + ':' + _config.serverPort;
 			_syncServer(url);
