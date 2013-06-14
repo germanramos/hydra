@@ -61,7 +61,6 @@ module.exports = function(colApp, config){
 		};
 
 		colApp.findOne(find, {}, function(err, item){
-			console.log(item);
 			if(item !== null) {
 				var modified = clean(item);
 				if(modified){
