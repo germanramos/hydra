@@ -1,5 +1,4 @@
 var assert	= require('assert');
-var hydra_server = require('../../lib/dao/server')();
 var commons = require('../../lib/commons'),
 	hero	= commons.hero,
 	hydra	= commons.hydra,
@@ -9,6 +8,36 @@ var commons = require('../../lib/commons'),
 describe('Hydra Server', function(){
 	var url = "http://test.local.com";
 	var h = null;
+	var now = Date.now();
+
+	var app = {
+		appId: 'test_app',
+		localStrategyEvents : {
+			//'42374897239' : localStrategyEnum.INDIFFERENT
+		},
+		cloudStrategyEvents : {
+			//'42374897239': cloudStrategyEnum.INDIFFERENT
+		},
+		servers : [
+			//{
+			//	server: 'http://server3/app',
+			//	cloud : 'nubeA',
+			//  cost : 0,
+			//	status: {
+			//		cpuLoad: 50, //Cpu load of the server 0-100
+			//		memLoad: 50, //Memory load of the server 0-100
+			//		timeStamp: 42374897239, //UTC time stamp of this info
+			//		stateEvents: {
+			//			'42374897239' : state: stateEnum.READY, //Future state of the serve
+			//		}
+			//	}
+			//}
+		]
+	};
+
+
+	app.localStrategyEvents[now] = 0;
+	app.cloudStrategyEvents[now] = 0;
 
 	before(function(done){
 		h = hero.worker(function(self){
@@ -40,20 +69,17 @@ describe('Hydra Server', function(){
 	});
 
 	before( function(done) {
-		hydra.server.remove(url, done);
+		hydra.app.remove(url, done);
 	});
 
 	afterEach(function(done){
-		hydra.server.remove(url, done);
+		hydra.app.remove(url, done);
 	});
 
-	describe('Add Servers', function(){
+	describe('Add Apps', function(){
 		it('Server available with future events', function(done){
 			var server = {
 				"url": url,
-				"clientPort": 7001,
-				"serverPort" : 7002,
-				"sibling": true,
 				"status": {
 					"memLoad": 32.8,
 					"cpuLoad": 9.8,
@@ -69,7 +95,9 @@ describe('Hydra Server', function(){
 			server.status.stateEvents[now + 10000] = 0;
 			server.status.stateEvents[now + 20000] = 0;
 
-			hydra.server.update(server, function(item){
+			app.servers = [server];
+
+			hydra.app.update(server, function(item){
 				assert.notEqual(item, null);
 				done();
 			});
@@ -78,9 +106,6 @@ describe('Hydra Server', function(){
 		it('Server with future events and all unavailable ', function(done){
 			var server = {
 				"url": url,
-				"clientPort": 7001,
-				"serverPort" : 7002,
-				"sibling": true,
 				"status": {
 					"memLoad": 32.8,
 					"cpuLoad": 9.8,
@@ -96,7 +121,9 @@ describe('Hydra Server', function(){
 			server.status.stateEvents[now + 10000] = 1;
 			server.status.stateEvents[now + 20000] = 1;
 
-			hydra.server.update(server, function(item){
+			app.servers = [server];
+
+			hydra.app.update(server, function(item){
 				assert.equal(item, null);
 				done();
 			});
@@ -105,9 +132,6 @@ describe('Hydra Server', function(){
 		it('Server without future state events but available', function(done){
 			var server = {
 				"url": url,
-				"clientPort": 7001,
-				"serverPort" : 7002,
-				"sibling": true,
 				"status": {
 					"memLoad": 32.8,
 					"cpuLoad": 9.8,
@@ -121,7 +145,9 @@ describe('Hydra Server', function(){
 			server.status.stateEvents[now - 10000] = 0;
 			server.status.stateEvents[now - 100] = 0;
 
-			hydra.server.update(server, function(item){
+			app.servers = [server];
+
+			hydra.app.update(server, function(item){
 				assert.notEqual(item, null);
 				done();
 			});
@@ -130,9 +156,6 @@ describe('Hydra Server', function(){
 		it('Server without future events and unavailable ', function(done){
 			var server = {
 				"url": url,
-				"clientPort": 7001,
-				"serverPort" : 7002,
-				"sibling": true,
 				"status": {
 					"memLoad": 32.8,
 					"cpuLoad": 9.8,
@@ -146,7 +169,9 @@ describe('Hydra Server', function(){
 			server.status.stateEvents[now - 10000] = 0;
 			server.status.stateEvents[now - 100] = 1;
 
-			hydra.server.update(server, function(item){
+			app.servers = [server];
+
+			hydra.app.update(server, function(item){
 				assert.equal(item, null);
 				done();
 			});
