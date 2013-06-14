@@ -1,5 +1,6 @@
 {
 	"url": "http://localhost",
+	"serverPort": 7002,
 	"db" : {
 		"host" : "localhost",
 		"port" : "27017",

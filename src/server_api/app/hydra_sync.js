@@ -40,20 +40,18 @@ module.exports = new function (){
 	}
 
 	function _syncDone(p_json){
-		_Servers  = p_json = p_json || [];
-		_Siblings = [];
+		p_json = p_json || [];
+		_Servers  = p_json.servers || [];
 
 		if (_Servers.length < 1) {
 			hero.error("No hydra servers are configured. This hydra instance doesn't connect with other hydras!");
 		}
 
-		for ( var f=0, F=p_json.length; f<F;  f++ ) {
-			if(p_json[f].url == _config.url) continue; //ignoring self on sync servers
-
-			if ( p_json[f].sibling === true ) {
-				_Siblings.push( p_json[f].url );		// Save siblings
-			}
-			_syncServer(p_json[f].url + ':' + p_json[f].serverPort);
+		for ( var f=0, F=_Servers.length; f<F;  f++ ) {
+			if(_Servers[f].url.indexof(_config.url) > -1) continue; //ignoring self on sync servers
+			var urlParts = utils.splitUrl(_Servers[f].url);
+			var url = urlParts.protocol + '://' + urlParts.host + ':' + _config.serverPort;
+			_syncServer(url);
 		}
 	}
 

@@ -42,6 +42,26 @@ exports.decipherString = function(crypted, key){
 	return data;
 };
 
+exports.splitUrl = function(url) {
+    var fields = url.match( /(.*)[:/]{3}([^:/]+)[:]?([^/]*)([^?]*)[?]?(.*)/ );
+	if(fields === null){
+		throw new Error('bar url param');
+	}
+	var protocol = fields[1];
+	var host = fields[2];
+	var port = fields[3];
+	var path = fields[4];
+	var query = fields[5];
+
+	return {
+		protocol: protocol,
+		host : host,
+		port: port,
+		path: path,
+		query: query
+	};
+};
+
 function request(method, url, data, cbk){
 	var fields = url.match( /(.*)[:/]{3}([^:/]+)[:]?([^/]*)([^?]*)[?]?(.*)/ );
 	if(fields === null){
