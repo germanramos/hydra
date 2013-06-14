@@ -1,9 +1,19 @@
-var utils = require('../../lib/utils');
+var utils = require('../../lib/utils'),
+	assert = require('assert');
 
 var clouds = {
-	cloud1: 'http://server1.cloud1.com',
-	cloud2: 'http://server1.cloud2.com',
-	cloud3: 'http://server1.cloud3.com'
+	cloud1: {
+		client : 'http://hydra1.cloud1.com:7001',
+		server : 'http://hydra1.cloud1.com:7002'
+	},
+	cloud2: {
+		client : 'http://hydra1.cloud2.com:7001',
+		server : 'http://hydra1.cloud2.com:7002'
+	},
+	cloud3: {
+		client : 'http://hydra1.cloud3.com:7001',
+		server : 'http://hydra1.cloud3.com:7002'
+	}
 };
 
 var app = {
@@ -28,6 +38,23 @@ var app = {
 
  function main(){
 	configHydras();
+	setTimeout(function(){
+		getApps(clouds.cloud1.server, function(status, data1){
+			data1 = JSON.parse(data1);
+			getApps(clouds.cloud2.server, function(status, data2){
+				data2 = JSON.parse(data2);
+				getApps(clouds.cloud3.server, function(status, data3){
+					data3 = JSON.parse(data3);
+					servers1 = getServers(data1[0].servers);
+					servers2 = getServers(data2[0].servers);
+					servers3 = getServers(data3[0].servers);
+
+					assert.deepEqual(servers1, servers2);
+					assert.deepEqual(servers2, servers3);
+				});
+			});
+		});
+	},10000);
  }
 
 function addApp(app, appData, toCloud, f_cbk) {
@@ -35,28 +62,36 @@ function addApp(app, appData, toCloud, f_cbk) {
 	utils.httpPost(toCloud + '/app/' + app, appData, f_cbk);
 }
 
+function getApps(from, f_cbk){
+	utils.httpGet(from + '/app/', f_cbk);
+}
+
+function getServers(servers) {
+	var s = [];
+	for(var index in servers){
+		s.push(servers[index].server);
+	}
+
+	s.sort();
+	return s;
+}
+
 function configHydras() {
-	app.servers[0].server = clouds.cloud2;
+	app.servers[0].server = clouds.cloud1.client;
 	app.servers[0].cloud = 'cloud2';
-	addApp('hydra', app, clouds.cloud1, callback);
+	addApp('hydra', app, clouds.cloud1.server, callback);
 
-	app.servers[0].server = clouds.cloud3;
+	app.servers[0].server = clouds.cloud3.client;
 	app.servers[0].cloud = 'cloud3';
-	addApp('hydra', app, clouds.cloud2, callback);
+	addApp('hydra', app, clouds.cloud2.server, callback);
 
-	app.servers[0].server = clouds.cloud1;
+	app.servers[0].server = clouds.cloud1.client;
 	app.servers[0].cloud = 'cloud1';
-	addApp('hydra', app, clouds.cloud3, callback);
+	addApp('hydra', app, clouds.cloud3.server, callback);
 }
 
-function configApp() {
-	app.servers[0].server = clouds.cloud2;
-	app.servers[0].cloud = 'cloud2';
-	addApp('test', app, clouds.cloud1, callback);
-}
-
-function callback(){
-	console.log('Response', arguments);
+function callback(status, data){
+	assert.equal(status, 200);
 }
 
 main();
