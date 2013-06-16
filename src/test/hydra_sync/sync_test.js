@@ -1,4 +1,5 @@
 var utils = require('../../lib/utils'),
+	async = require('../../lib/node_modules/async'),
 	assert = require('assert');
 
 var clouds = {
@@ -37,29 +38,39 @@ var app = {
 
 
  function main(){
-	configHydras();
-	setTimeout(function(){
-		getApps(clouds.cloud1.server, function(status, data1){
-			data1 = JSON.parse(data1);
-			getApps(clouds.cloud2.server, function(status, data2){
-				data2 = JSON.parse(data2);
-				getApps(clouds.cloud3.server, function(status, data3){
-					data3 = JSON.parse(data3);
-					servers1 = getServers(data1[0].servers);
-					servers2 = getServers(data2[0].servers);
-					servers3 = getServers(data3[0].servers);
+	async.parallel(
+		configHydras,
+		function(error, result){
+			if(!error) {
+				console.log('Waiting for Hydra Server Sync');
+				setTimeout(function(){
+					console.log('Checking Hydra server sync');
+					async.parallel(
+						hydraInfo,
+						function(error, result){
+							if(!error) {
+								servers1 = getServers(result.cloud1[0].servers);
+								servers2 = getServers(result.cloud2[0].servers);
+								servers3 = getServers(result.cloud3[0].servers);
 
-					assert.deepEqual(servers1, servers2);
-					assert.deepEqual(servers2, servers3);
-				});
-			});
-		});
-	},10000);
+								assert.deepEqual(servers1, servers2);
+								assert.deepEqual(servers2, servers3);
+								console.log('Servers synced correctly');
+							}
+						});
+				},10000);
+			}
+		}
+	);
  }
 
 function addApp(app, appData, toCloud, f_cbk) {
-	console.log(toCloud + '/app/' + app, appData);
-	utils.httpPost(toCloud + '/app/' + app, appData, f_cbk);
+	console.log('Adding app', app, 'to', toCloud);
+	utils.httpPost(toCloud + '/app/' + app, appData,
+	function(status, data){
+		console.log('Response for ', toCloud,':', status);
+		f_cbk(status, data);
+	});
 }
 
 function getApps(from, f_cbk){
@@ -76,22 +87,57 @@ function getServers(servers) {
 	return s;
 }
 
-function configHydras() {
-	app.servers[0].server = clouds.cloud1.client;
-	app.servers[0].cloud = 'cloud2';
-	addApp('hydra', app, clouds.cloud1.server, callback);
+var configHydras =  {
+	cloud1: function(done){
+		app.servers[0].server = clouds.cloud2.client;
+		app.servers[0].cloud = 'cloud2';
+		addApp('hydra', app, clouds.cloud1.server, function(status, data){
+			console.log('Response for ', clouds.cloud1.server,':', status);
+			done(status === 200 ? null : new Error(data));
+		});
 
-	app.servers[0].server = clouds.cloud3.client;
-	app.servers[0].cloud = 'cloud3';
-	addApp('hydra', app, clouds.cloud2.server, callback);
+	},
+	cloud2: function(done){
+		app.servers[0].server = clouds.cloud3.client;
+		app.servers[0].cloud = 'cloud3';
+		addApp('hydra', app, clouds.cloud2.server, function(status, data){
+			console.log('Response for ', clouds.cloud2.server,':', status);
+			done(status === 200 ? null : new Error(data));
+		});
+	},
+	cloud3: function(done){
+		app.servers[0].server = clouds.cloud1.client;
+		app.servers[0].cloud = 'cloud1';
+		addApp('hydra', app, clouds.cloud3.server, function(status, data){
+			console.log('Response for ', clouds.cloud3.server,':', status);
+			done(status === 200 ? null : new Error(data));
+		});
 
-	app.servers[0].server = clouds.cloud1.client;
-	app.servers[0].cloud = 'cloud1';
-	addApp('hydra', app, clouds.cloud3.server, callback);
-}
+	}
+};
 
-function callback(status, data){
-	assert.equal(status, 200);
-}
+var hydraInfo = {
+	cloud1: function(done){
+		getApps(clouds.cloud1.server, function(status, data){
+			var error = status === 200 ? null : new Error(data);
+			var result = status === 200 ? JSON.parse(data) : null;
+			done(error, result);
+		});
+	},
+	cloud2: function(done){
+		getApps(clouds.cloud2.server, function(status, data){
+			var error = status === 200 ? null : new Error(data);
+			var result = status === 200 ? JSON.parse(data) : null;
+			done(error, result);
+		});
+	},
+	cloud3: function(done){
+		getApps(clouds.cloud3.server, function(status, data){
+			var error = status === 200 ? null : new Error(data);
+			var result = status === 200 ? JSON.parse(data) : null;
+			done(error, result);
+		});
+	}
+};
 
 main();
