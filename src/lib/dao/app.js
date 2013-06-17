@@ -159,33 +159,37 @@ module.exports = function(colApp, config){
 				for(ns=0;ns<NS;ns++){
 					newServer = p_app.servers[ns];
 
+					if(newServer.status === undefined){
+						newServer.status = {
+							stateEvents: {}
+						}
+					}
+
 					serverFound = false;
-					if(newServer.status !== undefined){
-						for(os=0;os<OS;os++){
-							oldServer = oldApp.servers[os];
-							if(newServer.server == oldServer.server){
-								for(var stateEventsIdx in newServer.status.stateEvents){
-									oldServer.status.stateEvents[stateEventsIdx] = parseInt(newServer.status.stateEvents[stateEventsIdx]);
-								}
-								oldServer.status.stateEvents = utils.sortObj(oldServer.status.stateEvents);
-
-								// Copies info
-								for(var info in newServer){
-									if(info == 'status') continue;
-									oldServer[info] = newServer[info];
-								}
-
-								// Checks timestamp for cpu/mem updates
-								if(newServer.status.timeStamp > oldServer.status.timeStamp || oldServer.status.timeStamp === undefined){
-									for(var serverStatusFieldIdx in newServer.status){
-										if(serverStatusFieldIdx == 'stateEvents') continue;
-										oldServer.status[serverStatusFieldIdx] = newServer.status[serverStatusFieldIdx];
-									}
-								}
-
-								serverFound = true;
-								break;
+					for(os=0;os<OS;os++){
+						oldServer = oldApp.servers[os];
+						if(newServer.server == oldServer.server){
+							for(var stateEventsIdx in newServer.status.stateEvents){
+								oldServer.status.stateEvents[stateEventsIdx] = parseInt(newServer.status.stateEvents[stateEventsIdx]);
 							}
+							oldServer.status.stateEvents = utils.sortObj(oldServer.status.stateEvents);
+
+							// Copies info
+							for(var info in newServer){
+								if(info == 'status') continue;
+								oldServer[info] = newServer[info];
+							}
+
+							// Checks timestamp for cpu/mem updates
+							if(newServer.status.timeStamp > oldServer.status.timeStamp || oldServer.status.timeStamp === undefined){
+								for(var serverStatusFieldIdx in newServer.status){
+									if(serverStatusFieldIdx == 'stateEvents') continue;
+									oldServer.status[serverStatusFieldIdx] = newServer.status[serverStatusFieldIdx];
+								}
+							}
+
+							serverFound = true;
+							break;
 						}
 					}
 					if(!serverFound) {
