@@ -152,6 +152,7 @@ function create_server(app, serverElement, server, data, alive) {
 	serverElement.setAttribute('id', server.server);
 	serverElement.setAttribute('checked', 'true');
 	serverElement.appendChild(create_row("ID", app.appId));
+	serverElement.appendChild(create_row("PRZ", server.cost));
 	serverElement.appendChild(create_row("URL", server.server));
 	serverElement.ondblclick = function(e) {
 		$(this).remove();

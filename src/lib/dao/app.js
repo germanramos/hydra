@@ -256,6 +256,7 @@ module.exports = function(colApp, config){
 			for(s=0;s<S;s++){
 				load += servers[s];
 			}
+			load=load/S;
 			loads.push(load);
 		}
 		return loads;
