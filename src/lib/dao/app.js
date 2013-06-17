@@ -175,7 +175,7 @@ module.exports = function(colApp, config){
 							}
 
 							// Checks timestamp for cpu/mem updates
-							if(newServer.status.timeStamp > oldServer.status.timeStamp){
+							if(newServer.status.timeStamp > oldServer.status.timeStamp || oldServer.status.timeStamp === undefined){
 								for(var serverStatusFieldIdx in newServer.status){
 									if(serverStatusFieldIdx == 'stateEvents') continue;
 									oldServer.status[serverStatusFieldIdx] = newServer.status[serverStatusFieldIdx];
