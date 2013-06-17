@@ -106,6 +106,7 @@ module.exports = function(colApp, config){
 		var s, S = p_app.servers.length;
 		for(s=0;s<S;s++){
 			server = p_app.servers[s];
+			if(server.status === undefined) continue;
 
 			previousState = -1;
 			for(var serverState in server.status.stateEvents){
