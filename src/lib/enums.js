@@ -17,7 +17,8 @@ enums.app = {
 
 	stateEnum : {
 		READY: 0,
-		UNAVAILABLE : 1
+		UNAVAILABLE : 1,
+		DELETE: 2
 	}
 };
 

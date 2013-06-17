@@ -104,7 +104,7 @@ module.exports = function(colApp, config){
 		//clean servers
 		var server, previousState;
 		var s, S = p_app.servers.length;
-		for(s=0;s<S;s++){
+		for(s=S-1;s>=0;s--){
 			server = p_app.servers[s];
 			if(server.status === undefined) continue;
 
@@ -115,12 +115,21 @@ module.exports = function(colApp, config){
 						server.status.stateEvents[now] = enums.app.stateEnum.UNAVAILABLE;
 						modified = true;
 					}
+					if(server.status.stateEvents[serverState] == enums.app.stateEnum.DELETE){
+						p_app.servers.splice(s,1);
+						modified = true;
+						break;
+					}
 					if(previousState > 0){
 						delete server.status.stateEvents[previousState];
 						modified = true;
 					}
 					previousState = serverState;
+				} else {
+					//do nothing with future changes
+					break;
 				}
+
 			}
 		}
 
