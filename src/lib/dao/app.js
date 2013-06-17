@@ -106,7 +106,7 @@ module.exports = function(colApp, config){
 		var s, S = p_app.servers.length;
 		for(s=0;s<S;s++){
 			server = p_app.servers[s];
-			if(server.status === undefined) continue;
+
 			previousState = -1;
 			for(var serverState in server.status.stateEvents){
 				if(serverState < now){
@@ -163,14 +163,20 @@ module.exports = function(colApp, config){
 					if(newServer.status === undefined){
 						newServer.status = {
 							stateEvents: {}
-						}
+						};
 					}
-
 
 					serverFound = false;
 					for(os=0;os<OS;os++){
 						oldServer = oldApp.servers[os];
 						if(newServer.server == oldServer.server){
+
+							if(oldServer.status === undefined){
+								oldServer.status = {
+									stateEvents: {}
+								};
+							}
+
 							for(var stateEventsIdx in newServer.status.stateEvents){
 								oldServer.status.stateEvents[stateEventsIdx] = parseInt(newServer.status.stateEvents[stateEventsIdx]);
 							}
