@@ -160,30 +160,32 @@ module.exports = function(colApp, config){
 					newServer = p_app.servers[ns];
 
 					serverFound = false;
-					for(os=0;os<OS;os++){
-						oldServer = oldApp.servers[os];
-						if(newServer.server == oldServer.server){
-							for(var stateEventsIdx in newServer.status.stateEvents){
-								oldServer.status.stateEvents[stateEventsIdx] = parseInt(newServer.status.stateEvents[stateEventsIdx]);
-							}
-							oldServer.status.stateEvents = utils.sortObj(oldServer.status.stateEvents);
-
-							// Copies info
-							for(var info in newServer){
-								if(info == 'status') continue;
-								oldServer[info] = newServer[info];
-							}
-
-							// Checks timestamp for cpu/mem updates
-							if(newServer.status.timeStamp > oldServer.status.timeStamp || oldServer.status.timeStamp === undefined){
-								for(var serverStatusFieldIdx in newServer.status){
-									if(serverStatusFieldIdx == 'stateEvents') continue;
-									oldServer.status[serverStatusFieldIdx] = newServer.status[serverStatusFieldIdx];
+					if(newServer.status !== undefined){
+						for(os=0;os<OS;os++){
+							oldServer = oldApp.servers[os];
+							if(newServer.server == oldServer.server){
+								for(var stateEventsIdx in newServer.status.stateEvents){
+									oldServer.status.stateEvents[stateEventsIdx] = parseInt(newServer.status.stateEvents[stateEventsIdx]);
 								}
-							}
+								oldServer.status.stateEvents = utils.sortObj(oldServer.status.stateEvents);
 
-							serverFound = true;
-							break;
+								// Copies info
+								for(var info in newServer){
+									if(info == 'status') continue;
+									oldServer[info] = newServer[info];
+								}
+
+								// Checks timestamp for cpu/mem updates
+								if(newServer.status.timeStamp > oldServer.status.timeStamp || oldServer.status.timeStamp === undefined){
+									for(var serverStatusFieldIdx in newServer.status){
+										if(serverStatusFieldIdx == 'stateEvents') continue;
+										oldServer.status[serverStatusFieldIdx] = newServer.status[serverStatusFieldIdx];
+									}
+								}
+
+								serverFound = true;
+								break;
+							}
 						}
 					}
 					if(!serverFound) {
