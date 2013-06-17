@@ -2,39 +2,32 @@
     text-align: center;
 }
 
-#refreshButton {
-    position: fixed;
-    top: 0px;
-    right: 0px;
-    /*font-weight: bold;*/
-    cursor: pointer;
+#toolbar {
+    background-color: lightgray;
+    position: relative;
     z-index: 99;
+    padding: 2px;
 }
 
 #infoServer {
-    position: absolute;
-    top: 0px;
-    left: 0px;
+    float:left;
     width: 400px;
     background-color: lightgray;
     border: solid 1px;
     z-index: 99;
 }
 
-#configDiv {
-    position: fixed;
-    bottom: 0px;
-    left: 0px;
+.button {
+    float:left;
+    cursor: pointer;
+    z-index: 99;
+}
+
+#configShowUnavailable {
+    float:left
     border: solid 1px;
     z-index: 99;
     background-color: lightgray;
-}
-
-#addWatcherButton {
-    position: fixed;
-    bottom: 0px;
-    right: 0px;
-    z-index: 99;  
 }
 
 #title {

@@ -1,5 +1,5 @@
 INTERVAL = 0; //5000;
-INIT_HYDRA_URL = "http://localhost:7002/app";
+INIT_HYDRA_URL = "http://hydra1.cloud1.com:7002/app";
 
 var refresh = true;
 var interval;
@@ -103,7 +103,6 @@ function paint_server(app, server, data, alive) {
 		create_server(app, serverElement, server, data, alive);
 		// Create cloud if needed
 		cloud = server.cloud;
-		//cloud= parseCloud(server.server);
 		var cloudElement = document.getElementById(cloud)
 		if (cloudElement == null) {
 			cloudElement = document.createElement("div");
@@ -117,6 +116,7 @@ function paint_server(app, server, data, alive) {
 			divElement.appendChild(document.createTextNode(cloud));
 			cloudElement.appendChild(divElement);
 			document.body.appendChild(cloudElement);
+			//document.getElementById("main").appendChild(cloudElement);
 			$(cloudElement).resizable();
 			$(cloudElement).draggable();
 		}
@@ -133,18 +133,6 @@ function paint_server(app, server, data, alive) {
 			serverElement.removeChild(serverElement.lastChild);
 		}
 		create_server(app, serverElement, server, data, alive);
-	}
-}
-
-function parseCloud(url) {
-	var found = 0;
-	for ( var i = url.length - 1; i >= 0; i--) {
-		if (url[i] == '.') {
-			found++
-			if (found == 2) {
-				return url.substring(i + 1, url.lastIndexOf(':'));
-			}
-		}
 	}
 }
 
@@ -253,7 +241,39 @@ window.onload = function() {
 		}
 
 		document.body.appendChild(watcherElement);
+		//document.getElementById("main").appendChild(watcherElement);
 		$(watcherElement).draggable();
+	});
+	
+	$("#addHydraButton").click(function() {
+		var ip = window.prompt("Enter new hydra url:", "http://");
+		if (ip == null)
+			return;
+		
+		var data = {
+		    servers: [
+		        {
+		            server: ip
+		        }
+		    ]
+		}
+		
+		var url_parts = $("#infoServer").val().split('/');
+		var url = url_parts[0] + '//' + url_parts[2];
+		
+		$.ajax({
+			type: "POST",
+			url : url + "/app/hydra",
+			contentType: 'application/json',
+			data : JSON.stringify(data),
+			timeout : 3000,
+			success : function(data) {
+				//alert("OK");
+			},
+			error : function(data) {
+				alert("Error:" + data);
+			}
+		});
 	});
 
 	init_refresh();
