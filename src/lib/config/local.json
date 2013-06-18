@@ -1,5 +1,5 @@
 {
-	"url": "http://localhost",
+	"url": "http://localhost:7001",
 	"serverPort": 7002,
 	"db" : {
 		"host" : "localhost",
