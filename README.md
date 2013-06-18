@@ -50,6 +50,23 @@ cd hydra/src/lib/
 npm install
 ```
 
+## Configure Hydra
+
+### Configure Hydra Server
+
+#### Modify ./hydra/src/lib/config/local.json
+* Change url for the public url of your service, this is the url that will be used for other hydras.
+* Change server port, this is the base port that will be used to sync with other hydras.
+* Modify timeouts on app and server.
+* Modify mongodb configuration.
+* Add your own QLog credentials.
+
+#### Modify ./hydra/src/app_manager/app_manager.cfg
+* Modify app_id for your own app (hydra in this case).
+* Set the local and cloud strategies.
+* Modify the cloud name and cost.
+* Add the public and private server, the public server is the client_api (http://localhost:7001 for example), the private server is where the app_manager_info_server is listening (http://127.0.0.1:7777 for example).
+* Add the server_api of an Hydra to notify (in this case could be http://localhost:7002).
 
 Launching
 =========
