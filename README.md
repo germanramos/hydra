@@ -1,13 +1,21 @@
-hydra
+Hydra
 =====
 
-"if a head is cut off, two more will take its place"
+"If a head is cut off, two more will take its place"
+
+# What is Hydra?
+Hydra is multi-cloud application discovery, management and balancing service.
+
+Hydra attempts to ease the routing and balancing burden from servers and delegate it on the client (browser, mobile app, etc).   
 
 Deploy
 ======
 ## Prerequisites
 * build tools (gcc 4.2+, build-essential)
 * python 2.7+
+* python-devel package
+* pip python package manager
+* python psutil
 * ssh
 * git
 
@@ -65,11 +73,24 @@ npm install
 * Modify app_id for your own app (hydra in this case).
 * Set the local and cloud strategies.
 * Modify the cloud name and cost.
-* Add the public and private server, the public server is the client_api (http://localhost:7001 for example), the private server is where the app_manager_info_server is listening (http://127.0.0.1:7777 for example).
-* Add the server_api of an Hydra to notify (in this case could be http://localhost:7002).
+* Add the public and private server, the public server url is the client_api (same as in local.json), the private server is where the app_manager_info_server is listening (http://127.0.0.1:7777 for example).
+* Add the server_api url of an Hydra to notify (in this case could be http://localhost:7002).
 
 Launching
 =========
+
+Use the command run.sh on the src folder
+
+```
+./run.sh <envirnoment> <client_api_port> <server_api_port> <app_manager_info_server_port>
+```
+
+* environment - name of the environment file to use (local)
+* client_api_port - port used by the client api
+* server_api_port - port used by the server api and syncronization
+* app_manager_info_server - port used by the app_manager_info_server to monitor the system
+
+
 
 ```
 node ./server_api/app/main.js --port=7001 --env=pro &
