@@ -18,6 +18,7 @@ Deploy
 * python psutil (install via pip)
 * ssh
 * git
+* Increase max number of file descriptors - http://www.xenoclast.org/doc/benchmark/HTTP-benchmarking-HOWTO/node7.html
 
 ## Install nodejs
 * Download nodejs source code from http://nodejs.org/download/
@@ -102,4 +103,4 @@ or used as is:
 ./hydra stop
 ```
 
-Using main ports, such as 80 or 443 requires that no other application is listening in that port and superuser rights.
+Using main ports, such as 80 or 443, requires that no other application is listening on that port and superuser rights.
