@@ -13,11 +13,11 @@ ENVIROMENT=local     # environment
 CLIENT_PORT=7001     # client api port
 SERVER_PORT=7002     # server api port
 APP_MAN_PORT=7777    # app manager port
-
 #-----------------------------------------
 
 start() {
   echo -n "Starting Hydra processes: "
+  ulimit -n 999999
   cd ${SRC_HOME}
   echo 
   nohup /usr/local/bin/node ./client_api/app/main.js --port=${CLIENT_PORT} --env=${ENVIROMENT} >/dev/null 2>/dev/null &
