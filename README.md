@@ -89,10 +89,3 @@ Use the command run.sh on the src folder
 * client_api_port - port used by the client api
 * server_api_port - port used by the server api and syncronization
 * app_manager_info_server - port used by the app_manager_info_server to monitor the system
-
-
-
-```
-node ./server_api/app/main.js --port=7001 --env=pro &
-node ./client_api/app/main.js --port=7002 --env=pro &
-```
