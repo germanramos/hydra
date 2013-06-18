@@ -15,7 +15,7 @@ Deploy
 * python 2.7+
 * python-devel package
 * pip python package manager
-* python psutil
+* python psutil (install via pip)
 * ssh
 * git
 
@@ -89,3 +89,17 @@ Use the command run.sh on the src folder
 * client_api_port - port used by the client api
 * server_api_port - port used by the server api and syncronization
 * app_manager_info_server - port used by the app_manager_info_server to monitor the system
+
+Alternatively, there is an startup script that can be copied to /etc/init.d/ as superuser once configured the desired parameters:
+
+```
+cp hydra/src/hydra /etc/init.d/
+```
+
+or used as is:
+```
+./hydra start
+./hydra stop
+```
+
+Using main ports, such as 80 or 443 requires that no other application is listening in that port and superuser rights.
