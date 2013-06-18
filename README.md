@@ -34,7 +34,9 @@ make install // as superuser
 ```
 
 ## Install mongodb
-Follow this instructions: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
+Follow this instructions: 
+* Ubuntu - http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
+* CentOS/Fedora - http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/
 
 ## Get Hydra source code
 
