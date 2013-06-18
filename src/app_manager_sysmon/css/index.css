@@ -2,6 +2,16 @@
     text-align: center;
 }
 
+.deleteServer {
+	top: 0px;
+	right: 0px;
+	background-color: red;
+	width: 25px;
+	height: 25px;
+	position: absolute;
+	cursor: pointer;
+}
+
 #toolbar {
     background-color: lightgray;
     position: relative;

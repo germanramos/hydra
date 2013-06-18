@@ -177,6 +177,45 @@ function create_server(app, serverElement, server, data, alive) {
 	} else {
 		serverElement.setAttribute('class', 'server');
 	}
+	
+	var deleteElement = document.createElement("span");
+	deleteElement.appendChild(document.createTextNode("X"));
+	deleteElement.setAttribute('class', 'deleteServer');
+	serverElement.appendChild(deleteElement);
+	deleteElement.onclick = function() {
+		var delay = parseInt(window.prompt("Enter delay (ms):", "0"));
+		var now = (new Date).getTime();
+		var when = now + delay;
+		
+		var data = {
+		    servers: [{
+		            server: server.server,
+		            status: {
+		            	stateEvents: {
+		            		//"0": 2
+		            	}
+		            }
+		    }]
+		}
+		data.servers[0].status.stateEvents[when] = 2;
+		
+		var url_parts = $("#infoServer").val().split('/');
+		var url = url_parts[0] + '//' + url_parts[2];
+		
+		$.ajax({
+			type: "POST",
+			url : url + "/app/" + app.appId,
+			contentType: 'application/json',
+			data : JSON.stringify(data),
+			timeout : 3000,
+			success : function(data) {
+				alert("OK");
+			},
+			error : function(data) {
+				alert("Error:" + data);
+			}
+		});
+	}
 }
 
 function create_row(key, value) {
