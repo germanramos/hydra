@@ -29,6 +29,8 @@ var defaultApp = {
 module.exports = function(colApp, config){
 	var self = {};
 
+	colApp.ensureIndex({appId:1});
+
 	self.create = function(p_app, p_cbk){
 		var app = utils.merge({},defaultApp);
 
