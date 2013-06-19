@@ -3,20 +3,36 @@
 }
 
 .deleteServer {
-	top: 0px;
-	right: 0px;
-	background-color: red;
-	width: 25px;
-	height: 25px;
-	position: absolute;
-	cursor: pointer;
+    color: red;
+    cursor: pointer;
+    font-weight: bold;
+    height: 25px;
+    position: absolute;
+    right: 5px;
+    top: 0;
 }
 
-#toolbar {
+header {
     background-color: lightgray;
-    position: relative;
+    position: fixed;
+    top: 0;
     z-index: 99;
     padding: 2px;
+    width: 100%;
+}
+
+#main {
+	margin-top: 25px;
+	padding-bottom: 25px;
+}
+
+footer {
+	position: fixed;
+	bottom: 0;
+	z-index: 99;
+	background-color: lightgray;
+	padding: 2px;
+	width: 100%;
 }
 
 #infoServer {
@@ -83,7 +99,6 @@
 .server {
     border-color: RGB(204,0,0);
     background-color: RGB(234,153,153);
-    
     border: solid 3px;
     float: left;
     border-radius: 20px;
@@ -94,14 +109,46 @@
 }
 
 .server p {
-    margin: 5px;
+    margin: 5px 2px;
     white-space: nowrap;
+    height: 21px;
 }
 
-.server .key {
+.server p.CON {
+    float: right;
+    margin-right: 120px;
+    margin-top: -26px;
+}
+
+.server .key, footer .key {
+	background-color: lightgray;
+    border: 1px solid gray;
+    border-radius: 5px 5px 5px 5px;
     display: inline-block;
-    width: 50px;
     float: left;
+    font-weight: bold;
+    margin-right: 10px;
+    text-align: center;
+    width: 40px;
+}
+
+.server .value {
+    position: absolute;
+}
+
+footer .value {
+    float: left;
+    margin-right: 10px;
+}
+
+.progressBar {
+	text-align: center;
+    background-color: lightgreen;
+    border: 1px solid green;
+    border-radius: 5px 5px 5px 5px;
+    height: 21px;
+    position: absolute;
+    /*width: 220px;*/
 }
 
 .watcher {

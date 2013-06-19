@@ -27,12 +27,23 @@
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
         <!--<p id="title"> </p>-->
-        <div id="toolbar">
+        <header>
 	        <input id="infoServer" type="text" />
 	        <input id="refreshButton" class="button" type="button" value="Stop Refresh" />
 	        <input id="addWatcherButton" class="button" type="button" value="Add Watcher" />
 	        <input id="addHydraButton" class="button" type="button" value="Add Hydra" />
-	        <input id="configShowUnavailable" type="checkbox" checked/>Show unavailable servers<br/>
-        </div>
+	        <input id="configShowUnavailable" type="checkbox" checked/> Show unavailable servers
+	        <input id="configShowConnections" type="checkbox" checked/> Get connections from servers
+        </header>
+        <div id="main"> </div>
+        <footer>
+        	<span class="key">ID</span><span class="value">Service Name,</span>
+        	<span class="key">URL</span><span class="value">Public URL,</span>
+        	<span class="key">PRZ</span><span class="value">Server Prize,</span>
+        	<span class="key">CON</span><span class="value">Current Connections,</span>
+        	<span class="key">CPU</span><span class="value">Percent of CPU usage,</span>
+        	<span class="key">MEM</span><span class="value">Percent of Memory usage,</span>
+        	<span class="key">BAL</span><span class="value">Percent of connections</span>
+        </footer>
     </body>
 </html>

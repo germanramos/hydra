@@ -1,5 +1,5 @@
 INTERVAL = 0; //5000;
-INIT_HYDRA_URL = "http://hydra1.cloud1.com:7002/app";
+INIT_HYDRA_URL = "http://hydra.cloud1.com:7002/app/time";
 
 var refresh = true;
 var interval;
@@ -80,19 +80,23 @@ function process_app(app) {
 }
 
 function process_server(app, server, server_sysmon) {
-	$.ajax({
-		url : server_sysmon,
-		timeout : 3000,
-		success : function(data) {
-			console.log("Getted statics from server " + server_sysmon);
-			paint_server(app, server, data, true);
-		},
-		error : function(data) {
-			console.log("Error when getting static from server "
-					+ server_sysmon);
-			paint_server(app, server, {state: 1}, true);
-		}
-	})
+	if ($("#configShowConnections:checked").length > 0) {
+		$.ajax({
+			url : server_sysmon,
+			timeout : 3000,
+			success : function(data) {
+				console.log("Getted statics from server " + server_sysmon);
+				paint_server(app, server, data, true);
+			},
+			error : function(data) {
+				console.log("Error when getting static from server "
+						+ server_sysmon);
+				paint_server(app, server, {state: 1}, true);
+			}
+		})
+	} else {
+		paint_server(app, server, {state: 2}, true);
+	}
 }
 
 function paint_server(app, server, data, alive) {
@@ -115,7 +119,7 @@ function paint_server(app, server, data, alive) {
 			divElement.setAttribute('class', 'title');
 			divElement.appendChild(document.createTextNode(cloud));
 			cloudElement.appendChild(divElement);
-			document.body.appendChild(cloudElement);
+			document.getElementById('main').appendChild(cloudElement);
 			//document.getElementById("main").appendChild(cloudElement);
 			$(cloudElement).resizable();
 			$(cloudElement).draggable();
@@ -140,19 +144,21 @@ function create_server(app, serverElement, server, data, alive) {
 	serverElement.setAttribute('id', server.server);
 	serverElement.setAttribute('checked', 'true');
 	serverElement.appendChild(create_row("ID", app.appId));
-	serverElement.appendChild(create_row("PRZ", server.cost));
 	serverElement.appendChild(create_row("URL", server.server));
+	serverElement.appendChild(create_row("PRZ", server.cost));
 	serverElement.ondblclick = function(e) {
 		$(this).remove();
 		e.stopPropagation();
 		return false;
 	}
 	$(serverElement).draggable();
-	if (alive) {		
-		serverElement.appendChild(create_row("CPU", server.status.cpuLoad));
-		serverElement.appendChild(create_row("MEM", server.status.memLoad));
+	if (alive) {
+		var cpuElement = create_row("CPU", Math.round(server.status.cpuLoad).toString() + '%', server.status.cpuLoad)
+		serverElement.appendChild(cpuElement);
+		serverElement.appendChild(create_row("MEM", Math.round(server.status.memLoad).toString() + '%', server.status.memLoad));
+		var serverClass = 'server app_' + app.appId;
 		if (data.state == 0) {
-			serverElement.setAttribute('class', 'server active');
+			serverClass += ' active';
 			filtered = data.connections.filter(function(element, index, array) {
 				if (element[5] == "ESTABLISHED") {
 					var ip = element[4][0];
@@ -168,25 +174,44 @@ function create_server(app, serverElement, server, data, alive) {
 					return false;
 				}
 			});
-			serverElement.appendChild(create_row("CON", filtered.length));
+			//Count all connections of this application including all clouds
+			var allConnections = 0;
+			$('.server.active.app_' + app.appId + ' .CON .value').each(function() {
+				allConnections += parseInt(this.innerHTML);
+			});
+			
+			//Create connections row
+			allConnections += filtered.length;
+			serverElement.insertBefore(create_row("CON", filtered.length.toString() + ' of ' + allConnections), cpuElement);
+			
+			//Create connections percent row
+			if (allConnections == 0)
+				var percent = 0;
+			else
+				var percent = Math.round(filtered.length * 100 / allConnections);
+			serverElement.appendChild(create_row("BAL", percent.toString() + '%', percent));
+		} else if (data.state == 2) {
+			serverClass += ' active';
 		} else {
-			serverElement.setAttribute('class', 'server warning');
+			serverClass += ' warning';
 		}
-		
+		serverElement.setAttribute('class', serverClass);
 		
 	} else {
 		serverElement.setAttribute('class', 'server');
 	}
 	
 	var deleteElement = document.createElement("span");
-	deleteElement.appendChild(document.createTextNode("X"));
+	deleteElement.appendChild(document.createTextNode("x"));
 	deleteElement.setAttribute('class', 'deleteServer');
 	serverElement.appendChild(deleteElement);
 	deleteElement.onclick = function() {
-		var delay = parseInt(window.prompt("Enter delay (ms):", "0"));
+		var answer = window.prompt("Enter delay (ms):", "0");
+		if (answer == null)
+			return
+		var delay = parseInt(answer);
 		var now = (new Date).getTime();
-		var when = now + delay;
-		
+		var when = now + delay;	
 		var data = {
 		    servers: [{
 		            server: server.server,
@@ -197,11 +222,9 @@ function create_server(app, serverElement, server, data, alive) {
 		            }
 		    }]
 		}
-		data.servers[0].status.stateEvents[when] = 2;
-		
+		data.servers[0].status.stateEvents[when] = 2;	
 		var url_parts = $("#infoServer").val().split('/');
 		var url = url_parts[0] + '//' + url_parts[2];
-		
 		$.ajax({
 			type: "POST",
 			url : url + "/app/" + app.appId,
@@ -218,19 +241,33 @@ function create_server(app, serverElement, server, data, alive) {
 	}
 }
 
-function create_row(key, value) {
+function create_row(key, value, percent) {
 	var pElement = document.createElement("p");
+	pElement.setAttribute('class', key);
 
 	var keyElement = document.createElement("span");
 	keyElement.setAttribute('class', 'key');
 	keyElement.appendChild(document.createTextNode(key));
-
-	var valueElement = document.createElement("span");
-	valueElement.setAttribute('class', 'value');
-	valueElement.appendChild(document.createTextNode(value));
-
 	pElement.appendChild(keyElement);
-	pElement.appendChild(valueElement);
+	
+	if (percent >= 0) {
+		var progressBarElement = document.createElement("span");
+		progressBarElement.setAttribute('class', 'progressBar');
+		var width = percent * 220 / 100;
+		progressBarElement.style.width = width.toString() + 'px';
+		pElement.appendChild(progressBarElement);
+		if (percent >= 15)
+			progressBarElement.appendChild(document.createTextNode(value));	
+	}
+	if (percent == null || percent < 15) {
+		var valueElement = document.createElement("span");
+		valueElement.setAttribute('class', 'value');
+		valueElement.appendChild(document.createTextNode(value));
+		pElement.appendChild(valueElement);
+		if (percent >= 0)
+			valueElement.style.margin = '0px ' + (width+5).toString() + 'px';
+	}
+		
 	return pElement
 }
 
@@ -252,6 +289,8 @@ window.onload = function() {
 
 	$("#addWatcherButton").click(function() {
 		var ip = window.prompt("Enter client ip:", "127.0.0.1");
+		if (ip == null)
+			return
 		if (document.getElementById(ip) != null) {
 			alert("Watcher already exists");
 			return;
@@ -279,7 +318,7 @@ window.onload = function() {
 			$(this).remove();
 		}
 
-		document.body.appendChild(watcherElement);
+		document.getElementById('main').appendChild(watcherElement);
 		//document.getElementById("main").appendChild(watcherElement);
 		$(watcherElement).draggable();
 	});
@@ -307,7 +346,7 @@ window.onload = function() {
 			data : JSON.stringify(data),
 			timeout : 3000,
 			success : function(data) {
-				//alert("OK");
+				alert("OK");
 			},
 			error : function(data) {
 				alert("Error:" + data);
