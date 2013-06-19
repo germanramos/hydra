@@ -110,14 +110,14 @@ Hydra client is a js file that should be included in the web page or node projec
 ## hydra.config([<server list>], options)
 * [<server list>] - the initial server urls we want to use to access Hydra.
 * options - (optional) object containing the following fields:
-** hydraTimeOut - timeout for updating Hydra Servers. Minimum of 60 seconds
-** appTimeOut - timeout for updating an app server in the internal cache. Minimum 20 seconds
-** retryOnFail - retry timeout in case the hydra we are requesting an app or new Hydra servers fail to answer. Minimum 500ms
+	* hydraTimeOut - timeout for updating Hydra Servers. Minimum of 60 seconds
+	* appTimeOut - timeout for updating an app server in the internal cache. Minimum 20 seconds
+	* retryOnFail - retry timeout in case the hydra we are requesting an app or new Hydra servers fail to answer. Minimum 500ms
 
 By default on the browser, the initial Hydra server will be the host serving the hydra.js client file, making this function call optional, although it’s recommended to set up the servers.
 The node client have no initial servers, throwing an exception if <code>hydra.config</code> is not call prior to <code>hydra.get</code> 
 
-# hydra.get(appID, nocache, callback)
+## hydra.get(appID, nocache, callback)
 This function will call to callback(error, [servers]) function with the url of the server that provides the given appID.
 * appID - id of the application requested
 * nocache - boolean, if set to true will ask the hydra server for the application servers ignoring the internal cache.
