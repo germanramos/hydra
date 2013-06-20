@@ -38,6 +38,8 @@ DEBUG = 1
 TESTRUN = 0
 PROFILE = 0
 
+INFO_TIMEOUT = 1
+
 class stateEnum:
     READY = 0
     UNAVAILABLE = 1
@@ -77,7 +79,7 @@ def main(argv=None):
                     server_public,server_private = server.split(",")
                     logging.debug("Getting info from " + server_private)
                     try:
-                        response = urllib2.urlopen(server_private)
+                        response = urllib2.urlopen(server_private, timeout=INFO_TIMEOUT)
                         output = json.load(response)
                         state = int(output["state"])
                         cpuLoad = float(output["cpuLoad"])
