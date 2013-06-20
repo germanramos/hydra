@@ -76,6 +76,7 @@ npm install
 * Modify the cloud name and cost.
 * Add the public and private server, the public server url is the client_api (same as in local.json), the private server is where the app_manager_info_server is listening (http://127.0.0.1:7777 for example).
 * Add the server_api url of an Hydra to notify (in this case could be http://localhost:7002).
+* NOTE: You can see more information about app_manager at https://github.com/bbva-innotech/hydra/tree/master/src/app_manager
 
 # Launching
 
