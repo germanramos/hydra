@@ -11,14 +11,14 @@ Hydra attempts to ease the routing and balancing burden from servers and delegat
 # Deploy
 
 ## Prerequisites
-* build tools (gcc 4.2+, build-essential)
+* build tools (gcc 4.2+, build-essential, yum groupinstall "Development Tools")
 * python 2.7+
 * python-devel package
-* pip python package manager
+* pip python package manager (http://www.pip-installer.org/en/latest/installing.html)
 * python psutil (install via pip)
 * ssh
 * git
-* Increase max number of file descriptors - http://www.xenoclast.org/doc/benchmark/HTTP-benchmarking-HOWTO/node7.html
+* Increase max number of file descriptors (http://www.xenoclast.org/doc/benchmark/HTTP-benchmarking-HOWTO/node7.html)
 
 ## Install nodejs
 * Download nodejs source code from http://nodejs.org/download/
