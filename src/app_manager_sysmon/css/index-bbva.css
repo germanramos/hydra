@@ -7,7 +7,7 @@ body {
 }
 
 .deleteServer {
-    color: red;
+    color: RGB(200,23,94); /* Magenta */
     cursor: pointer;
     font-weight: bold;
     height: 25px;
@@ -17,7 +17,7 @@ body {
 }
 
 header {
-    background-color: rgb(204,204,204);
+    background-color: rgb(204,204,204); /* Gray */
     position: fixed;
     top: 0;
     z-index: 99;
@@ -34,7 +34,7 @@ footer {
 	position: fixed;
 	bottom: 0;
 	z-index: 99;
-	background-color: rgb(204,204,204);
+	background-color: rgb(204,204,204); /* Gray */
 	padding: 2px;
 	width: 100%;
 }
@@ -56,7 +56,7 @@ footer {
     float:left
     border: solid 1px;
     z-index: 99;
-    background-color: rgb(204,204,204);
+    background-color: rgb(204,204,204); /* Gray */
 }
 
 #title {
@@ -73,15 +73,8 @@ footer {
     padding: 5px;
     margin: 5px;
     overflow: hidden;
-    background-color: RGB(181,229,249);/*RGB(82,188,236);*/ /*RGB(164,194,244);*/
-    border-color: RGB(00,110,193); /*RGB(17,85,204);*/
-    /*
-    background-image: url("../img/Simple_Cloud.svg");
-    background-position: center center;
-    background-size: 100% 100%;
-    padding: 50px;
-    border: None;
-    */
+    background-color: RGB(181,229,249); /* Blue C 290 */
+    border-color: RGB(00,110,193); /* Blue C 300 */
 }
 
 .cloud .title {
@@ -90,19 +83,19 @@ footer {
 }
 
 .server.active {
-    border-color: RGB(134,200,45);/*RGB(56,118,29);*/
-    background-color: RGB(209,230,183);/*RGB(182,215,168);*/
+    border-color: RGB(134,200,45); /*Green*/
+    background-color: RGB(209,230,183);/*Green 40%*/
 }
 
 .server.warning {
-    border-color: RGB(253,189,44);/*RGB(192,144,0);*/
-    background-color: RGB(255,228,183);/*RGB(255,229,153);*/
+    border-color: RGB(253,189,44);/*Yellow*/
+    background-color: RGB(255,228,183);/*Yellow 40%*/
 }
 
 .server {
 	border: solid 3px;
-    border-color: RGB(200,23,94);/*RGB(204,0,0);*/
-    background-color: RGB(232,172,190);/*RGB(234,153,153);*/
+    border-color: RGB(200,23,94);/*Magenta*/
+    background-color: RGB(232,172,190);/*Magenta 40%*/
     float: left;
     border-radius: 20px;
     padding: 5px;
@@ -124,7 +117,7 @@ footer {
 }
 
 .server .key, footer .key {
-	background-color: rgb(204,204,204);
+	background-color: rgb(204,204,204); /* Gray */
     border: 1px solid gray;
     border-radius: 5px 5px 5px 5px;
     display: inline-block;
@@ -146,19 +139,34 @@ footer .value {
 
 .progressBar {
 	text-align: center;
-    background-color: lightgreen;
-    border: 1px solid green;
+    background-color: RGB(177,215,138); /*Green 65%*/
+    border: 1px solid RGB(134,200,45); /*Green*/
     border-radius: 5px 5px 5px 5px;
     height: 21px;
     position: absolute;
     /*width: 220px;*/
 }
 
+
+.MEM .progressBar {
+	background-color: RGB(252,187,118); /*Orange 65%*/
+    border: 1px solid RGB(246,137,30); /*Orange*/
+}
+
+.CPU .progressBar {
+	background-color: RGB(253,213,137); /*Yellow 65%*/
+    border: 1px solid RGB(253,189,44); /*Yellow*/
+}
+
+.BAL .progressBar {
+	background-color: RGB(82,188,236); /*Blue C 2915*/
+    border: 1px solid RGB(00,158,229); /*Blue C 2925*/
+}
+
 .watcher {
-    border-color: RGB(192,144,0);
-    background-color: RGB(255,229,153);
-    
     border: solid 3px;
+    border-color: RGB(246,137,30); /*Orange*/
+    background-color: RGB(254,213,169); /*Orange 40%*/
     float: left;
     border-radius: 20px;
     padding: 5px;
