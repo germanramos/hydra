@@ -61,16 +61,28 @@ def main(argv=None):
         # setup option parser
         parser = OptionParser(version=program_version_string, epilog=program_longdesc, description=program_license)
         parser.add_option("-v", "--verbose", dest="verbose", action="count", help="set verbosity level [default: %default]")
+        parser.add_option("-c", "--config", default="app_manager.cfg", dest="configFile", action="store", help="set configuration file [default: %default]")
+        parser.add_option("-l", "--log-config", default="logging.cfg", dest="loginConfigFile", action="store", help="set log configuration file [default: %default]")
 
         # process options
         (opts, _args) = parser.parse_args(argv)
         
         if opts.verbose > 0:
             print("verbosity level = %d" % opts.verbose)
-                    
-        # MAIN BODY #
+        
         config = ConfigParser.ConfigParser()
-        config.read(['app_manager.cfg', os.path.expanduser('~/app_manager.cfg'), '/etc/app_manager.cfg'])  
+        #config.read(['app_manager.cfg', os.path.expanduser('~/app_manager.cfg'), '/etc/app_manager.cfg'])
+        print "Using config file " + opts.configFile;
+        config.read([opts.configFile])
+        
+        #Conf logging
+        fileConfig(opts.loginConfigFile)
+        fileHandler = logging.handlers.RotatingFileHandler(opts.configFile + ".log", mode='a', maxBytes=1048576, backupCount=3)
+        fileHandler.setFormatter("simpleFormatter")
+        logging.getLogger().addHandler(fileHandler)
+        print "Logging to " + opts.configFile + ".log";
+        
+        # MAIN BODY #
         while True:
             try:
                 servers = []
@@ -146,8 +158,6 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
-    #Conf logging
-    fileConfig('logging.conf')    
     if DEBUG:
         sys.argv.append("-v")
         logging.getLogger("root").setLevel(logging.DEBUG)
