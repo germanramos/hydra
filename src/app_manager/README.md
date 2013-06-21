@@ -12,10 +12,16 @@ Ask periodically to the App Manager Info Server the state of the application and
 
 ## Prerequisites
 * build tools (gcc 4.2+, build-essential)
+  * yum groupinstall 'Development Tools'
 * python 2.6+
 * python-devel package
-* pip python package manager
-* python psutil (install via pip)
+  * yum install python-devel
+* pip python package manager 
+  * wget https://bitbucket.org/pypa/setuptools/raw/0.7.4/ez_setup.py -O - | python
+  * curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py
+  * [sudo] python get-pip.py
+* python psutil
+  * pip install psutil 
 * ssh
 * git
 * Increase max number of file descriptors - http://www.xenoclast.org/doc/benchmark/HTTP-benchmarking-HOWTO/node7.html
