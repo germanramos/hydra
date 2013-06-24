@@ -6,7 +6,7 @@
 		"express"	: "3.x",
 		"async"		: "0.2.x",
 		"pause"		: "0.0.1",
-		"hero"		: "https://github.com/thegameofcode/hero/archive/0.1.11.tar.gz"
+		"hero"		: "https://github.com/thegameofcode/hero/archive/0.1.12.tar.gz"
 	},
 	"engines" : {
 		"node"	: "0.8.x",
