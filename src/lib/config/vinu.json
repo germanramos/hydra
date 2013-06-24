@@ -1,8 +1,8 @@
 {
-	"url": "http://localhost:7001",
-	"serverPort": 7002,
+	"url": "http://1.hydra.innotechapp.com:80",
+	"serverPort": 443,
 	"db" : {
-		"host" : "localhost",
+		"host" : "0.mongodb.innotechapp.com",
 		"port" : "27017",
 		"name" : "hydra",
 		"type" : "mongodb",
