@@ -145,7 +145,11 @@ module.exports = function(colApp, config){
 
 		colApp.findOne(find, {}, function(err, oldApp){
 			p_app = utils.merge(utils.merge({},defaultApp), p_app);
-			if(err || oldApp === null){
+			if(err){
+				console.log(err);
+				if(p_cbk) p_cbk();
+			}
+			else if(oldApp === null){
 				self.create(p_app, p_cbk);
 			} else {
 
