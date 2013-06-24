@@ -6,6 +6,15 @@
 		"port" : "27017",
 		"name" : "hydra",
 		"type" : "mongodb",
+		"replicaSet" : {
+			"name" : "rsInnotech",
+			"servers" :	[
+				{
+					"host" : "0.mongodb.innotechapp.com",
+					"port" : 27017
+				}
+			]
+		},
 		"params" : ""
 	},
 	"qlog" : {

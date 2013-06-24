@@ -4,7 +4,7 @@
 		"port" : "27017",
 		"name" : "hydra",
 		"type" : "mongodb",
-		"params" : {"safe":false}
+		"params" : ""
 	},
 	"qlog" : {
 		"url" : "http://api.qlog.io:3000",
