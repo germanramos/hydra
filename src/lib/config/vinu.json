@@ -12,6 +12,14 @@
 				{
 					"host" : "0.mongodb.innotechapp.com",
 					"port" : 27017
+				},
+				{
+					"host" : "1.mongodb.innotechapp.com",
+					"port" : 27017
+				},
+				{
+					"host" : "2.mongodb.innotechapp.com",
+					"port" : 27017
 				}
 			]
 		},
