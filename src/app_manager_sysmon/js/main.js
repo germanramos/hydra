@@ -153,9 +153,12 @@ function create_server(app, serverElement, server, data, alive) {
 	}
 	$(serverElement).draggable();
 	if (alive) {
-		var cpuElement = create_row("CPU", Math.round(server.status.cpuLoad).toString() + '%', server.status.cpuLoad)
+		var cpuLoad = data.state == 0 ? data.cpuLoad : server.status.cpuLoad;
+		var cpuElement = create_row("CPU", Math.round(cpuLoad).toString() + '%', cpuLoad);
 		serverElement.appendChild(cpuElement);
-		serverElement.appendChild(create_row("MEM", Math.round(server.status.memLoad).toString() + '%', server.status.memLoad));
+		var memLoad = data.state == 0 ? data.memLoad : server.status.memLoad;
+		var memElement = create_row("MEM", Math.round(memLoad).toString() + '%', memLoad);
+		serverElement.appendChild(memElement);
 		var serverClass = 'server app_' + app.appId;
 		if (data.state == 0) {
 			serverClass += ' active';
