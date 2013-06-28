@@ -68,14 +68,14 @@ header {
   padding-bottom: 40px;
   font-family: 'Arial',Arial,Arial,serif;
   /*background: #2e7bcf url(../images/header-bg.jpg) 0 0 repeat-x;*/
-  background-color: rgb(09, 79, 164);
+  background-color: white;
   border-bottom: solid 1px #275da1;
 }
 
 header h1 {
   letter-spacing: -1px;
   font-size: 72px;
-  color: #fff;
+  color: rgb(09, 79, 164);
   line-height: 1;
   margin-bottom: 0.2em;
   width: 540px;
@@ -147,7 +147,7 @@ header a.button {
   position: absolute;
   right: 0;
   top: 0;
-  background: transparent url(../images/github-button.png) 0 0 no-repeat;
+  background: transparent url(../images/github-button-blue.png) 0 0 no-repeat;
 }
 aside a.button {
   width: 138px;
@@ -492,4 +492,8 @@ footer a:hover {
 
 .button.innovationLogo {
 	background: url("../images/innovationLogo.png") no-repeat scroll 0 0 transparent;
+}
+
+.button.github {
+	color: black;
 }
