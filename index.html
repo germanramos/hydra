@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Hydra by bbva-innotech</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Hydra</h1>
+        <h2>&quot;if a head is cut off, two more will take its place&quot;</h2>
+        <a href="https://github.com/bbva-innotech/hydra" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="what-is-hydra" class="anchor" href="#what-is-hydra"><span class="octicon octicon-link"></span></a>What is Hydra?</h1>
+
+<p>Hydra is multi-cloud application discovery, management and balancing service.</p>
+
+<p>Hydra attempts to ease the routing and balancing burden from servers and delegate it on the client (browser, mobile app, etc).   </p>
+
+<h1>
+<a name="deploy" class="anchor" href="#deploy"><span class="octicon octicon-link"></span></a>Deploy</h1>
+
+<h2>
+<a name="prerequisites" class="anchor" href="#prerequisites"><span class="octicon octicon-link"></span></a>Prerequisites</h2>
+
+<ul>
+<li>build tools (gcc 4.2+, build-essential, yum groupinstall "Development Tools")</li>
+<li>python 2.7+</li>
+<li>python-devel package</li>
+<li>pip python package manager (<a href="http://www.pip-installer.org/en/latest/installing.html">http://www.pip-installer.org/en/latest/installing.html</a>)</li>
+<li>python psutil (install via pip)</li>
+<li>ssh</li>
+<li>git</li>
+<li>Increase max number of file descriptors (<a href="http://www.xenoclast.org/doc/benchmark/HTTP-benchmarking-HOWTO/node7.html">http://www.xenoclast.org/doc/benchmark/HTTP-benchmarking-HOWTO/node7.html</a>)</li>
+</ul><h2>
+<a name="install-nodejs" class="anchor" href="#install-nodejs"><span class="octicon octicon-link"></span></a>Install nodejs</h2>
+
+<ul>
+<li>Download nodejs source code from <a href="http://nodejs.org/download/">http://nodejs.org/download/</a>
+Latest build at the time of writing is 0.10.11</li>
+</ul><pre><code>wget http://nodejs.org/dist/v0.10.11/node-v0.10.11.tar.gz
+</code></pre>
+
+<ul>
+<li>Unzip</li>
+</ul><pre><code>tar xvfz node-v0.10.11.tar.gz
+</code></pre>
+
+<ul>
+<li>Compile and install</li>
+</ul><pre><code>cd node-v0.10.11
+./configure
+make // -j&lt;num cores + 1&gt; for faster compiling
+make install // as superuser
+</code></pre>
+
+<h2>
+<a name="install-mongodb" class="anchor" href="#install-mongodb"><span class="octicon octicon-link"></span></a>Install mongodb</h2>
+
+<p>Follow this instructions: </p>
+
+<ul>
+<li>Ubuntu - <a href="http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/">http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/</a>
+</li>
+<li>CentOS/Fedora - <a href="http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/">http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/</a>
+</li>
+</ul><h2>
+<a name="get-hydra-source-code" class="anchor" href="#get-hydra-source-code"><span class="octicon octicon-link"></span></a>Get Hydra source code</h2>
+
+<pre><code>git clone https://github.com/bbva-innotech/hydra.git
+</code></pre>
+
+<h2>
+<a name="install-dependancies" class="anchor" href="#install-dependancies"><span class="octicon octicon-link"></span></a>Install dependancies</h2>
+
+<pre><code>cd hydra/src/lib/
+npm install
+</code></pre>
+
+<h2>
+<a name="configure-hydra" class="anchor" href="#configure-hydra"><span class="octicon octicon-link"></span></a>Configure Hydra</h2>
+
+<h3>
+<a name="configure-hydra-server" class="anchor" href="#configure-hydra-server"><span class="octicon octicon-link"></span></a>Configure Hydra Server</h3>
+
+<h4>
+<a name="modify-hydrasrclibconfiglocaljson" class="anchor" href="#modify-hydrasrclibconfiglocaljson"><span class="octicon octicon-link"></span></a>Modify ./hydra/src/lib/config/local.json</h4>
+
+<ul>
+<li>Change url for the public url of your service, this is the url that will be used for other hydras.</li>
+<li>Change server port, this is the base port that will be used to sync with other hydras.</li>
+<li>Modify timeouts on app and server.</li>
+<li>Modify mongodb configuration.</li>
+<li>Add your own QLog credentials.</li>
+</ul><h4>
+<a name="modify-hydrasrcapp_managerapp_managercfg" class="anchor" href="#modify-hydrasrcapp_managerapp_managercfg"><span class="octicon octicon-link"></span></a>Modify ./hydra/src/app_manager/app_manager.cfg</h4>
+
+<ul>
+<li>Modify app_id for your own app (hydra in this case).</li>
+<li>Set the local and cloud strategies.</li>
+<li>Modify the cloud name and cost.</li>
+<li>Add the public and private server, the public server url is the client_api (same as in local.json), the private server is where the app_manager_info_server is listening (<a href="http://127.0.0.1:7777">http://127.0.0.1:7777</a> for example).</li>
+<li>Add the server_api url of an Hydra to notify (in this case could be http://localhost:7002).</li>
+<li>NOTE: You can see more information about app_manager at <a href="https://github.com/bbva-innotech/hydra/tree/master/src/app_manager">https://github.com/bbva-innotech/hydra/tree/master/src/app_manager</a>
+</li>
+</ul><h1>
+<a name="launching" class="anchor" href="#launching"><span class="octicon octicon-link"></span></a>Launching</h1>
+
+<p>Use the command run.sh on the src folder</p>
+
+<pre><code>./run.sh &lt;envirnoment&gt; &lt;client_api_port&gt; &lt;server_api_port&gt; &lt;app_manager_info_server_port&gt;
+</code></pre>
+
+<ul>
+<li>environment - name of the environment file to use (local)</li>
+<li>client_api_port - port used by the client api</li>
+<li>server_api_port - port used by the server api and syncronization</li>
+<li>app_manager_info_server - port used by the app_manager_info_server to monitor the system</li>
+</ul><p>Alternatively, there is an startup script that can be copied to /etc/init.d/ as superuser once configured the desired parameters:</p>
+
+<pre><code>cp hydra/src/hydra /etc/init.d/
+</code></pre>
+
+<p>or used as is:</p>
+
+<pre><code>./hydra start
+./hydra stop
+</code></pre>
+
+<p>Using main ports, such as 80 or 443, requires that no other application is listening on that port and superuser rights.</p>
+
+<h1>
+<a name="hydra-client" class="anchor" href="#hydra-client"><span class="octicon octicon-link"></span></a>Hydra Client</h1>
+
+<p>Hydra client is a js file that should be included in the web page or node project. It provides two functions:</p>
+
+<h2>
+<a name="hydraconfig-options" class="anchor" href="#hydraconfig-options"><span class="octicon octicon-link"></span></a>hydra.config([], options)</h2>
+
+<ul>
+<li>[] - the initial server urls we want to use to access Hydra.</li>
+<li>options - (optional) object containing the following fields:
+
+<ul>
+<li>hydraTimeOut - timeout for updating Hydra Servers. Minimum of 60 seconds</li>
+<li>appTimeOut - timeout for updating an app server in the internal cache. Minimum 20 seconds</li>
+<li>retryOnFail - retry timeout in case the hydra we are requesting an app or new Hydra servers fail to answer. Minimum 500ms</li>
+</ul>
+</li>
+</ul><p>By default on the browser, the initial Hydra server will be the host serving the hydra.js client file, making this function call optional, although it’s recommended to set up the servers.
+The node client have no initial servers, throwing an exception if <code>hydra.config</code> is not call prior to <code>hydra.get</code> </p>
+
+<h2>
+<a name="hydragetappid-nocache-callback" class="anchor" href="#hydragetappid-nocache-callback"><span class="octicon octicon-link"></span></a>hydra.get(appID, nocache, callback)</h2>
+
+<p>This function will call to callback(error, [servers]) function with the url of the server that provides the given appID.</p>
+
+<ul>
+<li>appID - id of the application requested</li>
+<li>nocache - boolean, if set to true will ask the hydra server for the application servers ignoring the internal cache.</li>
+<li>callback(error, [servers]) - function callback that will receive the app server or an error in case the app does not exist</li>
+</ul><p>Internally, it will ask to the first Hydra server or use the internal cache in order to get the corresponding server url for the app and then it will call to callback function. If the application exist, the servers are sent back and served through the callback function (if the application exist, but there are no servers available, it will return an empty array). If the application does not exist, the callback will receive an error and the list will be set to null.</p>
+
+<p>In case an Hydra server fails to answer (when requesting an app or new Hydra servers), the client will try again (based on the retryOnFail timeout) using the next server and moving the one that failed to the end of the list until one of the Hydra servers replies.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/bbva-innotech/hydra/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/bbva-innotech/hydra/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/bbva-innotech/hydra"></a> is maintained by <a href="https://github.com/bbva-innotech">bbva-innotech</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
