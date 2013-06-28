@@ -86,7 +86,7 @@ header h2 {
   color: rgb(82, 188, 236);
   font-weight: normal;
   line-height: 1.3;
-  width: 540px;
+  width: 560px; /*540*/
   letter-spacing: 0;
 }
 
