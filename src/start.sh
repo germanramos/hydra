@@ -7,5 +7,5 @@ node ./server_api/app/main.js --port=7002 --env=local &
 #node ./monitor/app/main.js --port=0 --env=local &
 node ./client_server/app/main.js --port=7000 --env=local &
 cd ./app_manager
-python ./app_manager.py &
+python ./app_manager.py -c app_manager.cfg &
 cd ..
