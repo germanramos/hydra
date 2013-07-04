@@ -1,5 +1,5 @@
 INTERVAL = 0; //5000;
-INIT_HYDRA_URL = "http://2.hydra.innotechapp.com/app/";
+INIT_HYDRA_URL = "http://2.hydra.innotechapp.com:443/app/";
 
 var refresh = true;
 var interval;
