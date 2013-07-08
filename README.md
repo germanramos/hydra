@@ -7,6 +7,12 @@ Hydra
 Hydra is multi-cloud application discovery, management and balancing service.
 
 - [Deploy](#a1)
+ * [Prerequisites](#b1)
+ * [Install nodejs](#b2)
+ * [Install mongodb](#b3)
+ * [Get Hydra source code](#b4)
+ * [Install dependencies](#b5)
+ * [Configure Hydra](#b6)
 - [Launching](#a2)
 - [Hydra Client](#a3)
 - [License](#a4)
@@ -15,7 +21,7 @@ Hydra attempts to ease the routing and balancing burden from servers and delegat
 
 <a name="a1"/>
 # Deploy
-
+<a name="b1"/>
 ## Prerequisites
 * build tools (gcc 4.2+, build-essential, yum groupinstall "Development Tools")
 * python 2.7+
@@ -25,7 +31,7 @@ Hydra attempts to ease the routing and balancing burden from servers and delegat
 * ssh
 * git
 * Increase max number of file descriptors (http://www.xenoclast.org/doc/benchmark/HTTP-benchmarking-HOWTO/node7.html)
-
+<a name="b2"/>
 ## Install nodejs
 * Download nodejs source code from http://nodejs.org/download/
 Latest build at the time of writing is 0.10.11
@@ -47,24 +53,25 @@ cd node-v0.10.11
 make // -j<num cores + 1> for faster compiling
 make install // as superuser
 ```
-
+<a name="b3"/>
 ## Install mongodb
 Follow this instructions: 
 * Ubuntu - http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
 * CentOS/Fedora - http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/
 
+<a name="b4"/>
 ## Get Hydra source code
 
 ```
-git clone https://github.com/bbva-innotech/hydra.git
+git clone https://github.com/innotech/hydra.git
 ```
-
-## Install dependancies
+<a name="b5"/>
+## Install dependencies
 ```
 cd hydra/src/lib/
 npm install
 ```
-
+<a name="b6"/>
 ## Configure Hydra
 
 ### Configure Hydra Server
@@ -82,7 +89,7 @@ npm install
 * Modify the cloud name and cost.
 * Add the public and private server, the public server url is the client_api (same as in local.json), the private server is where the app_manager_info_server is listening (http://127.0.0.1:7777 for example).
 * Add the server_api url of an Hydra to notify (in this case could be http://localhost:7002).
-* NOTE: You can see more information about app_manager at https://github.com/bbva-innotech/hydra/tree/master/src/app_manager
+* NOTE: You can see more information about app_manager at https://github.com/innotech/hydra/tree/master/src/app_manager
 
 <a name="a2"/>
 # Launching
