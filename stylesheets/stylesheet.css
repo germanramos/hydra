@@ -51,7 +51,7 @@ body {
   font-size: 15px;
   line-height: 1.5; 
   background: #fafafa url(../images/body-bg.jpg) 0 0 repeat;
-  font-family: 'Arial',Arial,Arial,serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, serif;
   font-weight: 400;
   color: #666;
 }
@@ -66,16 +66,15 @@ a:hover {
 header {
   padding-top: 40px;
   padding-bottom: 40px;
-  font-family: 'Arial',Arial,Arial,serif;
-  /*background: #2e7bcf url(../images/header-bg.jpg) 0 0 repeat-x;*/
-  background-color: white;
+  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif; 
+  background: #2e7bcf url(../images/header-bg.jpg) 0 0 repeat-x;
   border-bottom: solid 1px #275da1;
 }
 
 header h1 {
   letter-spacing: -1px;
   font-size: 72px;
-  color: rgb(09, 79, 164);
+  color: #fff;
   line-height: 1;
   margin-bottom: 0.2em;
   width: 540px;
@@ -83,10 +82,10 @@ header h1 {
 
 header h2 {
   font-size: 26px;
-  color: rgb(82, 188, 236);
+  color: #9ddcff;
   font-weight: normal;
   line-height: 1.3;
-  width: 560px; /*540*/
+  width: 540px;
   letter-spacing: 0;
 }
 
@@ -137,7 +136,7 @@ a.button {
   color: #fff;
   padding-left: 68px;
   padding-top: 22px;
-  font-family: 'Arial',Arial,Arial,serif;
+  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif; 
 }
 a.button small {
   display: block;
@@ -147,7 +146,7 @@ header a.button {
   position: absolute;
   right: 0;
   top: 0;
-  background: transparent url(../images/github-button-blue.png) 0 0 no-repeat;
+  background: transparent url(../images/github-button.png) 0 0 no-repeat;
 }
 aside a.button {
   width: 138px;
@@ -226,7 +225,7 @@ form {
 /* GENERAL ELEMENT TYPE STYLES */
 
 #main-content h1 {
-  font-family: 'Arial',Arial,Arial,serif;
+  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif; 
   font-size: 2.8em;
   letter-spacing: -1px;
   color: #474747;
@@ -234,13 +233,13 @@ form {
 
 #main-content h1:before {
   content: "/";
-  color: rgb(82, 188, 236);
+  color: #9ddcff;
   padding-right: 0.3em;
   margin-left: -0.9em;
 }
 
 #main-content h2 {
-  font-family: 'Arial',Arial,Arial,serif;
+  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif; 
   font-size: 22px;
   font-weight: bold;
   margin-bottom: 8px;
@@ -248,13 +247,13 @@ form {
 } 
 #main-content h2:before {
   content: "//";
-  color: rgb(82, 188, 236);
+  color: #9ddcff;
   padding-right: 0.3em;
   margin-left: -1.5em;
 }
 
 #main-content h3 {
-  font-family: 'Arial',Arial,Arial,serif;
+  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif; 
   font-size: 18px;
   font-weight: bold;
   margin-top: 24px;
@@ -264,13 +263,13 @@ form {
  
 #main-content h3:before {
   content: "///";
-  color: rgb(82, 188, 236);
+  color: #9ddcff;
   padding-right: 0.3em;
   margin-left: -2em;
 }
 
 #main-content h4 {
-  font-family: 'Arial',Arial,Arial,serif;
+  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif; 
   font-size: 15px;
   font-weight: bold;
   color: #474747;
@@ -278,31 +277,31 @@ form {
 
 h4:before {
   content: "////";
-  color: rgb(82, 188, 236);
+  color: #9ddcff;
   padding-right: 0.3em;
   margin-left: -2.8em;
 }
 
 #main-content h5 {
-  font-family: 'Arial',Arial,Arial,serif;
+  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif; 
   font-size: 14px;
   color: #474747;
 } 
 h5:before {
   content: "/////";
-  color: rgb(82, 188, 236);
+  color: #9ddcff;
   padding-right: 0.3em;
   margin-left: -3.2em;
 }
 
 #main-content h6 {
-  font-family: 'Arial',Arial,Arial,serif;
+  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif; 
   font-size: .8em;
   color: #474747;
 } 
 h6:before {
   content: "//////";
-  color: rgb(82, 188, 236);
+  color: #9ddcff;
   padding-right: 0.3em;
   margin-left: -3.7em;
 }
@@ -436,7 +435,7 @@ footer a:hover {
     text-align: center;
     font-size: 13px;
     line-height: 1;
-    background-color: rgb(82, 188, 236);
+    background-color: #9ddcff;
     color: #2879d0;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;                     
@@ -478,22 +477,3 @@ footer a:hover {
 
 /* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
 @media only screen and (max-width: 479px) {}
-
-/* German */
-#hydraLogo {
-	float: left;
-    width: 130px;	
-}
-
-#headerText {
-	margin-left: 140px;
-	/*border: 1px solid;*/
-}
-
-.button.innovationLogo {
-	background: url("../images/innovationLogo.png") no-repeat scroll 0 0 transparent;
-}
-
-.button.github {
-	color: black;
-}

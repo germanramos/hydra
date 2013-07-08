@@ -8,23 +8,20 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-	<link rel="shortcut icon" type="image/x-icon" href="images/favicon2.ico" />
+
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <title>Hydra by bbva-innotech</title>
+    <title>Hydra by innotech</title>
   </head>
 
   <body>
     <header>
       <div class="inner">
-      	<img id="hydraLogo" src="images/hydraLogo.png" alt="Hydra Logo">
-      	<div id="headerText">
-	        <h1>Hydra</h1>
-	        <h2>&quot;if a head is cut off, two more will take its place&quot;</h2>
-	        <a href="https://github.com/bbva-innotech/hydra" class="button github"><small>View project on</small>GitHub</a>
-        </div>
+        <h1>Hydra</h1>
+        <h2>&quot;if a head is cut off, two more will take its place&quot;</h2>
+        <a href="https://github.com/innotech/hydra" class="button"><small>View project on</small>GitHub</a>
       </div>
     </header>
 
@@ -32,14 +29,39 @@
       <div class="inner clearfix">
         <section id="main-content">
           <h1>
+<a name="hydra" class="anchor" href="#hydra"><span class="octicon octicon-link"></span></a>Hydra</h1>
+
+<p>"If a head is cut off, two more will take its place"</p>
+
+<h1>
 <a name="what-is-hydra" class="anchor" href="#what-is-hydra"><span class="octicon octicon-link"></span></a>What is Hydra?</h1>
 
 <p>Hydra is multi-cloud application discovery, management and balancing service.</p>
 
-<p>Hydra attempts to ease the routing and balancing burden from servers and delegate it on the client (browser, mobile app, etc).   </p>
+<ul>
+<li>
+<a href="#a1">Deploy</a>
+
+<ul>
+<li><a href="#b1">Prerequisites</a></li>
+<li><a href="#b2">Install nodejs</a></li>
+<li><a href="#b3">Install mongodb</a></li>
+<li><a href="#b4">Get Hydra source code</a></li>
+<li><a href="#b5">Install dependencies</a></li>
+<li><a href="#b6">Configure Hydra</a></li>
+</ul>
+</li>
+<li><a href="#a2">Launching</a></li>
+<li><a href="#a3">Hydra Client</a></li>
+<li><a href="#a4">License</a></li>
+</ul><p>Hydra attempts to ease the routing and balancing burden from servers and delegate it on the client (browser, mobile app, etc).   </p>
+
+<p><a name="a1"></a></p>
 
 <h1>
 <a name="deploy" class="anchor" href="#deploy"><span class="octicon octicon-link"></span></a>Deploy</h1>
+
+<p><a name="b1"></a></p>
 
 <h2>
 <a name="prerequisites" class="anchor" href="#prerequisites"><span class="octicon octicon-link"></span></a>Prerequisites</h2>
@@ -52,11 +74,9 @@
 <li>python psutil (install via pip)</li>
 <li>ssh</li>
 <li>git</li>
-<li>Increase max number of file descriptors (<a href="http://www.xenoclast.org/doc/benchmark/HTTP-benchmarking-HOWTO/node7.html">http://www.xenoclast.org/doc/benchmark/HTTP-benchmarking-HOWTO/node7.html</a>)</li>
-</ul><h2>
-<a name="install-nodejs" class="anchor" href="#install-nodejs"><span class="octicon octicon-link"></span></a>Install nodejs</h2>
-
-<ul>
+<li>Increase max number of file descriptors (<a href="http://www.xenoclast.org/doc/benchmark/HTTP-benchmarking-HOWTO/node7.html">http://www.xenoclast.org/doc/benchmark/HTTP-benchmarking-HOWTO/node7.html</a>)
+<a name="b2"></a>
+## Install nodejs</li>
 <li>Download nodejs source code from <a href="http://nodejs.org/download/">http://nodejs.org/download/</a>
 Latest build at the time of writing is 0.10.11</li>
 </ul><pre><code>wget http://nodejs.org/dist/v0.10.11/node-v0.10.11.tar.gz
@@ -75,6 +95,8 @@ make // -j&lt;num cores + 1&gt; for faster compiling
 make install // as superuser
 </code></pre>
 
+<p><a name="b3"></a></p>
+
 <h2>
 <a name="install-mongodb" class="anchor" href="#install-mongodb"><span class="octicon octicon-link"></span></a>Install mongodb</h2>
 
@@ -85,18 +107,24 @@ make install // as superuser
 </li>
 <li>CentOS/Fedora - <a href="http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/">http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/</a>
 </li>
-</ul><h2>
-<a name="get-hydra-source-code" class="anchor" href="#get-hydra-source-code"><span class="octicon octicon-link"></span></a>Get Hydra source code</h2>
-
-<pre><code>git clone https://github.com/bbva-innotech/hydra.git
-</code></pre>
+</ul><p><a name="b4"></a></p>
 
 <h2>
-<a name="install-dependancies" class="anchor" href="#install-dependancies"><span class="octicon octicon-link"></span></a>Install dependancies</h2>
+<a name="get-hydra-source-code" class="anchor" href="#get-hydra-source-code"><span class="octicon octicon-link"></span></a>Get Hydra source code</h2>
+
+<pre><code>git clone https://github.com/innotech/hydra.git
+</code></pre>
+
+<p><a name="b5"></a></p>
+
+<h2>
+<a name="install-dependencies" class="anchor" href="#install-dependencies"><span class="octicon octicon-link"></span></a>Install dependencies</h2>
 
 <pre><code>cd hydra/src/lib/
 npm install
 </code></pre>
+
+<p><a name="b6"></a></p>
 
 <h2>
 <a name="configure-hydra" class="anchor" href="#configure-hydra"><span class="octicon octicon-link"></span></a>Configure Hydra</h2>
@@ -122,9 +150,11 @@ npm install
 <li>Modify the cloud name and cost.</li>
 <li>Add the public and private server, the public server url is the client_api (same as in local.json), the private server is where the app_manager_info_server is listening (<a href="http://127.0.0.1:7777">http://127.0.0.1:7777</a> for example).</li>
 <li>Add the server_api url of an Hydra to notify (in this case could be http://localhost:7002).</li>
-<li>NOTE: You can see more information about app_manager at <a href="https://github.com/bbva-innotech/hydra/tree/master/src/app_manager">https://github.com/bbva-innotech/hydra/tree/master/src/app_manager</a>
+<li>NOTE: You can see more information about app_manager at <a href="https://github.com/innotech/hydra/tree/master/src/app_manager">https://github.com/innotech/hydra/tree/master/src/app_manager</a>
 </li>
-</ul><h1>
+</ul><p><a name="a2"></a></p>
+
+<h1>
 <a name="launching" class="anchor" href="#launching"><span class="octicon octicon-link"></span></a>Launching</h1>
 
 <p>Use the command run.sh on the src folder</p>
@@ -149,6 +179,8 @@ npm install
 </code></pre>
 
 <p>Using main ports, such as 80 or 443, requires that no other application is listening on that port and superuser rights.</p>
+
+<p><a name="a3"></a></p>
 
 <h1>
 <a name="hydra-client" class="anchor" href="#hydra-client"><span class="octicon octicon-link"></span></a>Hydra Client</h1>
@@ -183,33 +215,53 @@ The node client have no initial servers, throwing an exception if <code>hydra.co
 </ul><p>Internally, it will ask to the first Hydra server or use the internal cache in order to get the corresponding server url for the app and then it will call to callback function. If the application exist, the servers are sent back and served through the callback function (if the application exist, but there are no servers available, it will return an empty array). If the application does not exist, the callback will receive an error and the list will be set to null.</p>
 
 <p>In case an Hydra server fails to answer (when requesting an app or new Hydra servers), the client will try again (based on the retryOnFail timeout) using the next server and moving the one that failed to the end of the list until one of the Hydra servers replies.</p>
+
+<p><a name="a4"></a></p>
+
+<h1>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h1>
+
+<p>(The MIT License)</p>
+
+<p>Authors:<br>
+Germán Ramos &lt;<a href="mailto:german.ramos@gmail.com">german.ramos@gmail.com</a>&gt;<br>
+Pascual de Juan &lt;<a href="mailto:pascual.dejuan@gmail.com">pascual.dejuan@gmail.com</a>&gt;<br>
+Jonas da Cruz &lt;<a href="mailto:unlogic@gmail.com">unlogic@gmail.com</a>&gt;<br>
+Luis Mesas &lt;<a href="mailto:luismesas@gmail.com">luismesas@gmail.com</a>&gt;<br>
+Alejandro Penedo &lt;<a href="mailto:icedfiend@gmail.com">icedfiend@gmail.com</a>&gt;<br>
+Jose María San José &lt;<a href="mailto:josem.sanjose@gmail.com">josem.sanjose@gmail.com</a>&gt;</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
         </section>
 
         <aside id="sidebar">
-          <!--<img id="innovationLogo" src="images/innovationLogo.png" alt="Innovation Logo">-->
-          <a href="https://www.centrodeinnovacionbbva.com/" class="button innovationLogo">
-          </a>
-        	
-          <a href="https://github.com/bbva-innotech/hydra/zipball/master" class="button">
+          <a href="https://github.com/innotech/hydra/zipball/master" class="button">
             <small>Download</small>
             .zip file
           </a>
-          <a href="https://github.com/bbva-innotech/hydra/tarball/master" class="button">
+          <a href="https://github.com/innotech/hydra/tarball/master" class="button">
             <small>Download</small>
             .tar.gz file
           </a>
-          
-          <a href="HydraDesign/HydraDesign.html" class="button">
-            <small>Documentation</small>
-            online
-          </a>
-          
-          <a href="HydraDesign.pdf" class="button">
-            <small>Documentation</small>
-            .pdf file
-          </a>
 
-          <p class="repo-owner"><a href="https://github.com/bbva-innotech/hydra"></a> is maintained by <a href="https://github.com/bbva-innotech">bbva-innotech</a>.</p>
+          <p class="repo-owner"><a href="https://github.com/innotech/hydra"></a> is maintained by <a href="https://github.com/innotech">innotech</a>.</p>
 
           <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
         </aside>
