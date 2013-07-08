@@ -6,8 +6,14 @@ Hydra
 # What is Hydra?
 Hydra is multi-cloud application discovery, management and balancing service.
 
+- [Deploy](#a1)
+- [Launching](#a2)
+- [Hydra Client](#a3)
+- [License](#a4)
+
 Hydra attempts to ease the routing and balancing burden from servers and delegate it on the client (browser, mobile app, etc).   
 
+<a name="a1"/>
 # Deploy
 
 ## Prerequisites
@@ -78,6 +84,7 @@ npm install
 * Add the server_api url of an Hydra to notify (in this case could be http://localhost:7002).
 * NOTE: You can see more information about app_manager at https://github.com/bbva-innotech/hydra/tree/master/src/app_manager
 
+<a name="a2"/>
 # Launching
 
 Use the command run.sh on the src folder
@@ -105,6 +112,7 @@ or used as is:
 
 Using main ports, such as 80 or 443, requires that no other application is listening on that port and superuser rights.
 
+<a name="a3"/>
 # Hydra Client
 Hydra client is a js file that should be included in the web page or node project. It provides two functions:
 
@@ -128,17 +136,18 @@ Internally, it will ask to the first Hydra server or use the internal cache in o
 
 In case an Hydra server fails to answer (when requesting an app or new Hydra servers), the client will try again (based on the retryOnFail timeout) using the next server and moving the one that failed to the end of the list until one of the Hydra servers replies.
 
-## License
+<a name="a4"/>
+# License
 
 (The MIT License)
 
-Authors: Germán Ramos &lt;german.ramos@gmail.com&gt;
-         Pascual de Juan &lt;pascual.dejuan@gmail.com&gt;
-         Jonas da Cruz &lt;unlogic@gmail.com&gt;
-         Luis Mesas &lt;luismesas@gmail.com&gt;
-         Alejandro Penedo &lt;icedfiend@gmail.com&gt;
-         Jose María San José &lt;josem.sanjose@gmail.com&gt;
-         
+Authors:  
+Germán Ramos &lt;german.ramos@gmail.com&gt;  
+Pascual de Juan &lt;pascual.dejuan@gmail.com&gt;  
+Jonas da Cruz &lt;unlogic@gmail.com&gt;  
+Luis Mesas &lt;luismesas@gmail.com&gt;  
+Alejandro Penedo &lt;icedfiend@gmail.com&gt;  
+Jose María San José &lt;josem.sanjose@gmail.com&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
