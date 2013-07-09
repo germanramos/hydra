@@ -57,7 +57,7 @@ body {
 }
 
 a {
-  color: #2879d0;
+  color: rgb(156, 0, 0); /*rgb(219, 39, 39);*/
 }
 a:hover {
   color: #2268b2;
@@ -153,7 +153,7 @@ aside a.button {
   width: 138px;
   padding-left: 64px;
   display: block;
-  background: transparent url(../images/download-button.png) 0 0 no-repeat;
+  background: transparent url(../images/download-button-red.png) 0 0 no-repeat;
   margin-bottom: 20px;
   font-size: 21px;
 }
@@ -179,7 +179,7 @@ pre {
   border: solid 1px #f2f2f2;
 }
 pre code {
-  color: #2879d0;
+  color: rgb(219, 39, 39);
   background-color: #fff;
   border: none;
   padding: 0;
@@ -437,7 +437,7 @@ footer a:hover {
     font-size: 13px;
     line-height: 1;
     background-color: rgb(156, 0, 0);
-    color: #2879d0;
+    color: rgb(219, 39, 39);
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;                     
     border-radius: 5px;    
