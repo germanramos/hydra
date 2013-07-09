@@ -30,7 +30,7 @@ Ask periodically to the App Manager Info Server the state of the application and
 ## Get Hydra source code
 
 ```
-git clone https://github.com/bbva-innotech/hydra.git
+git clone https://github.com/innotech/hydra.git
 ```
 
 ## Configure App Manager

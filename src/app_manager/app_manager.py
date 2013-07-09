@@ -10,13 +10,6 @@ The basic functionality is to notify to one Hydra Server when an application is 
 All these information should be updated periodically. If not, the Hydra server will assume that the servers are shutted down.
 
 @author:     German Ramos Garcia
-            
-@copyright:  2013 BBVA. All rights reserved.
-            
-@license:    license
-
-@contact:    german.ramos.garcia@bbva.com
-@deffield    updated: Updated
 '''
 
 import time
