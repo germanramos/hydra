@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+    <head>
+        <meta charset="utf-8">
+        <title>Time Client</title>
+        <style>
+            body {
+                text-align: center;
+            }
+            #time {
+                font-size: 40px;
+                font-weight: bold
+            }
+            #server {
+                
+                font-size: 20px;
+            }
+        </style>
+        <script type="text/javascript" src="hydra.js"></script>
+    </head>
+    <body>
+        <div id="time">Initializing...</div>
+        <div id="server">Initializing...</div>
+        <input id="button" type="button" value="Stop"/>
+    </body>
+    <script>
+    	var service="time";
+    	var hydraRefreshWait = 5000;
+    	var errorWait = 2000;
+    	var ajaxTimeout = 10000;
+    	
+        //var servers = ["http://server1.cloud1.com:1337"];
+        hydra.config(["http://2.hydra.innotechapp.com:80"]);
+        var servers = [];
+        var refresh = true;
+        
+        updateServers();
+        
+        function updateServers() {
+	        hydra.get("time", true, function(err, result){
+	        	if (result != null)
+					servers = result;
+			})
+			setTimeout(updateServers, hydraRefreshWait);
+		}
+		
+        
+        function updatePage(time) {
+            document.getElementById("time").innerHTML = time;
+            document.getElementById("server").innerHTML = servers[0];
+            if (refresh) makeRequest();
+        }
+
+        function makeRequest() {
+        	if (servers == null || servers.length < 1) {
+        		setTimeout(makeRequest, errorWait);
+        		return;
+        	}
+            xmlHttpReq = new XMLHttpRequest();
+            xmlHttpReq.open('GET', servers[0], true);
+            xmlHttpReq.timeout = ajaxTimeout;
+            xmlHttpReq.onreadystatechange = function() {
+                if (xmlHttpReq.readyState == 4) {
+                    if (xmlHttpReq.status==200) {
+                        updatePage(xmlHttpReq.responseText);
+                    } else {
+                        //Put the current first server at last position
+                        servers.push(servers.shift());
+                        if (refresh) makeRequest();
+                    }
+                }
+            }
+            xmlHttpReq.send(null);
+        }
+        
+        document.getElementById("button").onclick = function() {
+            refresh = !refresh;
+            if (refresh) {
+                this.value = "Stop";
+                makeRequest();
+            } else {
+                this.value = "Start";
+            }
+        }
+        
+        makeRequest();
+    </script>
+</html>
