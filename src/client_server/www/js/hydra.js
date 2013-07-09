@@ -175,7 +175,7 @@ var hydra = hydra || function () {
 			}
 		};
 
-		if(data !== null)
+		if(data)
 		{
 			req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 			data = JSON.stringify(data);
