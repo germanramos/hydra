@@ -31,16 +31,26 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <h1>
-<a name="hydra" class="anchor" href="#hydra"><span class="octicon octicon-link"></span></a>Hydra</h1>
-
-<p>"If a head is cut off, two more will take its place"</p>
 
 <h1>
 <a name="what-is-hydra" class="anchor" href="#what-is-hydra"><span class="octicon octicon-link"></span></a>What is Hydra?</h1>
 
 <p>Hydra is multi-cloud application discovery, management and balancing service.</p>
+<p>Hydra attempts to ease the routing and balancing burden from servers and delegate it on the client (browser, mobile app, etc).   </p>
 
+<h2>
+<a name="goal" class="anchor" href="#goal"><span class="octicon octicon-link"></span></a>Goal</h2>
+<p>Set up a Cloud Computing Service (IaaS) running onto more than one Cloud Provider in a federated way to be consumed as a single service from the consumer point of view.</p>
+<p>It should review the different topologies, data distribution, referential data consistency, process distribution, load balancing, recovery policies, accounting gathering, write-once-run-everywhere (or sort of), and several new problems yet to rise.</p>
+
+<h2>
+<a name="overall" class="anchor" href="#overall"><span class="octicon octicon-link"></span></a>Overall Architecture</h2>
+<p>Hydra must handle just the notification of the appropriate back-end server to supply a service for an identified or anonymous client. This notification must happen prior to the first request and, eventually, periodically/event-driven to have a refresh of the server assignment.</p>
+<p>Once Hydra notifies the most suitable server it gets out of the service-consumer service-provider communication.</p>
+<p>Therefore, Hydra offers a two sides operating interface: to the service consumer and to the provider server manager (the one who knows the actual server disponibility and workload). Those both interfaces can evolve to a publish subscription model.</p>
+
+<h2>
+<a name="index" class="anchor" href="#index"><span class="octicon octicon-link"></span></a>Index</h2>
 <ul>
 <li>
 <a href="#a1">Deploy</a>
@@ -57,7 +67,7 @@
 <li><a href="#a2">Launching</a></li>
 <li><a href="#a3">Hydra Client</a></li>
 <li><a href="#a4">License</a></li>
-</ul><p>Hydra attempts to ease the routing and balancing burden from servers and delegate it on the client (browser, mobile app, etc).   </p>
+</ul>
 
 <p><a name="a1"></a></p>
 
@@ -255,6 +265,24 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
         </section>
 
         <aside id="sidebar">
+        	
+          <div id="interactive">
+          	<p>Try the interactive demo!!!</p>
+          	<ul>
+			<li><a href="http://innotech.github.io/hydra/manager/" target="_blank">Hydra Monitor at AWS</a></li>
+			<li><a href="http://innotech.github.io/hydra/client/" target="_blank">Single Time Client</a></li>
+			</ul>       	
+          </div>
+          <!--
+          <a href="http://innotech.github.io/hydra/manager/" class="button">
+            <small>Interactive Demo!!!</small>
+            Monitor
+          </a>
+          <a href="http://innotech.github.io/hydra/client/" class="button">
+            <small>Interactive Demo!!!</small>
+            Time Client
+          </a>
+          -->
           <a href="https://github.com/innotech/hydra/zipball/master" class="button">
             <small>Download</small>
             .zip file
