@@ -1,5 +1,6 @@
 INTERVAL = 0; //5000;
-INIT_HYDRA_URL = "http://hydra.cloud1.com:7002/app/time";
+//INIT_HYDRA_URL = "http://hydra.cloud1.com:7002/app/time";
+INIT_HYDRA_URL = "http://2.hydra.innotechapp.com:443/app";
 
 var refresh = true;
 var interval;
@@ -203,11 +204,38 @@ function create_server(app, serverElement, server, data, alive) {
 	} else {
 		serverElement.setAttribute('class', 'server');
 	}
+	create_menu(serverElement, server, app);
+}
+
+
+function create_menu_action(action, menuElement, server) {
+	var actionElement = document.createElement("a");
+	actionElement.appendChild(document.createTextNode(action));
+	actionElement.setAttribute('href', '#');
+	menuElement.appendChild(actionElement);
 	
-	var deleteElement = document.createElement("span");
-	deleteElement.appendChild(document.createTextNode("x"));
-	deleteElement.setAttribute('class', 'deleteServer');
-	serverElement.appendChild(deleteElement);
+	actionElement.onclick = function() {
+		var url_parts = server.server.split(':');
+		$.ajax({
+			type: "GET",
+			url : url_parts[0] + ":" + url_parts[1] + ":7777/" + action,
+			timeout : 3000,
+			success : function(data) {
+				alert("OK");
+			},
+			error : function(data) {
+				alert("Error:" + data);
+			}
+		});
+	}
+}
+
+function create_menu_action_delete(menuElement, server, app) {
+	var deleteElement = document.createElement("a");
+	deleteElement.appendChild(document.createTextNode("delete"));
+	deleteElement.setAttribute('href', '#');
+	menuElement.appendChild(deleteElement);
+	
 	deleteElement.onclick = function() {
 		var answer = window.prompt("Enter delay (ms):", "0");
 		if (answer == null)
@@ -242,6 +270,23 @@ function create_server(app, serverElement, server, data, alive) {
 			}
 		});
 	}
+}
+
+function create_menu(serverElement, server, app) {
+	var deleteElement = document.createElement("span");
+	deleteElement.appendChild(document.createTextNode("x"));
+	deleteElement.setAttribute('class', 'deleteServer');
+	serverElement.appendChild(deleteElement);
+	
+	var menuElement = document.createElement("div");
+	menuElement.setAttribute('class', 'contextmenu');
+	serverElement.appendChild(menuElement);
+	
+	create_menu_action("stress", menuElement, server);
+	create_menu_action("halt", menuElement, server)
+	create_menu_action("ready", menuElement, server);
+	create_menu_action_delete(menuElement, server, app);
+
 }
 
 function create_row(key, value, percent) {
