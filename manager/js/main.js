@@ -1,5 +1,6 @@
 INTERVAL = 0; //5000;
-INIT_HYDRA_URL = "http://2.hydra.innotechapp.com:443/app/";
+//INIT_HYDRA_URL = "http://hydra.cloud1.com:7002/app/time";
+INIT_HYDRA_URL = "http://2.hydra.innotechapp.com:443/app";
 
 var refresh = true;
 var interval;
@@ -141,6 +142,12 @@ function paint_server(app, server, data, alive) {
 }
 
 function create_server(app, serverElement, server, data, alive) {
+	if (data.locked) {
+		lockElement = document.createElement("span");
+		lockElement.setAttribute("class","lockSymbol");
+		serverElement.appendChild(lockElement);
+	}
+	
 	serverElement.setAttribute('id', server.server);
 	serverElement.setAttribute('checked', 'true');
 	serverElement.appendChild(create_row("ID", app.appId));
@@ -203,11 +210,42 @@ function create_server(app, serverElement, server, data, alive) {
 	} else {
 		serverElement.setAttribute('class', 'server');
 	}
+	create_menu(serverElement, server, app);
+}
+
+
+function create_menu_action(action, menuElement, server) {
+	var actionElement = document.createElement("a");
+	actionElement.appendChild(document.createTextNode(action.charAt(0).toUpperCase()));
+	actionElement.setAttribute('href', '#');
+	actionElement.setAttribute('title', action);
+	menuElement.appendChild(actionElement);
+	password = $('#password').val();
 	
-	var deleteElement = document.createElement("span");
-	deleteElement.appendChild(document.createTextNode("x"));
-	deleteElement.setAttribute('class', 'deleteServer');
-	serverElement.appendChild(deleteElement);
+	actionElement.onclick = function() {
+		var url_parts = server.server.split(':');
+		log("Sending order '" + action + "' to "+ server.server);
+		$.ajax({
+			type: "GET",
+			url : url_parts[0] + ":" + url_parts[1] + ":7777/" + action + "?password=" + password,
+			timeout : 3000,
+			success : function(data) {
+				log("Succesfull response " + data + " from '" + server.server + "' to order '" + action + "'");
+			},
+			error : function(data) {
+				log("Error response " + data + " from '" + server.server + "' to order '" + action + "'");
+			}
+		});
+	}
+}
+
+function create_menu_action_delete(menuElement, server, app) {
+	var deleteElement = document.createElement("a");
+	deleteElement.appendChild(document.createTextNode("D"));
+	deleteElement.setAttribute('title', "delete");
+	deleteElement.setAttribute('href', '#');
+	menuElement.appendChild(deleteElement);
+	
 	deleteElement.onclick = function() {
 		var answer = window.prompt("Enter delay (ms):", "0");
 		if (answer == null)
@@ -228,6 +266,7 @@ function create_server(app, serverElement, server, data, alive) {
 		data.servers[0].status.stateEvents[when] = 2;	
 		var url_parts = $("#infoServer").val().split('/');
 		var url = url_parts[0] + '//' + url_parts[2];
+		log("Sending order 'delete' to "+ server.server);
 		$.ajax({
 			type: "POST",
 			url : url + "/app/" + app.appId,
@@ -235,13 +274,27 @@ function create_server(app, serverElement, server, data, alive) {
 			data : JSON.stringify(data),
 			timeout : 3000,
 			success : function(data) {
-				alert("OK");
+				log("Succesfull response from '" + server.server + "' to order 'delete'");
 			},
 			error : function(data) {
-				alert("Error:" + data);
+				log("Error response from '" + server.server + "' to order 'delete'");
 			}
 		});
 	}
+}
+
+function create_menu(serverElement, server, app) {	
+	var menuElement = document.createElement("div");
+	menuElement.setAttribute('class', 'contextmenu');
+	serverElement.appendChild(menuElement);
+	
+	create_menu_action("stress", menuElement, server);
+	create_menu_action("halt", menuElement, server)
+	create_menu_action("ready", menuElement, server);
+	create_menu_action("lock", menuElement, server);
+	create_menu_action("unlock", menuElement, server);
+	create_menu_action_delete(menuElement, server, app);
+
 }
 
 function create_row(key, value, percent) {
@@ -274,6 +327,16 @@ function create_row(key, value, percent) {
 	return pElement
 }
 
+function log(data) {
+	var date = new Date();
+	var element = document.createElement("p");
+	element.appendChild(document.createTextNode(date.toTimeString().split(" ")[0] + ": " + data));
+	logElement = $('#log')[0];
+	logElement.appendChild(element);
+	logElement.scrollTop = logElement.scrollHeight;
+	console.info(data);
+}
+
 window.onload = function() {
 	$("#infoServer").val(INIT_HYDRA_URL);
 	$("#title").html("Hydra System Monitor");
@@ -295,7 +358,7 @@ window.onload = function() {
 		if (ip == null)
 			return
 		if (document.getElementById(ip) != null) {
-			alert("Watcher already exists");
+			log("Watcher already exists");
 			return;
 		}
 
@@ -349,13 +412,48 @@ window.onload = function() {
 			data : JSON.stringify(data),
 			timeout : 3000,
 			success : function(data) {
-				alert("OK");
+				log("Succesfull response " + data + " from '" + server.server + "' to order 'add hydra'");
 			},
 			error : function(data) {
-				alert("Error:" + data);
+				log("Error response " + data + " from '" + server.server + "' to order 'add hydra'");
 			}
 		});
 	});
+	
+	$("#lockButton, #unlockButton").click(function() {
+		password = $('#password').val();
+		action = this.value.toLowerCase();
+		$('.server').each(function() {
+			server_url = this.id
+			var url_parts = server_url.split(':');	
+			
+			$.ajax({
+				type: "GET",
+				url : url_parts[0] + ":" + url_parts[1] + ":7777/" + action + "?password=" + password,
+				timeout : 3000,
+				success : function(data) {
+					log("Succesfull response " + data + " from '" + server_url + "' to order '" + action + "'");
+					console.info(data);
+				},
+				error : function(data) {
+					log("Error response " + data + " from '" + server_url + "' to order '" + action + "'");
+				}
+			});
+		});			
+	});
+	
+	function togleLog() {
+		if (this.checked) {
+			$('#log').show();
+			$('#main').css("bottom","229px");
+		} else {
+			$('#log').hide();
+			$('#main').css("bottom","29px");
+		}
+	}
+	
+	$("#configShowLog").change(togleLog);
+	$("#configShowLog").change();
 
 	init_refresh();
 }
