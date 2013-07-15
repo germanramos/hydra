@@ -10,12 +10,15 @@ import time
 import json
 import random
 
+PASSWORD = "hydra4ever"
 STRESS_TIME = 45;
 HALT_TIME = 90
+LOCK_TIME = 1800
 stress = 0;
 halt = 0;
+lock = 0
 
-print len(sys.argv)
+#print len(sys.argv)
 if len(sys.argv) < 6 or len(sys.argv) > 8:
     print "Usage: {0} CHECK_HOST CHECK_PORT LISTEN_HOST LISTEN_PORT PID [STRESS_TIME] [HALT_TIME]".format(sys.argv[0])
     sys.exit()
@@ -62,7 +65,30 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         
         global stress
         global halt
-        if self.path == "/ready":
+        global lock
+        splited = self.path.split("?")
+        pwd = ""
+        if len(splited) > 1:
+            splited2 = splited[1].split("=")
+            if len(splited2) > 1:
+                pwd = splited2[1]
+        self.path = splited[0];
+        
+        if time.time() - lock < LOCK_TIME and pwd != PASSWORD and (self.path == "/stress" or self.path == "/halt" or self.path == "/ready"):
+            data = "LOCKED"    
+        elif self.path == "/lock":
+            if pwd == PASSWORD:
+                lock = time.time()
+                data = "OK"
+            else:
+                data = "WRONG PASSWORD"
+        elif self.path == "/unlock":
+            if pwd == PASSWORD:
+                lock = 0
+                data = "OK"
+            else:
+                data = "WRONG PASSWORD"
+        elif self.path == "/ready":
             stress = 0;
             halt = 0;
             data = "OK"
@@ -76,14 +102,20 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             data = {}
             if time.time() - halt < HALT_TIME:
                 data["state"] = 1
+                data["halted"] = True;
             elif time.time() - stress < STRESS_TIME:
                 data["state"] = 0
                 data["cpuLoad"] = 90 + random.randint(0, 10)
                 data["memLoad"] = 90 + random.randint(0, 10)
+                data["stressed"] = True;
             else:
                 data["state"] = 0
                 data["cpuLoad"] = psutil.cpu_percent(interval=0.1, percpu=False)
                 data["memLoad"] = psutil.virtual_memory().percent  
+            
+            lockInterval = time.time() - lock 
+            if lockInterval < LOCK_TIME:
+                data["locked"] = int(LOCK_TIME-lockInterval);
                 
             if self.path == "/extended":
                 p = psutil.Process(PID)
