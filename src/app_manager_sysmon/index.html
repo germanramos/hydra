@@ -32,18 +32,23 @@
 	        <input id="refreshButton" class="button" type="button" value="Stop Refresh" />
 	        <input id="addWatcherButton" class="button" type="button" value="Add Watcher" />
 	        <input id="addHydraButton" class="button" type="button" value="Add Hydra" />
-	        <input id="configShowUnavailable" type="checkbox" checked/> Show unavailable servers
-	        <input id="configShowConnections" type="checkbox" checked/> Get connections from servers
+	        <input id="lockButton" class="button" type="button" value="Lock" />
+	        <input id="unlockButton" class="button" type="button" value="UnLock" />
+	        <input id="configShowLog" type="checkbox"/> Log
+	        <input id="password" type="password" value="hydra4ever"/>
+	        <input id="configShowUnavailable" type="checkbox" checked/> Show unavailable
+	        <input id="configShowConnections" type="checkbox" checked/> Get connections
         </header>
         <div id="main"> </div>
+		<div id="log"> </div>
         <footer>
         	<span class="key">ID</span><span class="value">Service Name,</span>
         	<span class="key">URL</span><span class="value">Public URL,</span>
-        	<span class="key">PRZ</span><span class="value">Server Prize,</span>
-        	<span class="key">CON</span><span class="value">Current Connections,</span>
-        	<span class="key">CPU</span><span class="value">Percent of CPU usage,</span>
-        	<span class="key">MEM</span><span class="value">Percent of Memory usage,</span>
-        	<span class="key">BAL</span><span class="value">Percent of connections</span>
+        	<span class="key">PRZ</span><span class="value">Prize,</span>
+        	<span class="key">CON</span><span class="value">Connections,</span>
+        	<span class="key">CPU</span><span class="value">CPU usage,</span>
+        	<span class="key">MEM</span><span class="value">Memory usage,</span>
+        	<span class="key">BAL</span><span class="value">Balance</span>
         </footer>
     </body>
 </html>
