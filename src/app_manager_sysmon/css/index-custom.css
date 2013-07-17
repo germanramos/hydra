@@ -7,16 +7,15 @@ body {
 }
 
 .lockSymbol {
-  background-image: url("../img/candado.png");
-  background-position: center center;
-  background-size: 100% 100%;
-  height: 16px;
-  position: absolute;
-  right: 5px;
-  top: 63px;
-  width: 16px;
+	background-image: url("../img/candado.png");
+	background-position: center center;
+	background-size: 100% 100%;
+	height: 16px;
+	position: absolute;
+	right: 5px;
+	top: 63px;
+	width: 16px;
 }
-
 
 header {
 	background-color: rgb(204,204,204); /* Gray */
@@ -26,7 +25,7 @@ header {
 	height: 23px;
 	position: fixed;
 	top: 0;
-	overflow:hidden;
+	overflow: hidden;
 }
 
 #main {
@@ -49,7 +48,7 @@ footer {
 }
 
 #log {
-	background-color:#DADADA;
+	background-color: #DADADA;
 	border-top: 2px solid;
 	bottom: 29px;
 	height: 195px;
@@ -221,10 +220,10 @@ footer .value {
 }
 
 .contextmenu {
-    font-size: small;
-    position: absolute;
-    right: 5px;
-    top: 5px;
+	font-size: small;
+	position: absolute;
+	right: 5px;
+	top: 5px;
 }
 
 .contextmenu a {
@@ -238,6 +237,59 @@ footer .value {
 	text-decoration: none;
 }
 
-.contextmenu a:hover{
+.contextmenu a:hover {
 	background-color: white;
+}
+
+/*HELP*/
+.help {
+	position: fixed;
+	z-index: 99;
+	background-color: orange;
+	border: 1px solid;
+	border-radius: 5px;
+	padding: 2px;
+}
+
+.help .arrow {
+	background-color: orange;
+	border-left: 1px solid;
+	border-top: 1px solid;
+	height: 10px;
+	position: absolute;
+	transform: rotate(45deg);
+	width: 10px;
+	z-index: 99;
+	left: 50%;
+	top: -6px;
+}
+
+#infoServerHelp {
+	top: 28px;
+	left: 10px;
+}
+
+#refreshButtonHelp {
+	top: 28px;
+	left: 340px;
+}
+
+#addWatcherButtonHelp {
+	top: 28px;
+	left: 437px;
+}
+
+#lockButtonHelp {
+	top: 28px;
+	left: 550px;
+}
+
+#unlockButtonHelp {
+	top: 28px;
+	left: 618px;
+}
+
+#passwordHelp {
+	top: 28px;
+	left: 698px;
 }
