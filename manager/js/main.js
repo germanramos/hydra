@@ -293,7 +293,7 @@ function create_menu(serverElement, server, app) {
 	create_menu_action("ready", menuElement, server);
 	create_menu_action("lock", menuElement, server);
 	create_menu_action("unlock", menuElement, server);
-	//create_menu_action_delete(menuElement, server, app);
+//	create_menu_action_delete(menuElement, server, app);
 
 }
 
@@ -448,12 +448,27 @@ window.onload = function() {
 			$('#main').css("bottom","229px");
 		} else {
 			$('#log').hide();
-			$('#main').css("bottom","29px");
+			$('#main').css("bottom","0");
 		}
 	}
 	
 	$("#configShowLog").change(togleLog);
 	$("#configShowLog").change();
+	
+	function togleHelp() {
+		if (this.checked) {
+			$('.help').show();
+			$("#leyendHelp").show();
+		} else {
+			$('.help').hide();
+		}
+	}
+	$("#configShowHelp").change(togleHelp);
+	$("#configShowHelp").change();
+	$("#leyendHelp").draggable();
+	$("#leyendHelp").dblclick(function() {
+		$("#leyendHelp").hide();
+	})
 
 	init_refresh();
 }

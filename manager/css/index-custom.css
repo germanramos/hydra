@@ -7,16 +7,15 @@ body {
 }
 
 .lockSymbol {
-  background-image: url("../img/candado.png");
-  background-position: center center;
-  background-size: 100% 100%;
-  height: 16px;
-  position: absolute;
-  right: 5px;
-  top: 63px;
-  width: 16px;
+	background-image: url("../img/candado.png");
+	background-position: center center;
+	background-size: 100% 100%;
+	height: 16px;
+	position: absolute;
+	right: 5px;
+	top: 63px;
+	width: 16px;
 }
-
 
 header {
 	background-color: rgb(204,204,204); /* Gray */
@@ -26,7 +25,7 @@ header {
 	height: 23px;
 	position: fixed;
 	top: 0;
-	overflow:hidden;
+	overflow: hidden;
 }
 
 #main {
@@ -34,25 +33,16 @@ header {
 	position: fixed !important;
 	position: absolute;
 	top: 27px;
-	bottom: 29px;
+	bottom: 0;
 	left: 0;
 	right: 0;
 }
 
-footer {
-	background-color: rgb(204,204,204); /* Gray */
-	padding: 2px;
-	width: 100%;
-	min-width: 1024px;
-	position: fixed;
-	bottom: 0;
-}
-
 #log {
-	background-color:#DADADA;
+	background-color: #DADADA;
 	border-top: 2px solid;
-	bottom: 29px;
-	height: 195px;
+	bottom: 0;
+	height: 224px;
 	overflow: auto;
 	padding: 2px;
 	position: fixed;
@@ -118,17 +108,17 @@ footer {
 	text-align: center;
 }
 
-.server.active {
+.server.active, .server-example.active {
 	border-color: RGB(134,200,45); /*Green*/
 	background-color: RGB(209,230,183);/*Green 40%*/
 }
 
-.server.warning {
+.server.warning, .server-example.warning {
 	border-color: RGB(253,189,44);/*Yellow*/
 	background-color: RGB(255,228,183);/*Yellow 40%*/
 }
 
-.server {
+.server, .server-example {
 	border: solid 3px;
 	border-color: RGB(200,23,94);/*Magenta*/
 	background-color: RGB(232,172,190);/*Magenta 40%*/
@@ -152,12 +142,11 @@ footer {
 	margin-top: -26px;
 }
 
-.server .key, footer .key {
+.server .key, #leyendHelp .key {
 	background-color: rgb(204,204,204); /* Gray */
 	border: 1px solid gray;
 	border-radius: 5px 5px 5px 5px;
 	display: inline-block;
-	float: left;
 	font-weight: bold;
 	margin-right: 10px;
 	text-align: center;
@@ -166,11 +155,6 @@ footer {
 
 .server .value {
 	position: absolute;
-}
-
-footer .value {
-	float: left;
-	margin-right: 10px;
 }
 
 .progressBar {
@@ -221,13 +205,13 @@ footer .value {
 }
 
 .contextmenu {
-    font-size: small;
-    position: absolute;
-    right: 5px;
-    top: 5px;
+	font-size: small;
+	position: absolute;
+	right: 5px;
+	top: 5px;
 }
 
-.contextmenu a {
+.contextmenu a, #leyendHelp a {
 	margin-left: 5px;
 	cursor: pointer;
 	font-weight: bold;
@@ -238,6 +222,128 @@ footer .value {
 	text-decoration: none;
 }
 
-.contextmenu a:hover{
+.contextmenu a:hover {
 	background-color: white;
+}
+
+/*HELP*/
+.help {
+	position: fixed;
+	z-index: 99;
+	background-color: rgb(247, 212, 218);;
+	border: 1px solid;
+	border-radius: 5px;
+	padding: 2px;
+}
+
+.help .arrow {
+	background-color: rgb(247, 212, 218);;
+	border-left: 1px solid;
+	border-top: 1px solid;
+	height: 10px;
+	position: absolute;
+	transform: rotate(45deg);
+	-webkit-transform: rotate(45deg);
+	width: 10px;
+	z-index: 99;
+	left: 50%;
+	top: -6px;
+}
+
+#infoServerHelp {
+	top: 28px;
+	left: 10px;
+}
+
+#refreshButtonHelp {
+	top: 28px;
+	left: 340px;
+}
+
+#addWatcherButtonHelp {
+	top: 85px;
+	left: 410px;
+}
+
+#addHydraButtonHelp {
+	top: 28px;
+	left: 480px;
+}
+
+#lockButtonHelp {
+	top: 85px;
+	left: 630px;
+}
+
+#unlockButtonHelp {
+	top: 28px;
+	left: 708px;
+}
+
+#passwordHelp {
+	top: 28px;
+	left: 788px;
+}
+
+#configShowLogHelp {
+	top: 85px;
+	left: 800px;
+}
+
+#configShowUnavailableHelp {
+	top: 28px;
+	left: 910px;
+}
+
+#configShowConnectionsHelp {
+	top: 85px;
+	left: 990px;
+}
+
+#configShowHelpHelp {
+	top:28px;
+	left: 1170px;
+}
+
+#leyendHelp {
+	border: solid 3px;
+	position: absolute;
+	top: 200px;
+	right: 10px;
+	width: 500px;
+	border-radius: 20px;
+	padding: 5px;
+	overflow: hidden;
+	background-color: rgb(247, 212, 218);
+	border-color: rgb(209, 127, 189);
+	z-index: 98;
+	display: none;
+}
+
+#leyendHelp p {
+	margin: 4px;
+}
+
+.server-example{
+	float: none;
+	width: auto;
+	text-align: center;
+}
+
+.server-warning-help {
+	border: solid 3px;
+	border-color: RGB(253,189,44);/*Yellow*/
+	background-color: RGB(255,228,183);/*Yellow 40%*/
+}
+
+.server-down-help {
+	border: solid 3px;
+	border-color: RGB(200,23,94);/*Magenta*/
+	background-color: RGB(232,172,190);/*Magenta 40%*/
+}
+
+.notes {
+	border: 3px solid;
+	margin: 10px;
+	border-color: rgb(209, 127, 189);
 }
