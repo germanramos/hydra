@@ -31,31 +31,61 @@
 	        <input id="infoServer" type="text" />
 	        <input id="refreshButton" class="button" type="button" value="Stop Refresh" />
 	        <input id="addWatcherButton" class="button" type="button" value="Add Watcher" />
-	        <!-- <input id="addHydraButton" class="button" type="button" value="Add Hydra" /> -->
+	        <input id="addHydraButton" class="button" type="button" value="Add Hydra"/>
 	        <input id="lockButton" class="button" type="button" value="Lock" />
 	        <input id="unlockButton" class="button" type="button" value="UnLock" />
 	        <input id="configShowLog" type="checkbox"/> Log
-	        <input id="password" type="password" value="hydra4ever"/>
+	        <input id="password" type="password" value="password"/>
 	        <input id="configShowUnavailable" type="checkbox" checked/> Show unavailable
 	        <input id="configShowConnections" type="checkbox" checked/> Get connections
-	        <!-- HELP -->
+	        <input id="configShowHelp" type="checkbox" /> Show Help
+        </header>
+        <div id="main">
+        	<!-- HELP -->
 	        <div id="infoServerHelp" class="help">Type here an Hydra server url<div class="arrow"> </div></div>
 	        <div id="refreshButtonHelp" class="help">Toggle auto<br>refresh data<div class="arrow"> </div></div>
 	        <div id="addWatcherButtonHelp" class="help">Add a watcher<br>for a client IP<div class="arrow"> </div></div>
-			<div id="lockButtonHelp" class="help">Lock all<br>servers<br>30 mins<div class="arrow"> </div></div>
+	        <div id="addHydraButtonHelp" class="help">Inform about a new Hydra<br>server to the current Hydra<div class="arrow"> </div></div>
+			<div id="lockButtonHelp" class="help">Lock all servers<br> during 30 mins<div class="arrow"> </div></div>
 			<div id="unlockButtonHelp" class="help">Unlock all<br>servers<div class="arrow"> </div></div>
 			<div id="passwordHelp" class="help">Set admin<br>password<div class="arrow"> </div></div>
-        </header>
-        <div id="main"> </div>
+			<div id="configShowLogHelp" class="help">Show/Hide log panel<div class="arrow"> </div></div>
+			<div id="configShowUnavailableHelp" class="help">Show/Hide unavailable<br>known servers<div class="arrow"> </div></div>
+			<div id="configShowConnectionsHelp" class="help">Enable/Disable get connections<br>information from servers<div class="arrow"> </div></div>
+			<div id="configShowHelpHelp" class="help">Show/Hide help<div class="arrow"> </div></div>
+			<div id="leyendHelp">
+				<table>
+				<tr>
+				<td>
+					<p><span class="key">ID</span><span class="value">Service Name</span></p>
+		        	<p><span class="key">URL</span><span class="value">Public URL</span></p>
+		        	<p><span class="key">PRZ</span><span class="value">Estimated Prize</span></p>
+		        	<p><span class="key">CON</span><span class="value">Number of Connections</span></p>
+		        	<p><span class="key">CPU</span><span class="value">CPU usage</span></p>
+		        	<p><span class="key">MEM</span><span class="value">Memory usage</span></p>
+		        	<p><span class="key">BAL</span><span class="value">Connections Balance</span></p>
+	      		</td><td>
+				<p><a href="#" title="stress">S</a> Stress CPU and MEM 45 secs.</p>
+				<p><a href="#" title="halt">H</a> Halt server 90 secs</p>
+				<p><a href="#" title="ready">R</a> Get the server ready</p>
+				<p><a href="#" title="lock">L</a> Lock with password</p>
+				<p><a href="#" title="unlock">U</a> Unlock with password</p>
+				<p><a title="delete" href="#">D</a> Send delete order</p>
+				</td></tr><tr>
+				<td>
+					<div class="server-example">Unavailable server</div> 
+					<div class="server-example warning">Warning server</div>
+					<div class="server-example active">Active server</div> 
+				</td><td>
+					<div class="notes">
+						<p>Cloud burbles are resizable</p>
+						<p>All burbles are draggable</p>
+						<p>Double-Click any burble to close</p>
+					</div>
+				</td></tr>
+				</table>
+			</div>
+        </div>
 		<div id="log"> </div>
-        <footer>
-        	<span class="key">ID</span><span class="value">Service Name,</span>
-        	<span class="key">URL</span><span class="value">Public URL,</span>
-        	<span class="key">PRZ</span><span class="value">Prize,</span>
-        	<span class="key">CON</span><span class="value">Connections,</span>
-        	<span class="key">CPU</span><span class="value">CPU usage,</span>
-        	<span class="key">MEM</span><span class="value">Memory usage,</span>
-        	<span class="key">BAL</span><span class="value">Balance</span>
-        </footer>
     </body>
 </html>
