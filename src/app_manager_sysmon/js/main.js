@@ -468,6 +468,9 @@ window.onload = function() {
 	$("#leyendHelp").draggable();
 	$("#leyendHelp").dblclick(function() {
 		$("#leyendHelp").hide();
+	});
+	$("#closeHelp").click(function() {
+		$("#leyendHelp").hide();
 	})
 
 	init_refresh();
