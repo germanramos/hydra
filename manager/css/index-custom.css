@@ -262,47 +262,47 @@ header {
 
 #addWatcherButtonHelp {
 	top: 85px;
-	left: 410px;
+	left: 400px;
 }
 
 #addHydraButtonHelp {
 	top: 28px;
-	left: 480px;
+	left: 465px;
 }
 
 #lockButtonHelp {
 	top: 85px;
-	left: 630px;
+	left: 605px;
 }
 
 #unlockButtonHelp {
 	top: 28px;
-	left: 708px;
+	left: 680px;
 }
 
 #passwordHelp {
 	top: 28px;
-	left: 788px;
+	left: 760px;
 }
 
 #configShowLogHelp {
 	top: 85px;
-	left: 800px;
+	left: 770px;
 }
 
 #configShowUnavailableHelp {
 	top: 28px;
-	left: 910px;
+	left: 860px;
 }
 
 #configShowConnectionsHelp {
 	top: 85px;
-	left: 990px;
+	left: 940px;
 }
 
 #configShowHelpHelp {
 	top:28px;
-	left: 1170px;
+	left: 1130px;
 }
 
 #leyendHelp {
@@ -346,4 +346,12 @@ header {
 	border: 3px solid;
 	margin: 10px;
 	border-color: rgb(209, 127, 189);
+}
+
+#closeHelp {
+	position: absolute;
+	top: 0;
+	right: 5px;
+	color: red;
+	cursor:pointer;
 }
