@@ -1,7 +1,9 @@
 Hydra
 =====
 
-"If a head is cut off, two more will take its place"
+"If a head is cut off, two more will take its place"  
+  
+http://innotech.github.io/hydra/
 
 # What is Hydra?
 Hydra is multi-cloud application discovery, management and balancing service.
