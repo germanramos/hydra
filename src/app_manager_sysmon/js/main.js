@@ -1,6 +1,7 @@
 INTERVAL = 0; //5000;
 //INIT_HYDRA_URL = "http://hydra.cloud1.com:7002/app/time";
 INIT_HYDRA_URL = "http://2.hydra.innotechapp.com:443/app";
+PROBE_PORT = "9099";
 
 var refresh = true;
 var interval;
@@ -68,7 +69,7 @@ function process_app(app) {
 		var server = servers[i];
 		console.log("Detected server: " + server.server);
 		var splitted = server.server.split(":");
-		var server_sysmon = splitted[0] + ":" + splitted[1] + ":7777/extended"
+		var server_sysmon = splitted[0] + ":" + splitted[1] + ":" + PROBE_PORT + "/extended"
 		for ( var key in server.status.stateEvents) {
 			if (server.status.stateEvents[key] == 0) {
 				process_server(app, server, server_sysmon);
@@ -227,7 +228,7 @@ function create_menu_action(action, menuElement, server) {
 		log("Sending order '" + action + "' to "+ server.server);
 		$.ajax({
 			type: "GET",
-			url : url_parts[0] + ":" + url_parts[1] + ":7777/" + action + "?password=" + password,
+			url : url_parts[0] + ":" + url_parts[1] + ":" + PROBE_PORT + "/" + action + "?password=" + password,
 			timeout : 3000,
 			success : function(data) {
 				log("Succesfull response " + data + " from '" + server.server + "' to order '" + action + "'");
@@ -429,7 +430,7 @@ window.onload = function() {
 			
 			$.ajax({
 				type: "GET",
-				url : url_parts[0] + ":" + url_parts[1] + ":7777/" + action + "?password=" + password,
+				url : url_parts[0] + ":" + url_parts[1] + ":" + PROBE_PORT + "/" + action + "?password=" + password,
 				timeout : 3000,
 				success : function(data) {
 					log("Succesfull response " + data + " from '" + server_url + "' to order '" + action + "'");
