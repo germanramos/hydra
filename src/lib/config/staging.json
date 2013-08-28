@@ -1,4 +1,6 @@
 {
+	"publicUrl": "http://< public_dns >:< client_api_port >",
+	"serverPort": "< server_api_port >",
 	"db" : {
 		"host" : "localhost",
 		"port" : "27017",
@@ -10,5 +12,17 @@
 		"url" : "http://api.qlog.io:3000",
 		"clientId" : "07moV9C-Deu5FDj9",
 		"secretKey" : "RdGgiunmONiTuJpU0bZxSHAkhwoNEe6x"
+	},
+	"server_api" : {
+		"allowedOrigins" : ["*"]
+	},
+	"client_api" : {
+		"allowedOrigins" : ["*"]
+	},
+	"app" : {
+		"timeout" : 60000
+	},
+	"server" : {
+		"sync" : 10000
 	}
 }

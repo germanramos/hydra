@@ -1,5 +1,5 @@
 {
-	"url": "http://1.hydra.innotechapp.com:80",
+	"publicUrl": "http://1.hydra.innotechapp.com:80",
 	"serverPort": 443,
 	"db" : {
 		"host" : "0.mongodb.innotechapp.com",
@@ -40,8 +40,6 @@
 		"timeout" : 60000
 	},
 	"server" : {
-		"sync" : 10000,
-		"timeout" : 60000,
-		"update"  : 20000
+		"sync" : 10000
 	}
 }

@@ -1,6 +1,6 @@
 {
-	"url": "http://localhost:7001",
-	"serverPort": 7002,
+	"publicUrl": "http://< public_dns >:< client_api_port >",
+	"serverPort": "< server_api_port >",
 	"db" : {
 		"host" : "localhost",
 		"port" : "27017",
@@ -23,8 +23,6 @@
 		"timeout" : 60000
 	},
 	"server" : {
-		"sync" : 10000,
-		"timeout" : 60000,
-		"update"  : 20000
+		"sync" : 10000
 	}
 }
