@@ -26,7 +26,7 @@ Hydra attempts to ease the routing and balancing burden from servers and delegat
 <a name="b1"/>
 ## Prerequisites
 * build tools (gcc 4.2+, build-essential, yum groupinstall "Development Tools")
-* python 2.7+
+* python 2.6+
 * python-devel package
 * pip python package manager (http://www.pip-installer.org/en/latest/installing.html)
 * python psutil (install via pip)
