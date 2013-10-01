@@ -11,17 +11,20 @@ import json
 import redis
 import threading
 import urllib2
+import ConfigParser
 
-REDIS_HOST = "localhost"
-REDIS_PORT = 6379
-REDIS_KEY = "libertyStatusPing"
-
-QLOG_CLIENT_ID = "grAUUne3Lv1eqYW5"
-QLOG_SECRET_KEY = "F37P1Y9Xpr8TkltjyDHUsvIN2S48htfu"
-QLOG_URL = "1.qlog.innotechapp.com"
-QLOG_PORT = 3001
-
-#TODO: QLOG parameters
+# Config File Example:
+# [REDIS]
+# host = localhost
+# port = 6379
+# key = libertyStatusPing
+# 
+# [QLOG]
+# client_id = grAUUne3Lv1eqYW5
+# secret_key = F37P1Y9Xpr8TkltjyDHUsvIN2S48htfu
+# url = 1.qlog.innotechapp.com
+# port = 3001
+# tags = probe
 
 class Listener(threading.Thread):
     def __init__(self, r, channels):
@@ -39,11 +42,13 @@ class Listener(threading.Thread):
                 print item['channel'], ":", item['data']
                 systemStatus = {
                                 "cpuLoad": psutil.cpu_percent(interval=0.1, percpu=False),
-                                "memLoad": psutil.virtual_memory().percent
+                                "memLoad": psutil.virtual_memory().percent,
+                                "diskUsed": psutil.disk_usage('/').used,
+                                "diskFree": psutil.disk_usage('/').free
                 }
                 data = {
                         "msg": json.dumps(systemStatus),
-                        "tags": "Probe",
+                        "tags": QLOG_TAGS,
                         "time": item['data'],
                         "secretKey": QLOG_SECRET_KEY
                 }
@@ -74,8 +79,6 @@ class Listener(threading.Thread):
             time.sleep(1);
             reconnect()
 
-print time.asctime(), "Server Starts"
-
 def reconnect():
     print "Connecting to Redis..."
     r = redis.Redis(REDIS_HOST, REDIS_PORT)
@@ -91,12 +94,21 @@ def sleepTillBreak():
         print ""
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print "Usage: {0} REDIS_HOST REDIS_PORT REDIS_KEY".format(sys.argv[0])
+    if len(sys.argv) != 2:
+        print "Usage: {0} CONFIG_FILE".format(sys.argv[0])
         sys.exit()
     else:
-        LISTEN_HOST = sys.argv[1]
-        LISTEN_PORT = int(sys.argv[2])
+        config = ConfigParser.ConfigParser()
+        config.readfp(open(sys.argv[1]))
+        REDIS_HOST = config.get('REDIS', 'host')
+        REDIS_PORT = int(config.get('REDIS', 'port'))
+        REDIS_KEY = config.get('REDIS', 'key')
+        QLOG_CLIENT_ID = config.get('QLOG', 'client_id')
+        QLOG_SECRET_KEY = config.get('QLOG', 'secret_key')
+        QLOG_URL = config.get('QLOG', 'url')
+        QLOG_PORT = int(config.get('QLOG', 'port'))
+        QLOG_TAGS = config.get('QLOG', 'tags')
+    print time.asctime(), "Server Starts"
     reconnect()
     sleepTillBreak()
     sys.exit()
