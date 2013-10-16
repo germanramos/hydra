@@ -15,7 +15,7 @@ Hydra is composed of 3 server-side applications:
 * <a href="https://github.com/innotech/hydra_basic_probe">AppManager Info Server</a>
 
 Also there is a client-side library:
-* <a href="https://github.com/innotech/hydra_node_client">Hydra Client</a>
+* <a href="https://github.com/innotech/hydra_javascript_client">Hydra Client</a>
 
 To use Hydra, you need to deploy all the 3 server-side applications. 
 * An Hydra server per cloud to comunicate your applications to the world.
