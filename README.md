@@ -28,13 +28,13 @@ For information on how to deploy each individual piece, check out their respecti
 
 (The MIT License)
 
-Authors: 
-Germán Ramos &lt;german.ramos@gmail.com&gt; 
-Pascual de Juan &lt;pascual.dejuan@gmail.com&gt; 
-Jonas da Cruz &lt;unlogic@gmail.com&gt; 
-Luis Mesas &lt;luismesas@gmail.com&gt; 
-Alejandro Penedo &lt;icedfiend@gmail.com&gt; 
-Jose María San José &lt;josem.sanjose@gmail.com&gt; 
+Authors:  
+Germán Ramos &lt;german.ramos@gmail.com&gt;  
+Pascual de Juan &lt;pascual.dejuan@gmail.com&gt;  
+Jonas da Cruz &lt;unlogic@gmail.com&gt;  
+Luis Mesas &lt;luismesas@gmail.com&gt;  
+Alejandro Penedo &lt;icedfiend@gmail.com&gt;  
+Jose María San José &lt;josem.sanjose@gmail.com&gt;  
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
