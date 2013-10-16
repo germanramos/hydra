@@ -18,9 +18,9 @@ Also there is a client-side library:
 * <a href="https://github.com/innotech/hydra_node_client">Hydra Client</a>
 
 To use Hydra, you need to deploy all the 3 server-side applications. 
-* An Hydra server to comunicate your applications to the world.
-* An AppManager to notify your apps information to Hydra.
-* An AppManager Info Server on each machine your application is deployed for the AppManager to gather the status information.
+* An Hydra server per cloud to comunicate your applications to the world.
+* An AppManager per app to notify information to Hydra.
+* An AppManager Info Server on each single server your application is deployed in. AppManager will gather the status information connecting to it.
 
 For information on how to deploy each individual piece, check out their respective repositories.
 
@@ -28,13 +28,13 @@ For information on how to deploy each individual piece, check out their respecti
 
 (The MIT License)
 
-Authors:
-Germán Ramos &lt;german.ramos@gmail.com&gt;
-Pascual de Juan &lt;pascual.dejuan@gmail.com&gt;
-Jonas da Cruz &lt;unlogic@gmail.com&gt;
-Luis Mesas &lt;luismesas@gmail.com&gt;
-Alejandro Penedo &lt;icedfiend@gmail.com&gt;
-Jose María San José &lt;josem.sanjose@gmail.com&gt;
+Authors: 
+Germán Ramos &lt;german.ramos@gmail.com&gt; 
+Pascual de Juan &lt;pascual.dejuan@gmail.com&gt; 
+Jonas da Cruz &lt;unlogic@gmail.com&gt; 
+Luis Mesas &lt;luismesas@gmail.com&gt; 
+Alejandro Penedo &lt;icedfiend@gmail.com&gt; 
+Jose María San José &lt;josem.sanjose@gmail.com&gt; 
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
