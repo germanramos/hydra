@@ -1,6 +1,6 @@
 # DO NOT USE THIS SRC FILES
 
-This code is only for historical pourposes and "app_manager_sysmon" (Pending new repo)  
+This code is only for historical purposes and "app_manager_sysmon" (Pending new repo)  
 
 The code has been splited intro small repositories. Please use that:  
 
