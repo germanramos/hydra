@@ -15,7 +15,7 @@ Hydra is composed of 3 server-side applications:
 * <a href="https://github.com/innotech/hydra_basic_probe">AppManager Info Server (Probe)</a>
 
 Also there is several client-side library:
-* <a href="https://github.com/innotech/hydra_javascript_client">Hydra Javascript Client</a>
+* <a href="https://github.com/innotech/hydra-javascript-client">Hydra Javascript Client</a>
 * <a href="https://github.com/innotech/hydra_node_client">Hydra NodeJS Client</a>
 * <a href="https://github.com/innotech/hydra-java-client">Hydra Java Client</a>
 
