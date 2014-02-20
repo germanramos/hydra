@@ -12,21 +12,30 @@ import (
 	"github.com/innotech/hydra/vendors/github.com/BurntSushi/toml"
 )
 
-const DefaultConfigFilePath = "/etc/hydra/hydra.conf"
+const (
+	DefaultConfigFilePath = "/etc/hydra/hydra.conf"
+	DEFAULT_ADDR          = "127.0.0.1:4001"
+	DEFAULT_PEER_ADDR     = "127.0.0.1:7001"
+)
+
+// const DefaultConfigFilePath = "/etc/hydra/hydra.conf"
 
 type Config struct {
 	ConfigFilePath string
 	EtcdConf       *etcdConfig.Config
+	Addr           string
+	PeerAddr       string
 	// EtcdConf *config.Config
 }
 
 func New() *Config {
-	conf := new(Config)
+	c := new(Config)
 	// conf.EtcdConf = new(etcdConfig.Config)
-	conf.EtcdConf = etcdConfig.New()
-	conf.ConfigFilePath = DefaultConfigFilePath
+	c.EtcdConf = etcdConfig.New()
+	c.ConfigFilePath = DefaultConfigFilePath
+	c.PeerAddr = DEFAULT_PEER_ADDR
 
-	return conf
+	return c
 }
 
 // Loads the configuration from the system config, command line config,
@@ -94,5 +103,9 @@ func (c *Config) LoadFlags(arguments []string) error {
 		return err
 	}
 
+	return nil
+}
+
+func (c *Config) LoadEtcdConfig() error {
 	return nil
 }
