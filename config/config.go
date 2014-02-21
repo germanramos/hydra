@@ -2,9 +2,10 @@ package config
 
 import (
 	"flag"
-	"io/ioutil"
 	// "fmt"
+	"io/ioutil"
 	"os"
+	// "strconv"
 
 	etcdConfig "github.com/innotech/hydra/vendors/github.com/coreos/etcd/config"
 	// "github.com/innotech/hydra/vendors/github.com/coreos/etcd/config"
@@ -15,15 +16,15 @@ import (
 const (
 	DefaultConfigFilePath = "/etc/hydra/hydra.conf"
 	DEFAULT_ADDR          = "127.0.0.1:4001"
+	DEFAULT_DATA_DIR      = "/tmp/hydra/"
 	DEFAULT_PEER_ADDR     = "127.0.0.1:7001"
 )
-
-// const DefaultConfigFilePath = "/etc/hydra/hydra.conf"
 
 type Config struct {
 	ConfigFilePath string
 	EtcdConf       *etcdConfig.Config
 	Addr           string
+	DataDir        string
 	PeerAddr       string
 	// EtcdConf *config.Config
 }
@@ -33,6 +34,8 @@ func New() *Config {
 	// conf.EtcdConf = new(etcdConfig.Config)
 	c.EtcdConf = etcdConfig.New()
 	c.ConfigFilePath = DefaultConfigFilePath
+	c.Addr = DEFAULT_ADDR
+	c.DataDir = DEFAULT_DATA_DIR
 	c.PeerAddr = DEFAULT_PEER_ADDR
 
 	return c
@@ -42,12 +45,12 @@ func New() *Config {
 // environment variables, and finally command line arguments.
 func (c *Config) Load(arguments []string) error {
 	var path string
-	f := flag.NewFlagSet("hydra", -1)
+	// f := flag.NewFlagSet("hydra", flag.ExitOnError)
+	f := flag.NewFlagSet("hydra", flag.ContinueOnError)
 	f.SetOutput(ioutil.Discard)
 	f.StringVar(&path, "config", "", "path to config file")
 	f.Parse(arguments)
 
-	// Load from config file.
 	if path != "" {
 		// Load from config file specified in arguments.
 		if err := c.LoadFile(path); err != nil {
@@ -61,13 +64,12 @@ func (c *Config) Load(arguments []string) error {
 	}
 
 	// Load from command line flags.
-	// if err := c.LoadFlags(arguments); err != nil {
-	// 	return err
-	// }
+	if err := c.LoadFlags(arguments); err != nil {
+		return err
+	}
 
 	// Load etcd configuration.
-	// TODO: Fix -> bad flag returns an error
-	if err := c.EtcdConf.Load(os.Args[1:]); err != nil {
+	if err := c.LoadEtcdConfig(); err != nil {
 		return err
 	}
 
@@ -92,8 +94,10 @@ func (c *Config) LoadFile(path string) error {
 func (c *Config) LoadFlags(arguments []string) error {
 	var ignoredString string
 
+	// f := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	f := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	f.SetOutput(ioutil.Discard)
+	f.StringVar(&c.Addr, "addr", c.Addr, "")
 
 	// BEGIN IGNORED FLAGS
 	f.StringVar(&ignoredString, "config", "", "")
@@ -106,6 +110,40 @@ func (c *Config) LoadFlags(arguments []string) error {
 	return nil
 }
 
+// Loads etcd configuration
 func (c *Config) LoadEtcdConfig() error {
+	fileContent := c.makeEtcdConfig()
+	f, _ := ioutil.TempFile("", "")
+	f.WriteString(fileContent)
+	f.Close()
+	// fmt.Println("etcd file: " + f.Name())
+	defer os.Remove(f.Name())
+	// c.WithTempFile(fileContent, func(pathToEtcdConfigFile string) {
+	if err := c.EtcdConf.Load([]string{"-config", f.Name()}); err != nil {
+		return err
+	}
+
 	return nil
+	// })
+}
+
+// func (c *Config) WithTempFile(content string, fn func(string)) {
+// 	f, _ := ioutil.TempFile("", "")
+// 	f.WriteString(content)
+// 	f.Close()
+// 	fmt.Println("etcd file: " + f.Name())
+// 	// defer os.Remove(f.Name())
+// 	fn(f.Name())
+// }
+
+func (c *Config) makeEtcdConfig() string {
+	var content string = ""
+	addLineToFileContent := func( /*fileContent *string, */ line string) {
+		// *fileContent = *fileContent + line + "\n"
+		content = content + line + "\n"
+	}
+	addLineToFileContent(`addr = "` + c.Addr + `"`)
+	addLineToFileContent(`data_dir = "` + c.DataDir + `"`)
+
+	return content
 }

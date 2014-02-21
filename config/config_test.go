@@ -5,6 +5,7 @@ import (
 	. "github.com/innotech/hydra/vendors/github.com/onsi/ginkgo"
 	. "github.com/innotech/hydra/vendors/github.com/onsi/gomega"
 
+	"fmt"
 	"io/ioutil"
 	"os"
 )
@@ -103,13 +104,18 @@ var _ = Describe("Config", func() {
 				})
 			})
 			Context("and also more valid flags exist", func() {
-				systemAddr := DEFAULT_ADDR + "0"
-				systemFileContent := `addr = "` + systemAddr + `"`
-				WithTempFile(systemFileContent, func(pathToCustomFile string) {
+				customAddr := DEFAULT_ADDR + "0"
+				customFileContent := `addr = "` + customAddr + `"`
+				addrCustomFlag := customAddr + "0"
+				WithTempFile(customFileContent, func(pathToCustomFile string) {
 					c := New()
-					err := c.Load([]string{"-addr", "127.0.0.1:4001", "-config", pathToCustomFile})
+					fmt.Println("&&&&&&&&&& ")
+					err := c.Load([]string{"-addr", addrCustomFlag, "-config", pathToCustomFile})
 					It("should be loaded successfully", func() {
-						Expect(err).To(HaveOccurred(), "No bad flag are allowed")
+						Expect(err).To(BeNil(), "error should be nil")
+					})
+					It("should be override the configuration loaded from custom configuration file", func() {
+						Expect(c.Addr).To(Equal(addrCustomFlag), "c.Addr should be equal "+addrCustomFlag)
 					})
 					// TODO: Check Error() message
 				})
@@ -122,6 +128,7 @@ var _ = Describe("Config", func() {
 			WithTempFile(systemFileContent, func(pathToSystemFile string) {
 				c := New()
 				c.ConfigFilePath = pathToSystemFile
+				fmt.Println("======== ")
 				err := c.Load([]string{"-addr", customAddr})
 				It("should be loaded successfully", func() {
 					Expect(err).To(BeNil(), "error should be nil")
@@ -135,13 +142,13 @@ var _ = Describe("Config", func() {
 
 	Describe("loading etcd configuration", func() {
 		c := New()
-		c.Addr = "127.0.0.1:4009"
+		c.DataDir = "/tmp/hydra-tests"
 		err := c.LoadEtcdConfig()
 		It("should be loaded successfully", func() {
 			Expect(err).To(BeNil(), "error should be nil")
 		})
 		It("should be override the default configuration loaded from default system configuration file", func() {
-			Expect(c.EtcdConf.Addr).To(Equal(c.Addr), "c.EtcdConfig.Addr should be equal "+c.Addr)
+			Expect(c.EtcdConf.DataDir).To(Equal(c.DataDir), "c.EtcdConfig.DataDir should be equal "+c.DataDir)
 		})
 	})
 })
