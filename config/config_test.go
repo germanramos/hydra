@@ -45,6 +45,17 @@ var _ = Describe("Config", func() {
 		})
 	})
 
+	// Describe("loading with no data directory", func() {
+	// 	c := New()
+	// 	err := c.Load([]string{})
+	// 	It("should be throw an error", func() {
+	// 		Expect(err).To(HaveOccurred(), "data directory attribute should not be empty")
+	// 	})
+	// 	It("should be have an specific error message", func() {
+	// 		Expect(err.Error()).To(Equal("data directory attribute is required"))
+	// 	})
+	// })
+
 	Describe("loading without flags", func() {
 		Context("when default system cofig file doesn't exist", func() {
 			c := New()

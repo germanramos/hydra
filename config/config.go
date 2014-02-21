@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	// "fmt"
+	// "errors"
 	"io/ioutil"
 	"os"
 	// "strconv"
@@ -35,7 +36,7 @@ func New() *Config {
 	c.EtcdConf = etcdConfig.New()
 	c.ConfigFilePath = DefaultConfigFilePath
 	c.Addr = DEFAULT_ADDR
-	c.DataDir = DEFAULT_DATA_DIR
+	// c.DataDir = DEFAULT_DATA_DIR
 	c.PeerAddr = DEFAULT_PEER_ADDR
 
 	return c
@@ -68,10 +69,16 @@ func (c *Config) Load(arguments []string) error {
 		return err
 	}
 
-	// Load etcd configuration.
-	if err := c.LoadEtcdConfig(); err != nil {
-		return err
-	}
+	// if c.DataDir == "" {
+	// 	// TODO: include log system
+	// 	// log.Fatal("The data dir was not set and could not be guessed from machine name")
+	// 	return errors.New("data directory attribute is required")
+	// }
+
+	// // Load etcd configuration.
+	// if err := c.LoadEtcdConfig(); err != nil {
+	// 	return err
+	// }
 
 	return nil
 }
@@ -113,6 +120,7 @@ func (c *Config) LoadFlags(arguments []string) error {
 // Loads etcd configuration
 func (c *Config) LoadEtcdConfig() error {
 	fileContent := c.makeEtcdConfig()
+	// TODO: Check if file is created
 	f, _ := ioutil.TempFile("", "")
 	f.WriteString(fileContent)
 	f.Close()
@@ -137,7 +145,7 @@ func (c *Config) LoadEtcdConfig() error {
 // }
 
 func (c *Config) makeEtcdConfig() string {
-	var content string = ""
+	var content string
 	addLineToFileContent := func( /*fileContent *string, */ line string) {
 		// *fileContent = *fileContent + line + "\n"
 		content = content + line + "\n"
