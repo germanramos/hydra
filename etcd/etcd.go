@@ -77,17 +77,7 @@ func (e *Etcd) configPsListener(psConfig server.PeerServerConfig) net.Listener {
 }
 
 func (e *Etcd) Load() {
-	// IGNORE: not load etcd configuration
-	// IGNORE: not set verbose etcd log
-	// IGNORE: not set etcd profiling
-	// IGNORE: check data dir configuration
-	// IGNORE: create data dir
-	// IGNORE: info file warning
-
-	// Create metrics bucket
 	mb := e.configMetrics()
-
-	// IGNORE: retrieve CORS configuration
 
 	// Create etcd key-value store and registry.
 	store := store.New()
@@ -115,7 +105,6 @@ func (e *Etcd) Load() {
 	}
 	ps := server.NewPeerServer(psConfig, registry, store, &mb, followersStats, serverStats)
 
-	// Create peer listener
 	psListener := e.configPsListener(psConfig)
 
 	// Create raft transporter and server
@@ -127,7 +116,7 @@ func (e *Etcd) Load() {
 		}
 		raftTransporter.SetTLSConfig(*raftClientTLSConfig)
 	}
-	raftServer, err := raft.NewServer(e.Config.Name, e.Config.DataDir, raftTransporter, store, e.PeerServer, "")
+	raftServer, err := raft.NewServer(e.Config.Name, e.Config.DataDir, raftTransporter, store, ps, "")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -136,14 +125,9 @@ func (e *Etcd) Load() {
 	ps.SetRaftServer(raftServer)
 
 	// Create etcd server
-	// s := server.New(etcd.Config.Name, etcd.Config.Addr, etcd.PeerServer, registry, etcd.Store, &mb)
+	s := server.New(e.Config.Name, e.Config.Addr, ps, registry, store, nil)
 
-	// if etcd.Config.Trace() {
-	// 	s.EnableTracing()
-	// }
-	// etcd.PeerServer.SetServer(s)
-
-	// IGNORE: etcd server listener
+	ps.SetServer(s)
 
 	e.PeerServer = ps
 	e.PeerServerListener = psListener
@@ -194,6 +178,5 @@ func (e *Etcd) Start() {
 		log.Fatal("CORS:", err)
 	}
 	sHTTP := &ehttp.CORSHandler{e.PeerServer.HTTPHandler(), corsInfo}
-
 	log.Fatal(http.Serve(e.PeerServerListener, sHTTP))
 }
