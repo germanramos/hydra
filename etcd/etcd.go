@@ -21,7 +21,8 @@ import (
 
 type Etcd struct {
 	Config *config.Config
-	// Store      store.Store
+	// Store              store.Store
+	EtcdServer         *server.Server
 	PeerServer         *server.PeerServer
 	PeerServerListener net.Listener
 }
@@ -129,6 +130,7 @@ func (e *Etcd) Load() {
 
 	ps.SetServer(s)
 
+	e.EtcdServer = s
 	e.PeerServer = ps
 	e.PeerServerListener = psListener
 }
@@ -136,39 +138,36 @@ func (e *Etcd) Load() {
 func (e *Etcd) Start() {
 	e.PeerServer.Start(e.Config.Snapshot, e.Config.Peers)
 
-	// go func() {
-	// 	var Permanent time.Time
-	// 	log.Infof("Sleeping 5s...")
-	// 	time.Sleep(1000 * time.Millisecond)
-	// 	log.Infof("Setting foo = bar")
-	// 	// _, err := store.Set("/foo", false, "bar", Permanent)
-	// 	// s.Store().CommandFactory().CreateSetCommand(key, dir, value, expireTime)
-	// 	// _, err := s.Store().Set("/foo", false, "bar", Permanent)
-	// 	c := s.Store().CommandFactory().CreateSetCommand("/foo", false, "bar", Permanent)
-	// 	result, err := etcd.PeerServer.RaftServer().Do(c)
-	// 	if err != nil {
-	// 		// return err
-	// 		log.Fatal("Failed 1 to set key", err)
-	// 	}
+	go func() {
+		// var Permanent time.Time
+		// log.Infof("Sleeping 5s...")
+		// time.Sleep(1000 * time.Millisecond)
+		// log.Infof("Setting foo = bar")
+		// // _, err := store.Set("/foo", false, "bar", Permanent)
+		// // s.Store().CommandFactory().CreateSetCommand(key, dir, value, expireTime)
+		// // _, err := s.Store().Set("/foo", false, "bar", Permanent)
+		// c := e.EtcdServer.Store().CommandFactory().CreateSetCommand("/foo", false, "bar", Permanent)
+		// result, err := e.PeerServer.RaftServer().Do(c)
+		// if err != nil {
+		// 	// return err
+		// 	log.Fatal("Failed 1 to set key", err)
+		// }
 
-	// 	// if result == nil {
-	// 	// 	// return etcdErr.NewError(300, "Empty result from raft", s.Store().Index())
-	// 	// 	log.Fatal("Failed 2 to set key", err)
-	// 	// }
-	// 	// // if err != nil {
-	// 	// // 	log.Fatal("Failed to set key", err)
-	// 	// // }
+		// if result == nil {
+		// 	// return etcdErr.NewError(300, "Empty result from raft", s.Store().Index())
+		// 	log.Fatal("Failed 2 to set key", err)
+		// }
 
-	// 	log.Infof("Sleeping 2000ms...")
-	// 	time.Sleep(2000 * time.Millisecond)
-	// 	g, err := s.Store().Get("/foo", false, false)
-	// 	if err != nil {
-	// 		log.Fatal("Failed to get key", err)
-	// 	}
-	// 	log.Infof("printing results...")
-	// 	log.Infof(g.Node.Key)
-	// 	log.Infof(g.Node.Value)
-	// }()
+		// log.Infof("Sleeping 2000ms...")
+		// time.Sleep(2000 * time.Millisecond)
+		// g, err := e.EtcdServer.Store().Get("/foo", false, false)
+		// if err != nil {
+		// 	log.Fatal("Failed to get key", err)
+		// }
+		// log.Infof("printing results...")
+		// log.Infof(g.Node.Key)
+		// log.Infof(g.Node.Value)
+	}()
 
 	log.Infof("peer server [name %s, listen on %s, advertised url %s]", e.PeerServer.Config.Name, e.PeerServerListener.Addr(), e.PeerServer.Config.URL)
 

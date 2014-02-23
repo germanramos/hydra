@@ -2,7 +2,7 @@ package config
 
 import (
 	"flag"
-	// "fmt"
+	"fmt"
 	// "errors"
 	"io/ioutil"
 	"os"
@@ -25,8 +25,10 @@ type Config struct {
 	ConfigFilePath string
 	EtcdConf       *etcdConfig.Config
 	Addr           string
-	DataDir        string
-	PeerAddr       string
+	DataDir        string `toml:"data_dir"`
+	Name           string
+	Peers          []string
+	PeerAddr       string `toml:"peer_addr"`
 	// EtcdConf *config.Config
 }
 
@@ -52,16 +54,19 @@ func (c *Config) Load(arguments []string) error {
 	f.StringVar(&path, "config", "", "path to config file")
 	f.Parse(arguments)
 
+	fmt.Println("path to config file: " + path)
 	if path != "" {
 		// Load from config file specified in arguments.
 		if err := c.LoadFile(path); err != nil {
 			return err
 		}
+		fmt.Println("entra")
 	} else {
 		// Load from system file.
 		if err := c.LoadSystemFile(); err != nil {
 			return err
 		}
+
 	}
 
 	// Load from command line flags.
@@ -69,6 +74,10 @@ func (c *Config) Load(arguments []string) error {
 		return err
 	}
 
+	// TODO: name is required make default or check if exist
+
+	fmt.Println("Addr:" + c.Addr)
+	fmt.Println("Datadir:" + c.DataDir)
 	// if c.DataDir == "" {
 	// 	// TODO: include log system
 	// 	// log.Fatal("The data dir was not set and could not be guessed from machine name")
@@ -152,6 +161,17 @@ func (c *Config) makeEtcdConfig() string {
 	}
 	addLineToFileContent(`addr = "` + c.Addr + `"`)
 	addLineToFileContent(`data_dir = "` + c.DataDir + `"`)
+	addLineToFileContent(`name = "` + c.Name + `"`)
+	peers := ""
+	for i, addr := range c.Peers {
+		if i > 0 {
+			peers = peers + ", "
+		}
+		peers = peers + `"` + addr + `"`
+	}
+	addLineToFileContent(`peers = [` + peers + `]`)
+	addLineToFileContent(`[peer]`)
+	addLineToFileContent(`addr = "` + c.PeerAddr + `"`)
 
 	return content
 }
