@@ -5,7 +5,6 @@ import (
 	. "github.com/innotech/hydra/vendors/github.com/onsi/ginkgo"
 	. "github.com/innotech/hydra/vendors/github.com/onsi/gomega"
 
-	"fmt"
 	"io/ioutil"
 	"os"
 )
@@ -120,7 +119,6 @@ var _ = Describe("Config", func() {
 				addrCustomFlag := customAddr + "0"
 				WithTempFile(customFileContent, func(pathToCustomFile string) {
 					c := New()
-					fmt.Println("&&&&&&&&&& ")
 					err := c.Load([]string{"-addr", addrCustomFlag, "-config", pathToCustomFile})
 					It("should be loaded successfully", func() {
 						Expect(err).To(BeNil(), "error should be nil")
@@ -139,7 +137,6 @@ var _ = Describe("Config", func() {
 			WithTempFile(systemFileContent, func(pathToSystemFile string) {
 				c := New()
 				c.ConfigFilePath = pathToSystemFile
-				fmt.Println("======== ")
 				err := c.Load([]string{"-addr", customAddr})
 				It("should be loaded successfully", func() {
 					Expect(err).To(BeNil(), "error should be nil")

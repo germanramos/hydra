@@ -2,7 +2,6 @@ package config
 
 import (
 	"flag"
-	"fmt"
 	// "errors"
 	"io/ioutil"
 	"os"
@@ -54,13 +53,11 @@ func (c *Config) Load(arguments []string) error {
 	f.StringVar(&path, "config", "", "path to config file")
 	f.Parse(arguments)
 
-	fmt.Println("path to config file: " + path)
 	if path != "" {
 		// Load from config file specified in arguments.
 		if err := c.LoadFile(path); err != nil {
 			return err
 		}
-		fmt.Println("entra")
 	} else {
 		// Load from system file.
 		if err := c.LoadSystemFile(); err != nil {
@@ -76,8 +73,6 @@ func (c *Config) Load(arguments []string) error {
 
 	// TODO: name is required make default or check if exist
 
-	fmt.Println("Addr:" + c.Addr)
-	fmt.Println("Datadir:" + c.DataDir)
 	// if c.DataDir == "" {
 	// 	// TODO: include log system
 	// 	// log.Fatal("The data dir was not set and could not be guessed from machine name")
@@ -133,7 +128,6 @@ func (c *Config) LoadEtcdConfig() error {
 	f, _ := ioutil.TempFile("", "")
 	f.WriteString(fileContent)
 	f.Close()
-	// fmt.Println("etcd file: " + f.Name())
 	defer os.Remove(f.Name())
 	// c.WithTempFile(fileContent, func(pathToEtcdConfigFile string) {
 	if err := c.EtcdConf.Load([]string{"-config", f.Name()}); err != nil {
@@ -148,7 +142,6 @@ func (c *Config) LoadEtcdConfig() error {
 // 	f, _ := ioutil.TempFile("", "")
 // 	f.WriteString(content)
 // 	f.Close()
-// 	fmt.Println("etcd file: " + f.Name())
 // 	// defer os.Remove(f.Name())
 // 	fn(f.Name())
 // }
