@@ -5,7 +5,9 @@ import (
 	"os"
 
 	"github.com/innotech/hydra/config"
+	"github.com/innotech/hydra/driver"
 	"github.com/innotech/hydra/etcd"
+	"github.com/innotech/hydra/server"
 )
 
 func main() {
@@ -42,5 +44,11 @@ func main() {
 	// etcd.Load()
 	// etcd.Start()
 	etcd.Load()
-	etcd.Start()
+	go func() {
+		etcd.Start()
+	}()
+
+	etcdDriver := driver.NewEtcdDriver(etcd.EtcdServer, etcd.PeerServer)
+	var server = server.NewServer(etcdDriver)
+	server.Start()
 }
