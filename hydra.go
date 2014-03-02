@@ -2,11 +2,14 @@ package main
 
 import (
 	"fmt"
+	"net"
+	"net/http"
 	"os"
 
 	"github.com/innotech/hydra/config"
-	"github.com/innotech/hydra/driver"
+	"github.com/innotech/hydra/database/connector"
 	"github.com/innotech/hydra/etcd"
+	"github.com/innotech/hydra/log"
 	"github.com/innotech/hydra/server"
 )
 
@@ -48,7 +51,17 @@ func main() {
 		etcd.Start()
 	}()
 
-	etcdDriver := driver.NewEtcdDriver(etcd.EtcdServer, etcd.PeerServer)
-	var server = server.NewServer(etcdDriver)
-	server.Start()
+	connector.SetEtcdConnector(etcd)
+	// etcdDriver := driver.NewEtcdDriver(etcd.EtcdServer, etcd.PeerServer)
+	// var server = server.NewServer(etcdDriver)
+	// server.Start()
+
+	// TODO: Use Config addr
+	privateHydraListener, err := net.Listen("tcp", ":8082")
+	if err != nil {
+		log.Fatal("Failed to create hydra listener: ", err)
+	}
+	var privateServer = server.NewPrivateServer(privateHydraListener)
+	privateServer.RegisterControllers()
+	log.Fatal(http.Serve(privateServer.Listener, privateServer.Router))
 }
