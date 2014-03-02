@@ -8,8 +8,11 @@
 # go test -i ./server
 # go test -v ./server
 
-go test -i ./utils
-go test -v ./utils
+go test -i ./model/entity
+go test -v ./model/entity
+
+# go test -i ./utils
+# go test -v ./utils
 
 # go test -i ./tests
 # HYDRA_BIN_PATH=$(pwd)/bin/hydra go test -v ./tests
