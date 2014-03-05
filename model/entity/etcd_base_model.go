@@ -4,6 +4,8 @@ import (
 	"errors"
 	"reflect"
 	"strconv"
+
+	"github.com/innotech/hydra/vendors/github.com/coreos/etcd/store"
 )
 
 type EtcdModelizer interface {
@@ -12,7 +14,62 @@ type EtcdModelizer interface {
 
 type EtcdBaseModel map[string]interface{}
 
-func (e EtcdBaseModel) CastInterfaceToString(v interface{}) (string, error) {
+// func CheckIfStructFieldNameExists(s interface{}, fieldToFind string) (bool, error) {
+// 	if structValue.Kind() != reflect.Struct {
+// 		// TODO
+// 		return nil, errors.New("Bad type")
+// 	}
+
+// 	numOfFields := reflect.ValueOf(s).NumField()
+// 	fieldIndex := []int{0}
+// 	var structField reflect.StructField
+// 	for i := 0; i < numOfFields; i++ {
+// 		fieldIndex[0] = i
+// 		structField = reflect.TypeOf(s).FieldByIndex(fieldIndex)
+// 		if structField.Name == fieldToFind {
+// 			return true, nil
+// 		}
+// 	}
+// 	return false, nil
+// }
+
+// func NewEtcdBaseModel() {
+
+// }
+
+func NewFromEvent(event *store.Event) (*EtcdBaseModel, error) {
+	var proccessStruct func(interface{}, map[string]interface{}) error
+	proccessStruct = func(s interface{}, m map[string]interface{}) error {
+		if node := reflect.ValueOf(s).Elem().FieldByName("Node"); node.IsValid() {
+			proccessStruct(node.Interface(), m)
+		} else if exists := reflect.ValueOf(s).Elem().FieldByName("Nodes"); exists.IsValid() && !exists.IsNil() {
+			key := reflect.ValueOf(s).Elem().FieldByName("Key").Interface().(string)
+			nodes := []*store.NodeExtern(reflect.ValueOf(s).Elem().FieldByName("Nodes").Interface().(store.NodeExterns))
+			m[key] = make(map[string]interface{})
+			for _, node := range nodes {
+				proccessStruct(node, m[key].(map[string]interface{}))
+			}
+		} else {
+			value, err := CastInterfaceToString(reflect.ValueOf(s).Elem().FieldByName("Value").Interface())
+			if err != nil {
+				return err
+			}
+			key := reflect.ValueOf(s).Elem().FieldByName("Key").Interface().(string)
+			m[key] = value
+		}
+		return nil
+	}
+
+	model := make(map[string]interface{})
+	if err := proccessStruct(event, model); err != nil {
+		return nil, err
+	}
+	m := EtcdBaseModel(model)
+	return &m, nil
+}
+
+// func (e EtcdBaseModel) CastInterfaceToString(v interface{}) (string, error) {
+func CastInterfaceToString(v interface{}) (string, error) {
 	var str string
 	switch v.(type) {
 	case nil:
@@ -26,7 +83,7 @@ func (e EtcdBaseModel) CastInterfaceToString(v interface{}) (string, error) {
 	case string:
 		str = v.(string)
 	default:
-		// TODO
+		// TODO: improve error
 		return "", errors.New("Bad interface")
 	}
 	return str, nil
@@ -47,7 +104,7 @@ func (e EtcdBaseModel) ExportEtcdOperations() (map[string]string, error) {
 		case reflect.Slice:
 			processSlice(in.([]interface{}), key)
 		default:
-			valueString, err := e.CastInterfaceToString(in)
+			valueString, err := CastInterfaceToString(in)
 			if err != nil {
 				return err
 			}

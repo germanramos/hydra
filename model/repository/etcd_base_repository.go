@@ -42,7 +42,7 @@ func (e EtcdBaseRepository) Set(entity *entity.EtcdBaseModel) error {
 	}
 	// var i = 0
 	for key, value := range ops {
-		if err := e.conn.Set(key, false, value, PERMANENT); err != nil {
+		if err := e.conn.Set("/v2/keys/"+key, false, value, PERMANENT); err != nil {
 			// TODO: logger
 			return err
 		}

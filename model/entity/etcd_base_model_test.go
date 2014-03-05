@@ -6,6 +6,10 @@ import (
 	. "github.com/innotech/hydra/vendors/github.com/onsi/gomega"
 
 	"encoding/json"
+
+	"github.com/innotech/hydra/model/entity"
+
+	"github.com/innotech/hydra/vendors/github.com/coreos/etcd/store"
 )
 
 var _ = Describe("EtcdBaseModel", func() {
@@ -42,4 +46,100 @@ var _ = Describe("EtcdBaseModel", func() {
 			Expect(etcdOps["/ArrayOfObjects/1/ObjectKey0"]).To(Equal("And start your broker"))
 		})
 	})
+
+	Describe("Intantiating new etcd model from etcd store event", func() {
+		var event = &store.Event{
+			Action: "get",
+			Node: &store.NodeExtern{
+				Key: "/",
+				Dir: true,
+				Nodes: store.NodeExterns{
+					&store.NodeExtern{
+						Key: "key_1",
+						Dir: true,
+						Nodes: store.NodeExterns{
+							&store.NodeExtern{
+								Key:           "key_1_1",
+								Value:         "24.00",
+								ModifiedIndex: 8,
+								CreatedIndex:  8,
+							},
+							&store.NodeExtern{
+								Key:           "key_1_2",
+								Value:         "true",
+								ModifiedIndex: 8,
+								CreatedIndex:  8,
+							},
+						},
+					},
+					&store.NodeExtern{
+						Key: "key_2",
+						Dir: true,
+						Nodes: store.NodeExterns{
+							&store.NodeExtern{
+								Key:           "key_2_1",
+								Value:         "Hello Hydra",
+								ModifiedIndex: 12,
+								CreatedIndex:  12,
+							},
+							&store.NodeExtern{
+								Key:           "key_2_2",
+								Value:         "",
+								ModifiedIndex: 12,
+								CreatedIndex:  12,
+							},
+						},
+					},
+				},
+			},
+		}
+
+		m1, err := entity.NewFromEvent(event)
+		m := map[string]interface{}(*m1)
+		It("should instantiate a new EtcdBaseModel successfully", func() {
+			Expect(err).NotTo(HaveOccurred())
+			Expect(m["/"].(map[string]interface{})["key_1"].(map[string]interface{})["key_1_1"].(string)).To(Equal("24.00"))
+			Expect(m["/"].(map[string]interface{})["key_1"].(map[string]interface{})["key_1_2"]).To(Equal("true"))
+			Expect(m["/"].(map[string]interface{})["key_2"].(map[string]interface{})["key_2_1"]).To(Equal("Hello Hydra"))
+			Expect(m["/"].(map[string]interface{})["key_2"].(map[string]interface{})["key_2_2"]).To(Equal(""))
+		})
+	})
+
+	// Describe("Checking if i field exits", func() {
+	// 	Context("When correct structure instance contains the i field", func() {
+	// 		type myStruct struct {
+	// 			i int
+	// 			j int
+	// 			s string
+	// 		}
+	// 		var s myStruct
+	// 		exists, err := entity.CheckIfStructFieldNameExists(s, "i")
+	// 		It("should exist", func() {
+	// 			Expect(err).NotTo(HaveOccurred())
+	// 			Expect(exists).To(BeTrue())
+	// 		})
+	// 	})
+
+	// 	Context("When correct structure instance doesn't contain the i field", func() {
+	// 		type myStruct struct {
+	// 			j int
+	// 			s string
+	// 		}
+	// 		var s myStruct
+	// 		exists, err := entity.CheckIfStructFieldNameExists(s, "i")
+	// 		It("should exist", func() {
+	// 			Expect(err).NotTo(HaveOccurred())
+	// 			Expect(exists).To(BeFalse())
+	// 		})
+	// 	})
+
+	// 	Context("When no structure instance contains the i field", func() {
+	// 		var s int
+	// 		exists, err := entity.CheckIfStructFieldNameExists(s, "i")
+	// 		It("should exist", func() {
+	// 			Expect(err).To(HaveOccurred())
+	// 		})
+	// 	})
+
+	// })
 })
