@@ -1,6 +1,8 @@
 package connector
 
 import (
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/innotech/hydra/etcd"
@@ -42,7 +44,23 @@ func (e EtcdConnector) Get(key string, recursive bool, sort bool) []interface{} 
 func (e EtcdConnector) Set(key string, dir bool, value string, expireTime time.Time) error {
 	c := e.etcd.EtcdServer.Store().CommandFactory().CreateSetCommand(key, dir, value, expireTime)
 	// c := e.etcd.Store().CommandFactory().CreateSetCommand(key, dir, value, expireTime)
-	return e.dispatch(c)
+	// return e.dispatch(c)
+	err := e.dispatch(c)
+	// event, err := e.etcd.EtcdServer.Store().Get("/v2/keys/testapp/Number", true, false)
+	event, err := e.etcd.EtcdServer.Store().Get("/", true, false)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("%+v\n", event)
+	fmt.Printf("%#v\n", event)
+	js, _ := json.Marshal(event)
+	fmt.Println(string(js))
+	inter := event.Response(e.etcd.EtcdServer.Store().Index())
+	fmt.Printf("%+v\n", inter)
+	fmt.Printf("%#v\n", inter)
+	js2, err := json.Marshal(inter)
+	fmt.Println(string(js2))
+	return err
 }
 
 func (e EtcdConnector) dispatch(c raft.Command) error {

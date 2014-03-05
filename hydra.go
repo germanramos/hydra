@@ -17,9 +17,10 @@ func main() {
 	// Load configuration.
 	var config = config.New()
 	if err := config.Load(os.Args[1:]); err != nil {
+		fmt.Println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 		// fmt.Println(server.Usage() + "\n")
-		fmt.Println(err.Error() + "\n")
-		os.Exit(1)
+		// fmt.Println(err.Error() + "\n")
+		log.Fatal(err.Error() + "\n")
 	}
 
 	if config.DataDir == "" {

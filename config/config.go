@@ -2,6 +2,7 @@ package config
 
 import (
 	"flag"
+	"fmt"
 	// "errors"
 	"io/ioutil"
 	"os"
@@ -115,6 +116,7 @@ func (c *Config) LoadFlags(arguments []string) error {
 	// BEGIN IGNORED FLAGS
 
 	if err := f.Parse(arguments); err != nil {
+		fmt.Println("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
 		return err
 	}
 
