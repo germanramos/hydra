@@ -9,7 +9,7 @@ import (
 	// "runtime"
 	"time"
 
-	hlog "github.com/innotech/hydra/log"
+	// hlog "github.com/innotech/hydra/log"
 
 	"github.com/innotech/hydra/vendors/github.com/coreos/etcd/third_party/github.com/coreos/raft"
 
@@ -59,7 +59,7 @@ func (e *Etcd) configMetrics() metrics.Bucket {
 func (e *Etcd) configPsListener(psConfig server.PeerServerConfig) net.Listener {
 	var psListener net.Listener
 	var err error
-	hlog.Info(e.Config.Peer.BindAddr)
+	// hlog.Info(e.Config.Peer.BindAddr)
 	if psConfig.Scheme == "https" {
 		peerServerTLSConfig, err := e.Config.PeerTLSInfo().ServerConfig()
 		if err != nil {

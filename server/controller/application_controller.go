@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/innotech/hydra/model/entity"
@@ -17,14 +18,14 @@ type ApplicationController struct {
 
 func NewApplicationController() *ApplicationController {
 	var a = new(ApplicationController)
-	a.basePath = "/applications/"
-	a.repo = repository.NewEctdRepository()
+	a.basePath = "/applications"
+	a.repo = repository.NewEctdRepository("applications")
 	return a
 }
 
 func (a ApplicationController) RegisterHandlers(r *mux.Router) {
-	r.HandleFunc(a.basePath+"{id}", a.Delete).Methods("DELETE")
-	r.HandleFunc(a.basePath+"{id}", a.Get).Methods("GET")
+	r.HandleFunc(a.basePath+"/{id}", a.Delete).Methods("DELETE")
+	r.HandleFunc(a.basePath+"/{id}", a.Get).Methods("GET")
 	r.HandleFunc(a.basePath, a.List).Methods("GET")
 	r.HandleFunc(a.basePath, a.Set).Methods("POST")
 }
@@ -34,16 +35,43 @@ func (a ApplicationController) Delete(rw http.ResponseWriter, req *http.Request)
 }
 
 func (a ApplicationController) Get(rw http.ResponseWriter, req *http.Request) {
-	// w.Header().Set("Content-Type", "application/json")
-
+	fmt.Println("Entra en GET")
+	vars := mux.Vars(req)
+	id := vars["id"]
+	app, err := a.repo.Get(id)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusNotFound)
+		return
+	}
+	jsonOutput, err := json.Marshal(app)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	rw.WriteHeader(http.StatusOK)
+	rw.Header().Set("Content-Type", "application/json")
+	rw.Write(jsonOutput)
 }
 
 func (a ApplicationController) List(rw http.ResponseWriter, req *http.Request) {
-	// w.Header().Set("Content-Type", "application/json")
-
+	fmt.Println("Entra en LIST")
+	apps, err := a.repo.GetAll()
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusNotFound)
+		return
+	}
+	jsonOutput, err := json.Marshal(apps)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	rw.WriteHeader(http.StatusOK)
+	rw.Header().Set("Content-Type", "application/json")
+	rw.Write(jsonOutput)
 }
 
 func (a *ApplicationController) Set(rw http.ResponseWriter, req *http.Request) {
+	fmt.Println("Entra en SET")
 	decoder := json.NewDecoder(req.Body)
 	var app entity.EtcdBaseModel
 	err := decoder.Decode(&app)
@@ -56,5 +84,4 @@ func (a *ApplicationController) Set(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	rw.WriteHeader(http.StatusOK)
 }

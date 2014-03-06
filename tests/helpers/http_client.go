@@ -2,7 +2,7 @@ package helpers
 
 import (
 	"encoding/json"
-	// "fmt"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -19,6 +19,7 @@ func NewHTTPClientHelper() *HTTPClientHelper {
 // Creates a new HTTP client with KeepAlive disabled.
 func newHTTPClient() *http.Client {
 	return &http.Client{Transport: &http.Transport{DisableKeepAlives: true}}
+	// return &http.Client{}
 }
 
 // Reads the body from the response and closes it.
@@ -31,19 +32,30 @@ func (h HTTPClientHelper) ReadBody(resp *http.Response) []byte {
 	return body
 }
 
-// Reads the body from the response and parses it as JSON.
-func (h HTTPClientHelper) ReadBodyJSON(resp *http.Response) (map[string]interface{}, error) {
+// Reads the body from the response and parses it as JSON Object.
+func (h HTTPClientHelper) ReadBodyJsonArray(resp *http.Response) ([]map[string]interface{}, error) {
+	var m []map[string]interface{}
+	decoder := json.NewDecoder(resp.Body)
+	err := decoder.Decode(&m)
+	if err != nil {
+		panic(fmt.Sprintf("HTTP body JSON parse error: %v", err))
+	}
+	return m, nil
+}
+
+// Reads the body from the response and parses it as JSON Object.
+func (h HTTPClientHelper) ReadBodyJsonObject(resp *http.Response) (map[string]interface{}, error) {
 	m := make(map[string]interface{})
-	b := h.ReadBody(resp)
-	if err := json.Unmarshal(b, &m); err != nil {
-		// panic(fmt.Sprintf("HTTP body JSON parse error: %v", err))
-		return nil, err
+	decoder := json.NewDecoder(resp.Body)
+	err := decoder.Decode(&m)
+	if err != nil {
+		panic(fmt.Sprintf("HTTP body JSON parse error: %v", err))
 	}
 	return m, nil
 }
 
 func (h HTTPClientHelper) Get(url string) (*http.Response, error) {
-	return h.send("GET", url, "application/json", nil)
+	return h.send("GET", url, "", nil)
 }
 
 func (h HTTPClientHelper) Post(url string, bodyType string, body io.Reader) (*http.Response, error) {
@@ -72,10 +84,24 @@ func (h HTTPClientHelper) DeleteForm(url string, data url.Values) (*http.Respons
 
 func (h HTTPClientHelper) send(method string, url string, bodyType string, body io.Reader) (*http.Response, error) {
 	c := newHTTPClient()
+	fmt.Println(method)
+	fmt.Println(url)
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
+		fmt.Println("ERROR")
 		return nil, err
 	}
-	req.Header.Set("Content-Type", bodyType)
+	if bodyType != "" {
+		req.Header.Set("Content-Type", bodyType)
+	}
 	return c.Do(req)
+	// res, err := c.Do(req)
+	// if err != nil {
+	// 	fmt.Println("ERROR")
+	// 	fmt.Println(err.Error())
+	// }
+	// b, _ := ioutil.ReadAll(res.Body)
+	// res.Body.Close()
+	// fmt.Println(string(b))
+	// return res, err
 }
