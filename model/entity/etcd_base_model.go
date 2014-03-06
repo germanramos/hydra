@@ -4,6 +4,7 @@ import (
 	"errors"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/innotech/hydra/vendors/github.com/coreos/etcd/store"
 )
@@ -14,51 +15,30 @@ type EtcdModelizer interface {
 
 type EtcdBaseModel map[string]interface{}
 
-// func CheckIfStructFieldNameExists(s interface{}, fieldToFind string) (bool, error) {
-// 	if structValue.Kind() != reflect.Struct {
-// 		// TODO
-// 		return nil, errors.New("Bad type")
-// 	}
+type EtcdBaseModels []EtcdBaseModel
 
-// 	numOfFields := reflect.ValueOf(s).NumField()
-// 	fieldIndex := []int{0}
-// 	var structField reflect.StructField
-// 	for i := 0; i < numOfFields; i++ {
-// 		fieldIndex[0] = i
-// 		structField = reflect.TypeOf(s).FieldByIndex(fieldIndex)
-// 		if structField.Name == fieldToFind {
-// 			return true, nil
-// 		}
-// 	}
-// 	return false, nil
-// }
-
-// func NewEtcdBaseModel() {
-
-// }
-
-func NewFromEvent(event *store.Event) (*EtcdBaseModel, error) {
-	var proccessStruct func(interface{}, map[string]interface{}) error
-	proccessStruct = func(s interface{}, m map[string]interface{}) error {
-		if node := reflect.ValueOf(s).Elem().FieldByName("Node"); node.IsValid() {
-			proccessStruct(node.Interface(), m)
-		} else if exists := reflect.ValueOf(s).Elem().FieldByName("Nodes"); exists.IsValid() && !exists.IsNil() {
-			key := reflect.ValueOf(s).Elem().FieldByName("Key").Interface().(string)
-			nodes := []*store.NodeExtern(reflect.ValueOf(s).Elem().FieldByName("Nodes").Interface().(store.NodeExterns))
-			m[key] = make(map[string]interface{})
-			for _, node := range nodes {
-				proccessStruct(node, m[key].(map[string]interface{}))
-			}
-		} else {
-			value, err := CastInterfaceToString(reflect.ValueOf(s).Elem().FieldByName("Value").Interface())
-			if err != nil {
-				return err
-			}
-			key := reflect.ValueOf(s).Elem().FieldByName("Key").Interface().(string)
-			m[key] = value
-		}
-		return nil
-	}
+func NewModelFromEvent(event *store.Event) (*EtcdBaseModel, error) {
+	// var proccessStruct func(interface{}, map[string]interface{}) error
+	// proccessStruct = func(s interface{}, m map[string]interface{}) error {
+	// 	if node := reflect.ValueOf(s).Elem().FieldByName("Node"); node.IsValid() {
+	// 		proccessStruct(node.Interface(), m)
+	// 	} else if exists := reflect.ValueOf(s).Elem().FieldByName("Nodes"); exists.IsValid() && !exists.IsNil() {
+	// 		key := reflect.ValueOf(s).Elem().FieldByName("Key").Interface().(string)
+	// 		nodes := []*store.NodeExtern(reflect.ValueOf(s).Elem().FieldByName("Nodes").Interface().(store.NodeExterns))
+	// 		m[key] = make(map[string]interface{})
+	// 		for _, node := range nodes {
+	// 			proccessStruct(node, m[key].(map[string]interface{}))
+	// 		}
+	// 	} else {
+	// 		value, err := CastInterfaceToString(reflect.ValueOf(s).Elem().FieldByName("Value").Interface())
+	// 		if err != nil {
+	// 			return err
+	// 		}
+	// 		key := reflect.ValueOf(s).Elem().FieldByName("Key").Interface().(string)
+	// 		m[key] = value
+	// 	}
+	// 	return nil
+	// }
 
 	model := make(map[string]interface{})
 	if err := proccessStruct(event, model); err != nil {
@@ -66,6 +46,56 @@ func NewFromEvent(event *store.Event) (*EtcdBaseModel, error) {
 	}
 	m := EtcdBaseModel(model)
 	return &m, nil
+}
+
+func NewModelsFromEvent(event *store.Event) (*EtcdBaseModels, error) {
+	models := make([]EtcdBaseModel, 0)
+	nodes := []*store.NodeExtern(reflect.ValueOf(event).Elem().FieldByName("Node").Elem().FieldByName("Nodes").Interface().(store.NodeExterns))
+	for _, node := range nodes {
+		model := make(map[string]interface{})
+		if err := proccessStruct(node, model); err != nil {
+			return nil, err
+		}
+		models = append(models, model)
+	}
+
+	m := EtcdBaseModels(models)
+	return &m, nil
+}
+
+func ExtractJsonKeyFromEtcdKey(s string) (string, error) {
+	lastIndex := strings.LastIndex(s, "/")
+	if lastIndex == -1 {
+		// TODO
+		return "", errors.New("Bad etcd key")
+	}
+	key := s[lastIndex+1:]
+	if len(key) == 0 {
+		// TODO
+		return "", errors.New("Bad etcd key")
+	}
+	return key, nil
+}
+
+func proccessStruct(s interface{}, m map[string]interface{}) error {
+	if node := reflect.ValueOf(s).Elem().FieldByName("Node"); node.IsValid() {
+		proccessStruct(node.Interface(), m)
+	} else if exists := reflect.ValueOf(s).Elem().FieldByName("Nodes"); exists.IsValid() && !exists.IsNil() {
+		key, _ := ExtractJsonKeyFromEtcdKey(reflect.ValueOf(s).Elem().FieldByName("Key").Interface().(string))
+		nodes := []*store.NodeExtern(reflect.ValueOf(s).Elem().FieldByName("Nodes").Interface().(store.NodeExterns))
+		m[key] = make(map[string]interface{})
+		for _, node := range nodes {
+			proccessStruct(node, m[key].(map[string]interface{}))
+		}
+	} else {
+		value, err := CastInterfaceToString(reflect.ValueOf(s).Elem().FieldByName("Value").Interface())
+		if err != nil {
+			return err
+		}
+		key, _ := ExtractJsonKeyFromEtcdKey(reflect.ValueOf(s).Elem().FieldByName("Key").Interface().(string))
+		m[key] = value
+	}
+	return nil
 }
 
 // func (e EtcdBaseModel) CastInterfaceToString(v interface{}) (string, error) {

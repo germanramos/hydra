@@ -47,25 +47,51 @@ var _ = Describe("EtcdBaseModel", func() {
 		})
 	})
 
-	Describe("Intantiating new etcd model from etcd store event", func() {
-		var event = &store.Event{
+	Describe("Extracting json key from etcd key", func() {
+		Context("When json key is empty", func() {
+			jsonKey, err := ExtractJsonKeyFromEtcdKey("")
+			It("should be thrown an error", func() {
+				Expect(err).To(HaveOccurred())
+				// TODO: check error type or message
+				Expect(jsonKey).To(BeEmpty())
+			})
+		})
+		Context("When json key is incorrect", func() {
+			jsonKey, err := ExtractJsonKeyFromEtcdKey("/db/applications/")
+			It("should be thrown an error", func() {
+				Expect(err).To(HaveOccurred())
+				// TODO: check error type or message
+				Expect(jsonKey).To(BeEmpty())
+			})
+		})
+		Context("When json key is correct", func() {
+			jsonKey, err := ExtractJsonKeyFromEtcdKey("/db/applications/App1/instances/Instance1")
+			It("should be extracted successfully", func() {
+				Expect(err).ToNot(HaveOccurred())
+				Expect(jsonKey).To(Equal("Instance1"))
+			})
+		})
+	})
+
+	Context("When store is not empty", func() {
+		event := &store.Event{
 			Action: "get",
 			Node: &store.NodeExtern{
-				Key: "/",
+				Key: "/App1",
 				Dir: true,
 				Nodes: store.NodeExterns{
 					&store.NodeExtern{
-						Key: "key_1",
+						Key: "/App1/key_1",
 						Dir: true,
 						Nodes: store.NodeExterns{
 							&store.NodeExtern{
-								Key:           "key_1_1",
+								Key:           "/App1/key_1/key_1_1",
 								Value:         "24.00",
 								ModifiedIndex: 8,
 								CreatedIndex:  8,
 							},
 							&store.NodeExtern{
-								Key:           "key_1_2",
+								Key:           "/App1/key_1/key_1_2",
 								Value:         "true",
 								ModifiedIndex: 8,
 								CreatedIndex:  8,
@@ -73,17 +99,17 @@ var _ = Describe("EtcdBaseModel", func() {
 						},
 					},
 					&store.NodeExtern{
-						Key: "key_2",
+						Key: "/App1/key_2",
 						Dir: true,
 						Nodes: store.NodeExterns{
 							&store.NodeExtern{
-								Key:           "key_2_1",
+								Key:           "/App1/key_2/key_2_1",
 								Value:         "Hello Hydra",
 								ModifiedIndex: 12,
 								CreatedIndex:  12,
 							},
 							&store.NodeExtern{
-								Key:           "key_2_2",
+								Key:           "/App1/key_2/key_2_2",
 								Value:         "",
 								ModifiedIndex: 12,
 								CreatedIndex:  12,
@@ -93,53 +119,27 @@ var _ = Describe("EtcdBaseModel", func() {
 				},
 			},
 		}
-
-		m1, err := entity.NewFromEvent(event)
-		m := map[string]interface{}(*m1)
-		It("should instantiate a new EtcdBaseModel successfully", func() {
-			Expect(err).NotTo(HaveOccurred())
-			Expect(m["/"].(map[string]interface{})["key_1"].(map[string]interface{})["key_1_1"].(string)).To(Equal("24.00"))
-			Expect(m["/"].(map[string]interface{})["key_1"].(map[string]interface{})["key_1_2"]).To(Equal("true"))
-			Expect(m["/"].(map[string]interface{})["key_2"].(map[string]interface{})["key_2_1"]).To(Equal("Hello Hydra"))
-			Expect(m["/"].(map[string]interface{})["key_2"].(map[string]interface{})["key_2_2"]).To(Equal(""))
+		Describe("Instantiating new etcd model from etcd store event", func() {
+			m1, err := entity.NewModelFromEvent(event)
+			m := map[string]interface{}(*m1)
+			It("should instantiate a new EtcdBaseModel successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(m["App1"].(map[string]interface{})["key_1"].(map[string]interface{})["key_1_1"].(string)).To(Equal("24.00"))
+				Expect(m["App1"].(map[string]interface{})["key_1"].(map[string]interface{})["key_1_2"]).To(Equal("true"))
+				Expect(m["App1"].(map[string]interface{})["key_2"].(map[string]interface{})["key_2_1"]).To(Equal("Hello Hydra"))
+				Expect(m["App1"].(map[string]interface{})["key_2"].(map[string]interface{})["key_2_2"]).To(Equal(""))
+			})
+		})
+		Describe("Instantiating new etcd models (array of models) from etcd store event", func() {
+			m1, err := entity.NewModelsFromEvent(event)
+			m := []EtcdBaseModel(*m1)
+			It("should instantiate a new EtcdBaseModel successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(m[0]["key_1"].(map[string]interface{})["key_1_1"].(string)).To(Equal("24.00"))
+				Expect(m[0]["key_1"].(map[string]interface{})["key_1_2"]).To(Equal("true"))
+				Expect(m[1]["key_2"].(map[string]interface{})["key_2_1"]).To(Equal("Hello Hydra"))
+				Expect(m[1]["key_2"].(map[string]interface{})["key_2_2"]).To(Equal(""))
+			})
 		})
 	})
-
-	// Describe("Checking if i field exits", func() {
-	// 	Context("When correct structure instance contains the i field", func() {
-	// 		type myStruct struct {
-	// 			i int
-	// 			j int
-	// 			s string
-	// 		}
-	// 		var s myStruct
-	// 		exists, err := entity.CheckIfStructFieldNameExists(s, "i")
-	// 		It("should exist", func() {
-	// 			Expect(err).NotTo(HaveOccurred())
-	// 			Expect(exists).To(BeTrue())
-	// 		})
-	// 	})
-
-	// 	Context("When correct structure instance doesn't contain the i field", func() {
-	// 		type myStruct struct {
-	// 			j int
-	// 			s string
-	// 		}
-	// 		var s myStruct
-	// 		exists, err := entity.CheckIfStructFieldNameExists(s, "i")
-	// 		It("should exist", func() {
-	// 			Expect(err).NotTo(HaveOccurred())
-	// 			Expect(exists).To(BeFalse())
-	// 		})
-	// 	})
-
-	// 	Context("When no structure instance contains the i field", func() {
-	// 		var s int
-	// 		exists, err := entity.CheckIfStructFieldNameExists(s, "i")
-	// 		It("should exist", func() {
-	// 			Expect(err).To(HaveOccurred())
-	// 		})
-	// 	})
-
-	// })
 })

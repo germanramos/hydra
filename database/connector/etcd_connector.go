@@ -1,13 +1,13 @@
 package connector
 
 import (
-	"encoding/json"
-	"fmt"
+	// "encoding/json"
+	// "fmt"
 	"time"
 
 	"github.com/innotech/hydra/etcd"
 
-	// "github.com/innotech/hydra/vendors/github.com/coreos/etcd/store"
+	"github.com/innotech/hydra/vendors/github.com/coreos/etcd/store"
 	"github.com/innotech/hydra/vendors/github.com/coreos/etcd/third_party/github.com/coreos/raft"
 )
 
@@ -37,8 +37,8 @@ func (e EtcdConnector) Delete(key string, dir, recursive bool) error {
 
 }
 
-func (e EtcdConnector) Get(key string, recursive bool, sort bool) []interface{} {
-	return nil
+func (e EtcdConnector) Get(key string, recursive bool, sort bool) (*store.Event, error) {
+	return e.etcd.EtcdServer.Store().Get(key, recursive, sort)
 }
 
 func (e EtcdConnector) Set(key string, dir bool, value string, expireTime time.Time) error {
@@ -46,21 +46,26 @@ func (e EtcdConnector) Set(key string, dir bool, value string, expireTime time.T
 	// c := e.etcd.Store().CommandFactory().CreateSetCommand(key, dir, value, expireTime)
 	// return e.dispatch(c)
 	err := e.dispatch(c)
-	// event, err := e.etcd.EtcdServer.Store().Get("/v2/keys/testapp/Number", true, false)
-	event, err := e.etcd.EtcdServer.Store().Get("/", true, false)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%+v\n", event)
-	fmt.Printf("%#v\n", event)
-	js, _ := json.Marshal(event)
-	fmt.Println(string(js))
-	inter := event.Response(e.etcd.EtcdServer.Store().Index())
-	fmt.Printf("%+v\n", inter)
-	fmt.Printf("%#v\n", inter)
-	js2, err := json.Marshal(inter)
-	fmt.Println(string(js2))
-	return err
+	// event, err := e.etcd.EtcdServer.Store().Get("/v2/keys/testapp/Number", true, false)
+	// event, err := e.etcd.EtcdServer.Store().Get("/", true, false)
+	// if err != nil {
+	// 	return err
+	// }
+	// fmt.Printf("%+v\n", event)
+	// fmt.Printf("%#v\n", event)
+	// js, _ := json.Marshal(event)
+	// fmt.Println(string(js))
+	// inter := event.Response(e.etcd.EtcdServer.Store().Index())
+	// fmt.Printf("%+v\n", inter)
+	// fmt.Printf("%#v\n", inter)
+	// js2, err := json.Marshal(inter)
+	// fmt.Println(string(js2))
+	// return err
+
+	return nil
 }
 
 func (e EtcdConnector) dispatch(c raft.Command) error {
