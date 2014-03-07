@@ -6,7 +6,6 @@ import (
 
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	. "github.com/innotech/hydra/tests/helpers"
@@ -104,7 +103,7 @@ var _ = Describe("Applications", func() {
 			},
 		}
 		appJson, _ = json.Marshal(app2)
-		FDescribe("Setting App2 application and getting all applications (App1 and App2)", func() {
+		Describe("Setting App2 application and getting all applications (App1 and App2)", func() {
 			response, err := httpUtils.Post(BASE_URI, "application/json", bytes.NewReader(appJson))
 			It("should be created successfully", func() {
 				Expect(err).NotTo(HaveOccurred())

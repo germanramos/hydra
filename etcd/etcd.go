@@ -80,6 +80,29 @@ func (e *Etcd) configPsListener(psConfig server.PeerServerConfig) net.Listener {
 	return psListener
 }
 
+func (e *Etcd) configEtcdListener() net.Listener {
+	var sListener net.Listener
+	var err error
+	if e.Config.EtcdTLSInfo().Scheme() == "https" {
+		etcdServerTLSConfig, err := e.Config.EtcdTLSInfo().ServerConfig()
+		if err != nil {
+			log.Fatal("etcd TLS error: ", err)
+		}
+
+		sListener, err = server.NewTLSListener(e.Config.BindAddr, etcdServerTLSConfig)
+		if err != nil {
+			log.Fatal("Failed to create TLS etcd listener: ", err)
+		}
+	} else {
+		sListener, err = server.NewListener(e.Config.BindAddr)
+		if err != nil {
+			log.Fatal("Failed to create etcd listener: ", err)
+		}
+	}
+
+	return sListener
+}
+
 func (e *Etcd) Load() {
 	mb := e.configMetrics()
 
@@ -138,42 +161,23 @@ func (e *Etcd) Load() {
 	e.PeerServerListener = psListener
 }
 
-func (e *Etcd) Start() {
+func (e *Etcd) Start(withEtcdServer string) {
 	e.PeerServer.Start(e.Config.Snapshot, e.Config.Peers)
 
-	// go func() {
-	// var Permanent time.Time
-	// log.Infof("Sleeping 5s...")
-	// time.Sleep(1000 * time.Millisecond)
-	// log.Infof("Setting foo = bar")
-	// // _, err := store.Set("/foo", false, "bar", Permanent)
-	// // s.Store().CommandFactory().CreateSetCommand(key, dir, value, expireTime)
-	// // _, err := s.Store().Set("/foo", false, "bar", Permanent)
-	// c := e.EtcdServer.Store().CommandFactory().CreateSetCommand("/foo", false, "bar", Permanent)
-	// result, err := e.PeerServer.RaftServer().Do(c)
-	// if err != nil {
-	// 	// return err
-	// 	log.Fatal("Failed 1 to set key", err)
-	// }
-
-	// if result == nil {
-	// 	// return etcdErr.NewError(300, "Empty result from raft", s.Store().Index())
-	// 	log.Fatal("Failed 2 to set key", err)
-	// }
-
-	// log.Infof("Sleeping 2000ms...")
-	// time.Sleep(2000 * time.Millisecond)
-	// g, err := e.EtcdServer.Store().Get("/foo", false, false)
-	// if err != nil {
-	// 	log.Fatal("Failed to get key", err)
-	// }
-	// log.Infof("printing results...")
-	// log.Infof(g.Node.Key)
-	// log.Infof(g.Node.Value)
-	// }()
+	if withEtcdServer == "TEST" {
+		sListener := e.configEtcdListener()
+		go func() {
+			log.Infof("etcd server [name %s, listen on %s, advertised url %s]", e.EtcdServer.Name, sListener.Addr(), e.EtcdServer.URL())
+			corsInfo, err := ehttp.NewCORSInfo(e.Config.CorsOrigins)
+			if err != nil {
+				log.Fatal("CORS:", err)
+			}
+			sHTTP := &ehttp.CORSHandler{e.EtcdServer.HTTPHandler(), corsInfo}
+			log.Fatal(http.Serve(sListener, sHTTP))
+		}()
+	}
 
 	log.Infof("peer server [name %s, listen on %s, advertised url %s]", e.PeerServer.Config.Name, e.PeerServerListener.Addr(), e.PeerServer.Config.URL)
-
 	// Retrieve CORS configuration
 	corsInfo, err := ehttp.NewCORSInfo(e.Config.CorsOrigins)
 	if err != nil {

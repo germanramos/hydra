@@ -2,10 +2,7 @@ package repository
 
 import (
 	"github.com/innotech/hydra/database/connector"
-	// "github.com/innotech/hydra/log"
 	"github.com/innotech/hydra/model/entity"
-
-	"fmt"
 )
 
 const KEY_PREFIX string = "/db/"
@@ -42,7 +39,6 @@ func (e EtcdBaseRepository) Delete(key string) error {
 }
 
 func (e EtcdBaseRepository) Get(key string) (*entity.EtcdBaseModel, error) {
-	fmt.Println(e.makePath(key))
 	event, err := e.conn.Get(e.makePath(key), false, false)
 	if err != nil {
 		return nil, err

@@ -84,24 +84,12 @@ func (h HTTPClientHelper) DeleteForm(url string, data url.Values) (*http.Respons
 
 func (h HTTPClientHelper) send(method string, url string, bodyType string, body io.Reader) (*http.Response, error) {
 	c := newHTTPClient()
-	fmt.Println(method)
-	fmt.Println(url)
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
-		fmt.Println("ERROR")
 		return nil, err
 	}
 	if bodyType != "" {
 		req.Header.Set("Content-Type", bodyType)
 	}
 	return c.Do(req)
-	// res, err := c.Do(req)
-	// if err != nil {
-	// 	fmt.Println("ERROR")
-	// 	fmt.Println(err.Error())
-	// }
-	// b, _ := ioutil.ReadAll(res.Body)
-	// res.Body.Close()
-	// fmt.Println(string(b))
-	// return res, err
 }

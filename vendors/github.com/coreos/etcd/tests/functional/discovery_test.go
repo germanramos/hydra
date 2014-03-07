@@ -12,14 +12,14 @@ import (
 
 	"github.com/innotech/hydra/vendors/github.com/coreos/etcd/third_party/github.com/stretchr/testify/assert"
 
-	etcdtest "github.com/innotech/hydra/vendors/github.com/coreos/etcd/tests"
 	"github.com/innotech/hydra/vendors/github.com/coreos/etcd/server"
+	etcdtest "github.com/innotech/hydra/vendors/github.com/coreos/etcd/tests"
 	goetcd "github.com/innotech/hydra/vendors/github.com/coreos/etcd/third_party/github.com/coreos/go-etcd/etcd"
 )
 
 type garbageHandler struct {
-	t	*testing.T
-	success	bool
+	t       *testing.T
+	success bool
 }
 
 func (g *garbageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

@@ -35,8 +35,9 @@ func main() {
 
 	var etcd = etcd.New(config.EtcdConf)
 	etcd.Load()
+	hydraEnv := os.Getenv("HYDRA_ENV")
 	go func() {
-		etcd.Start()
+		etcd.Start(hydraEnv)
 	}()
 
 	connector.SetEtcdConnector(etcd)

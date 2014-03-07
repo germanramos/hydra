@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/innotech/hydra/model/entity"
@@ -35,7 +34,6 @@ func (a ApplicationController) Delete(rw http.ResponseWriter, req *http.Request)
 }
 
 func (a ApplicationController) Get(rw http.ResponseWriter, req *http.Request) {
-	fmt.Println("Entra en GET")
 	vars := mux.Vars(req)
 	id := vars["id"]
 	app, err := a.repo.Get(id)
@@ -54,7 +52,6 @@ func (a ApplicationController) Get(rw http.ResponseWriter, req *http.Request) {
 }
 
 func (a ApplicationController) List(rw http.ResponseWriter, req *http.Request) {
-	fmt.Println("Entra en LIST")
 	apps, err := a.repo.GetAll()
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusNotFound)
@@ -71,7 +68,6 @@ func (a ApplicationController) List(rw http.ResponseWriter, req *http.Request) {
 }
 
 func (a *ApplicationController) Set(rw http.ResponseWriter, req *http.Request) {
-	fmt.Println("Entra en SET")
 	decoder := json.NewDecoder(req.Body)
 	var app entity.EtcdBaseModel
 	err := decoder.Decode(&app)
