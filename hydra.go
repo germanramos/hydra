@@ -1,9 +1,11 @@
 package main
 
 import (
+	// "fmt"
 	"net"
 	"net/http"
 	"os"
+	// "time"
 
 	"github.com/innotech/hydra/config"
 	"github.com/innotech/hydra/database/connector"
@@ -36,23 +38,31 @@ func main() {
 	var etcd = etcd.New(config.EtcdConf)
 	etcd.Load()
 	hydraEnv := os.Getenv("HYDRA_ENV")
-	go func() {
+	// fmt.Println(hydraEnv)
+	if hydraEnv == "ETCD_TEST" {
+		// fmt.Println("********************************************************")
+		// time.Sleep(150 * time.Millisecond)
 		etcd.Start(hydraEnv)
-	}()
+	} else {
+		// fmt.Println("--------------------------------------------------------")
+		go func() {
+			etcd.Start(hydraEnv)
+		}()
 
-	connector.SetEtcdConnector(etcd)
-	// etcdDriver := driver.NewEtcdDriver(etcd.EtcdServer, etcd.PeerServer)
-	// var server = server.NewServer(etcdDriver)
-	// server.Start()
+		connector.SetEtcdConnector(etcd)
+		// etcdDriver := driver.NewEtcdDriver(etcd.EtcdServer, etcd.PeerServer)
+		// var server = server.NewServer(etcdDriver)
+		// server.Start()
 
-	// TODO: Use Config addr
-	// privateHydraListener, err := net.Listen("tcp", config.PrivateAddr)
-	privateHydraListener, err := net.Listen("tcp", ":8082")
-	if err != nil {
-		log.Fatalf("Failed to create hydra listener: ", err)
+		// TODO: Use Config addr
+		privateHydraListener, err := net.Listen("tcp", config.PrivateAddr)
+		// privateHydraListener, err := net.Listen("tcp", ":8181")
+		if err != nil {
+			log.Fatalf("Failed to create hydra listener: ", err)
+		}
+		var privateServer = server.NewPrivateServer(privateHydraListener)
+		privateServer.RegisterControllers()
+		log.Infof("private hydra server [name %s, listen on %s, advertised url %s]", config.Name, config.PrivateAddr, "http://"+config.PrivateAddr)
+		log.Fatal(http.Serve(privateServer.Listener, privateServer.Router))
 	}
-	var privateServer = server.NewPrivateServer(privateHydraListener)
-	privateServer.RegisterControllers()
-	log.Infof("private hydra server [name %s, listen on %s, advertised url %s]", config.Name, config.PrivateAddr, "http://"+config.PrivateAddr)
-	log.Fatal(http.Serve(privateServer.Listener, privateServer.Router))
 }

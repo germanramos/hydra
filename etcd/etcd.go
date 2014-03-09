@@ -164,25 +164,53 @@ func (e *Etcd) Load() {
 func (e *Etcd) Start(withEtcdServer string) {
 	e.PeerServer.Start(e.Config.Snapshot, e.Config.Peers)
 
-	if withEtcdServer == "TEST" {
+	// log.Infof("peer server [name %s, listen on %s, advertised url %s]", e.PeerServer.Config.Name, e.PeerServerListener.Addr(), e.PeerServer.Config.URL)
+	// // Retrieve CORS configuration
+	// corsInfo, err := ehttp.NewCORSInfo(e.Config.CorsOrigins)
+	// if err != nil {
+	// 	log.Fatal("CORS:", err)
+	// }
+	// sHTTP := &ehttp.CORSHandler{e.PeerServer.HTTPHandler(), corsInfo}
+	// log.Fatal(http.Serve(e.PeerServerListener, sHTTP))
+
+	if withEtcdServer == "ETCD_TEST" {
+		// time.Sleep(300 * time.Millisecond)
 		sListener := e.configEtcdListener()
 		go func() {
-			log.Infof("etcd server [name %s, listen on %s, advertised url %s]", e.EtcdServer.Name, sListener.Addr(), e.EtcdServer.URL())
+			// time.Sleep(80 * time.Millisecond)
+			// log.Infof("etcd server [name %s, listen on %s, advertised url %s]", e.EtcdServer.Name, sListener.Addr(), e.EtcdServer.URL())
+			// corsInfo, err := ehttp.NewCORSInfo(e.Config.CorsOrigins)
+			// if err != nil {
+			// 	log.Fatal("CORS:", err)
+			// }
+			// sHTTP := &ehttp.CORSHandler{e.EtcdServer.HTTPHandler(), corsInfo}
+			// log.Fatal(http.Serve(sListener, sHTTP))
+
+			log.Infof("peer server [name %s, listen on %s, advertised url %s]", e.PeerServer.Config.Name, e.PeerServerListener.Addr(), e.PeerServer.Config.URL)
+			// Retrieve CORS configuration
 			corsInfo, err := ehttp.NewCORSInfo(e.Config.CorsOrigins)
 			if err != nil {
 				log.Fatal("CORS:", err)
 			}
-			sHTTP := &ehttp.CORSHandler{e.EtcdServer.HTTPHandler(), corsInfo}
-			log.Fatal(http.Serve(sListener, sHTTP))
+			sHTTP := &ehttp.CORSHandler{e.PeerServer.HTTPHandler(), corsInfo}
+			log.Fatal(http.Serve(e.PeerServerListener, sHTTP))
 		}()
+		log.Infof("etcd server [name %s, listen on %s, advertised url %s]", e.EtcdServer.Name, sListener.Addr(), e.EtcdServer.URL())
+		corsInfo, err := ehttp.NewCORSInfo(e.Config.CorsOrigins)
+		if err != nil {
+			log.Fatal("CORS:", err)
+		}
+		sHTTP := &ehttp.CORSHandler{e.EtcdServer.HTTPHandler(), corsInfo}
+		log.Fatal(http.Serve(sListener, sHTTP))
 	}
-
-	log.Infof("peer server [name %s, listen on %s, advertised url %s]", e.PeerServer.Config.Name, e.PeerServerListener.Addr(), e.PeerServer.Config.URL)
-	// Retrieve CORS configuration
-	corsInfo, err := ehttp.NewCORSInfo(e.Config.CorsOrigins)
-	if err != nil {
-		log.Fatal("CORS:", err)
-	}
-	sHTTP := &ehttp.CORSHandler{e.PeerServer.HTTPHandler(), corsInfo}
-	log.Fatal(http.Serve(e.PeerServerListener, sHTTP))
+	// } else {
+	// log.Infof("peer server [name %s, listen on %s, advertised url %s]", e.PeerServer.Config.Name, e.PeerServerListener.Addr(), e.PeerServer.Config.URL)
+	// // Retrieve CORS configuration
+	// corsInfo, err := ehttp.NewCORSInfo(e.Config.CorsOrigins)
+	// if err != nil {
+	// 	log.Fatal("CORS:", err)
+	// }
+	// sHTTP := &ehttp.CORSHandler{e.PeerServer.HTTPHandler(), corsInfo}
+	// log.Fatal(http.Serve(e.PeerServerListener, sHTTP))
+	// }
 }
