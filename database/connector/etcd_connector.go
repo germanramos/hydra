@@ -7,6 +7,7 @@ import (
 
 	"github.com/innotech/hydra/etcd"
 
+	. "github.com/innotech/hydra/vendors/github.com/coreos/etcd/server"
 	"github.com/innotech/hydra/vendors/github.com/coreos/etcd/store"
 	"github.com/innotech/hydra/vendors/github.com/coreos/etcd/third_party/github.com/coreos/raft"
 )
@@ -88,6 +89,15 @@ func (e EtcdConnector) dispatch(c raft.Command) error {
 		if leader == "" {
 			return nil
 		}
+
+		var url string
+		switch c.(type) {
+		case *JoinCommand, *RemoveCommand:
+			url, _ = ps.registry.PeerURL(leader)
+		default:
+			url, _ = ps.registry.ClientURL(leader)
+		}
+		uhttp.Redirect(url, w, req)
 
 		return nil
 	}
