@@ -34,6 +34,11 @@ var _ = Describe("Config", func() {
 				PEER_2       string = "192.168.113.102:7001"
 				PRIVATE_ADDR string = "127.0.0.1:8771"
 				PUBLIC_ADDR  string = "127.0.0.1:8772"
+
+				PEER_ADDR      string = "127.0.0.1:8001"
+				PEER_CA_FILE   string = "./fixtures/ca/peer_server-chain.pem"
+				PEER_CERT_FILE string = "./fixtures/ca/peer_server.crt"
+				PEER_KEY_FILE  string = "./fixtures/ca/peer_server.key.insecure"
 			)
 			fileContent := `
 				addr = "` + ETCD_ADDR + `"
@@ -43,10 +48,14 @@ var _ = Describe("Config", func() {
 				discovery = "` + DISCOVERY + `"
 				key_file = "` + KEY_FILE + `"
 				name = "` + NAME + `"
-				peer = "` + NAME + `"
 				peers = ["` + PEER_1 + `","` + PEER_2 + `"]
 				private_addr = "` + PRIVATE_ADDR + `"
 				public_addr = "` + PUBLIC_ADDR + `"
+				[peer]
+				addr = "` + PEER_ADDR + `"
+				ca_file = "` + PEER_CA_FILE + `"
+				cert_file = "` + PEER_CERT_FILE + `"
+				key_file = "` + PEER_KEY_FILE + `"
 			`
 			WithTempFile(fileContent, func(pathToFile string) {
 				c := New()
@@ -65,6 +74,10 @@ var _ = Describe("Config", func() {
 					Expect(c.Peers).To(ContainElement(PEER_2))
 					Expect(c.PrivateAddr).To(Equal(PRIVATE_ADDR))
 					Expect(c.PublicAddr).To(Equal(PUBLIC_ADDR))
+					Expect(c.Peer.Addr).To(Equal(PEER_ADDR))
+					Expect(c.Peer.CAFile).To(Equal(PEER_CA_FILE))
+					Expect(c.Peer.CertFile).To(Equal(PEER_CERT_FILE))
+					Expect(c.Peer.KeyFile).To(Equal(PEER_KEY_FILE))
 				})
 			})
 		})
@@ -91,7 +104,7 @@ var _ = Describe("Config", func() {
 				Expect(err).To(BeNil(), "error should be nil")
 				Expect(c.DataDir).To(Equal(DEFAULT_DATA_DIR))
 				Expect(c.EtcdAddr).To(Equal(DEFAULT_ETCD_ADDR))
-				Expect(c.PeerAddr).To(Equal(DEFAULT_PEER_ADDR))
+				Expect(c.Peer.Addr).To(Equal(DEFAULT_PEER_ADDR))
 				Expect(c.PrivateAddr).To(Equal(DEFAULT_PRIVATE_ADDR))
 				Expect(c.PublicAddr).To(Equal(DEFAULT_PUBLIC_ADDR))
 			})
@@ -209,7 +222,34 @@ var _ = Describe("Config", func() {
 			err := c.LoadFlags([]string{"-peer-addr", PEER_ADDR})
 			It("should be loaded successfully", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(c.PeerAddr).To(Equal(PEER_ADDR))
+				Expect(c.Peer.Addr).To(Equal(PEER_ADDR))
+			})
+		})
+		Context("When -peer-ca-file flag exists", func() {
+			const PEER_CA_FILE string = "./fixtures/ca/peer_server-chain.pem"
+			c := New()
+			err := c.LoadFlags([]string{"-peer-ca-file", PEER_CA_FILE})
+			It("should be loaded successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(c.Peer.CAFile).To(Equal(PEER_CA_FILE))
+			})
+		})
+		Context("When -peer-cert-file flag exists", func() {
+			const PEER_CERT_FILE string = "./fixtures/ca/peer_server.crt"
+			c := New()
+			err := c.LoadFlags([]string{"-peer-cert-file", PEER_CERT_FILE})
+			It("should be loaded successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(c.Peer.CertFile).To(Equal(PEER_CERT_FILE))
+			})
+		})
+		Context("When -peer-cert-file flag exists", func() {
+			const PEER_KEY_FILE string = "./fixtures/ca/peer_server.key.insecure"
+			c := New()
+			err := c.LoadFlags([]string{"-peer-key-file", PEER_KEY_FILE})
+			It("should be loaded successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(c.Peer.KeyFile).To(Equal(PEER_KEY_FILE))
 			})
 		})
 		Context("When -peers flag exists", func() {
@@ -312,7 +352,7 @@ var _ = Describe("Config", func() {
 			c := New()
 			c.DataDir = "/tmp/hydra-tests_11"
 			c.EtcdAddr = "127.0.0.1:4411"
-			c.PeerAddr = "127.0.0.1:7711"
+			c.Peer.Addr = "127.0.0.1:7711"
 			err := c.LoadEtcdConfig()
 			It("should be loaded successfully", func() {
 				Expect(err).To(BeNil(), "error should be nil")
@@ -320,16 +360,19 @@ var _ = Describe("Config", func() {
 			It("should be override the default configuration loaded from default system configuration file", func() {
 				Expect(c.EtcdConf.DataDir).To(Equal(c.DataDir))
 				Expect(c.EtcdConf.Addr).To(Equal("http://" + c.EtcdAddr))
-				Expect(c.EtcdConf.Peer.Addr).To(Equal("http://" + c.PeerAddr))
+				Expect(c.EtcdConf.Peer.Addr).To(Equal("http://" + c.Peer.Addr))
 			})
 		})
 		Context("When transport Security with HTTPS will be enabled", func() {
 			c := New()
-			c.CAFile = "./fixtures/ca/server-chain_11.pem"
-			c.CertFile = "./fixtures/ca/server_11.crt"
+			c.CAFile = "./fixtures/ca/server-chain.pem"
+			c.CertFile = "./fixtures/ca/server.crt"
 			c.EtcdAddr = "127.0.0.1:4411"
-			c.KeyFile = "./fixtures/ca/server_11.key.insecure"
-			c.PeerAddr = "127.0.0.1:7711"
+			c.KeyFile = "./fixtures/ca/server.key.insecure"
+			c.Peer.Addr = "127.0.0.1:7711"
+			c.Peer.CAFile = "./fixtures/ca/peer-server-chain.pem"
+			c.Peer.CertFile = "./fixtures/ca/peerserver.crt"
+			c.Peer.KeyFile = "./fixtures/ca/peerserver.key.insecure"
 			err := c.LoadEtcdConfig()
 			It("should be loaded successfully", func() {
 				Expect(err).To(BeNil(), "error should be nil")
@@ -339,7 +382,10 @@ var _ = Describe("Config", func() {
 				Expect(c.EtcdConf.CertFile).To(Equal(c.CertFile))
 				Expect(c.EtcdConf.Addr).To(Equal("https://" + c.EtcdAddr))
 				Expect(c.EtcdConf.KeyFile).To(Equal(c.KeyFile))
-				Expect(c.EtcdConf.Peer.Addr).To(Equal("https://" + c.PeerAddr))
+				Expect(c.EtcdConf.Peer.Addr).To(Equal("https://" + c.Peer.Addr))
+				Expect(c.EtcdConf.Peer.CAFile).To(Equal(c.Peer.CAFile))
+				Expect(c.EtcdConf.Peer.CertFile).To(Equal(c.Peer.CertFile))
+				Expect(c.EtcdConf.Peer.KeyFile).To(Equal(c.Peer.KeyFile))
 			})
 		})
 

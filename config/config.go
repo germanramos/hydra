@@ -37,9 +37,14 @@ type Config struct {
 	KeyFile        string `toml:"key_file"`
 	Name           string
 	Peers          []string
-	PeerAddr       string `toml:"peer_addr"`
 	PrivateAddr    string `toml:"private_addr"`
 	PublicAddr     string `toml:"public_addr"`
+	Peer           struct {
+		Addr     string `toml:"addr"`
+		CAFile   string `toml:"ca_file"`
+		CertFile string `toml:"cert_file"`
+		KeyFile  string `toml:"key_file"`
+	}
 }
 
 func New() *Config {
@@ -48,9 +53,10 @@ func New() *Config {
 	c.ConfigFilePath = DEFAULT_CONFIG_FILE_PATH
 	c.DataDir = DEFAULT_DATA_DIR
 	c.EtcdAddr = DEFAULT_ETCD_ADDR
-	c.PeerAddr = DEFAULT_PEER_ADDR
+	// c.PeerAddr = DEFAULT_PEER_ADDR
 	c.PrivateAddr = DEFAULT_PRIVATE_ADDR
 	c.PublicAddr = DEFAULT_PUBLIC_ADDR
+	c.Peer.Addr = DEFAULT_PEER_ADDR
 
 	return c
 }
@@ -133,6 +139,12 @@ func (c *Config) LoadFlags(arguments []string) error {
 	f.StringVar(&peers, "peers", "", "")
 	f.StringVar(&c.PrivateAddr, "private-addr", c.PrivateAddr, "")
 	f.StringVar(&c.PublicAddr, "public-addr", c.PublicAddr, "")
+
+	f.StringVar(&c.Peer.Addr, "peer-addr", c.Peer.Addr, "")
+	f.StringVar(&c.Peer.CAFile, "peer-ca-file", c.Peer.CAFile, "")
+	f.StringVar(&c.Peer.CertFile, "peer-cert-file", c.Peer.CertFile, "")
+	f.StringVar(&c.Peer.KeyFile, "peer-key-file", c.Peer.KeyFile, "")
+
 	// BEGIN IGNORED FLAGS
 	f.StringVar(&ignoredString, "config", "", "")
 	// BEGIN IGNORED FLAGS
@@ -200,13 +212,16 @@ func (c *Config) makeEtcdConfig() string {
 	}
 	addLineToFileContent(`peers = [` + peers + `]`)
 	addLineToFileContent(`[peer]`)
-	addLineToFileContent(`addr = "` + c.PeerAddr + `"`)
+	addLineToFileContent(`addr = "` + c.Peer.Addr + `"`)
+	addLineToFileContent(`ca_file = "` + c.Peer.CAFile + `"`)
+	addLineToFileContent(`cert_file = "` + c.Peer.CertFile + `"`)
+	addLineToFileContent(`key_file = "` + c.Peer.KeyFile + `"`)
 
 	return content
 }
 
 func (c *Config) handleDiscovery() error {
-	p, err := discovery.Do(c.Discovery, c.Name, c.PeerAddr)
+	p, err := discovery.Do(c.Discovery, c.Name, c.Peer.Addr)
 
 	// This is fatal, discovery encountered an unexpected error
 	// and we have no peer list.
