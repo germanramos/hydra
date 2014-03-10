@@ -38,13 +38,9 @@ func main() {
 	var etcd = etcd.New(config.EtcdConf)
 	etcd.Load()
 	hydraEnv := os.Getenv("HYDRA_ENV")
-	// fmt.Println(hydraEnv)
 	if hydraEnv == "ETCD_TEST" {
-		// fmt.Println("********************************************************")
-		// time.Sleep(150 * time.Millisecond)
 		etcd.Start(hydraEnv)
 	} else {
-		// fmt.Println("--------------------------------------------------------")
 		go func() {
 			etcd.Start(hydraEnv)
 		}()
