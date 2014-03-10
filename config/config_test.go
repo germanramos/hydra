@@ -8,6 +8,7 @@ import (
 	// "fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 )
 
 var _ = Describe("Config", func() {
@@ -23,17 +24,19 @@ var _ = Describe("Config", func() {
 	Describe("loading from TOML", func() {
 		Context("when the TOML file exists", func() {
 			const (
-				CA_FILE      string = "./fixtures/ca/server-chain.pem"
-				CERT_FILE    string = "./fixtures/ca/server.crt"
-				DATA_DIR     string = "/tmp/hydra-0"
-				DISCOVERY    string = "http://etcd.local:4001/v2/keys/_etcd/registry/examplecluster"
-				ETCD_ADDR    string = "127.0.0.1:5001"
-				KEY_FILE     string = "./fixtures/ca/server.key.insecure"
-				NAME         string = "hydra-0"
-				PEER_1       string = "192.168.113.101:7001"
-				PEER_2       string = "192.168.113.102:7001"
-				PRIVATE_ADDR string = "127.0.0.1:8771"
-				PUBLIC_ADDR  string = "127.0.0.1:8772"
+				CA_FILE        string = "./fixtures/ca/server-chain.pem"
+				CERT_FILE      string = "./fixtures/ca/server.crt"
+				DATA_DIR       string = "/tmp/hydra-0"
+				DISCOVERY      string = "http://etcd.local:4001/v2/keys/_etcd/registry/examplecluster"
+				ETCD_ADDR      string = "127.0.0.1:5001"
+				KEY_FILE       string = "./fixtures/ca/server.key.insecure"
+				NAME           string = "hydra-0"
+				PEER_1         string = "192.168.113.101:7001"
+				PEER_2         string = "192.168.113.102:7001"
+				PRIVATE_ADDR   string = "127.0.0.1:8771"
+				PUBLIC_ADDR    string = "127.0.0.1:8772"
+				SNAPSHOT       bool   = false
+				SNAPSHOT_COUNT int    = 333
 
 				PEER_ADDR      string = "127.0.0.1:8001"
 				PEER_CA_FILE   string = "./fixtures/ca/peer_server-chain.pem"
@@ -51,6 +54,8 @@ var _ = Describe("Config", func() {
 				peers = ["` + PEER_1 + `","` + PEER_2 + `"]
 				private_addr = "` + PRIVATE_ADDR + `"
 				public_addr = "` + PUBLIC_ADDR + `"
+				snapshot = ` + strconv.FormatBool(SNAPSHOT) + `
+				snapshot_count = ` + strconv.FormatInt(int64(SNAPSHOT_COUNT), 10) + `
 				[peer]
 				addr = "` + PEER_ADDR + `"
 				ca_file = "` + PEER_CA_FILE + `"
@@ -74,6 +79,8 @@ var _ = Describe("Config", func() {
 					Expect(c.Peers).To(ContainElement(PEER_2))
 					Expect(c.PrivateAddr).To(Equal(PRIVATE_ADDR))
 					Expect(c.PublicAddr).To(Equal(PUBLIC_ADDR))
+					Expect(c.Snapshot).To(Equal(SNAPSHOT))
+					Expect(c.SnapshotCount).To(Equal(SNAPSHOT_COUNT))
 					Expect(c.Peer.Addr).To(Equal(PEER_ADDR))
 					Expect(c.Peer.CAFile).To(Equal(PEER_CA_FILE))
 					Expect(c.Peer.CertFile).To(Equal(PEER_CERT_FILE))
@@ -107,6 +114,8 @@ var _ = Describe("Config", func() {
 				Expect(c.Peer.Addr).To(Equal(DEFAULT_PEER_ADDR))
 				Expect(c.PrivateAddr).To(Equal(DEFAULT_PRIVATE_ADDR))
 				Expect(c.PublicAddr).To(Equal(DEFAULT_PUBLIC_ADDR))
+				Expect(c.Snapshot).To(Equal(DEFAULT_SNAPSHOT))
+				Expect(c.SnapshotCount).To(Equal(DEFAULT_SNAPSHOT_COUNT))
 			})
 		})
 		Context("when default system cofig file exists", func() {
@@ -282,6 +291,24 @@ var _ = Describe("Config", func() {
 				Expect(c.PublicAddr).To(Equal(PUBLIC_ADDR))
 			})
 		})
+		Context("When -snapshot flag exists", func() {
+			c := New()
+			c.Snapshot = false
+			err := c.LoadFlags([]string{"-snapshot"})
+			It("should be loaded successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(c.Snapshot).To(BeTrue())
+			})
+		})
+		Context("When -snapshot-count flag exists", func() {
+			const SNAPSHOT_COUNT int = 777
+			c := New()
+			err := c.LoadFlags([]string{"-snapshot-count", strconv.FormatInt(int64(SNAPSHOT_COUNT), 10)})
+			It("should be loaded successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(c.SnapshotCount).To(Equal(SNAPSHOT_COUNT))
+			})
+		})
 		Context("When -name flag exists", func() {
 			const NAME string = "test-0"
 			c := New()
@@ -352,6 +379,8 @@ var _ = Describe("Config", func() {
 			c := New()
 			c.DataDir = "/tmp/hydra-tests_11"
 			c.EtcdAddr = "127.0.0.1:4411"
+			c.Snapshot = false
+			c.SnapshotCount = 222
 			c.Peer.Addr = "127.0.0.1:7711"
 			err := c.LoadEtcdConfig()
 			It("should be loaded successfully", func() {
@@ -360,6 +389,8 @@ var _ = Describe("Config", func() {
 			It("should be override the default configuration loaded from default system configuration file", func() {
 				Expect(c.EtcdConf.DataDir).To(Equal(c.DataDir))
 				Expect(c.EtcdConf.Addr).To(Equal("http://" + c.EtcdAddr))
+				Expect(c.EtcdConf.Snapshot).To(Equal(c.Snapshot))
+				Expect(c.EtcdConf.SnapshotCount).To(Equal(c.SnapshotCount))
 				Expect(c.EtcdConf.Peer.Addr).To(Equal("http://" + c.Peer.Addr))
 			})
 		})

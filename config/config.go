@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/innotech/hydra/log"
@@ -22,6 +23,8 @@ const (
 	DEFAULT_PEER_ADDR        = "127.0.0.1:7001"
 	DEFAULT_PRIVATE_ADDR     = "127.0.0.1:7771"
 	DEFAULT_PUBLIC_ADDR      = "127.0.0.1:7772"
+	DEFAULT_SNAPSHOT         = true
+	DEFAULT_SNAPSHOT_COUNT   = 20000
 )
 
 type Config struct {
@@ -39,6 +42,8 @@ type Config struct {
 	Peers          []string
 	PrivateAddr    string `toml:"private_addr"`
 	PublicAddr     string `toml:"public_addr"`
+	Snapshot       bool
+	SnapshotCount  int `toml:"snapshot_count"`
 	Peer           struct {
 		Addr     string `toml:"addr"`
 		CAFile   string `toml:"ca_file"`
@@ -56,6 +61,8 @@ func New() *Config {
 	// c.PeerAddr = DEFAULT_PEER_ADDR
 	c.PrivateAddr = DEFAULT_PRIVATE_ADDR
 	c.PublicAddr = DEFAULT_PUBLIC_ADDR
+	c.Snapshot = DEFAULT_SNAPSHOT
+	c.SnapshotCount = DEFAULT_SNAPSHOT_COUNT
 	c.Peer.Addr = DEFAULT_PEER_ADDR
 
 	return c
@@ -127,6 +134,7 @@ func (c *Config) LoadFlags(arguments []string) error {
 
 	f := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	f.SetOutput(ioutil.Discard)
+	f.BoolVar(&c.Snapshot, "snapshot", true, "")
 	f.StringVar(&c.CAFile, "ca-file", c.CAFile, "")
 	f.StringVar(&c.CertFile, "cert-file", c.CertFile, "")
 	f.StringVar(&c.DataDir, "data-dir", c.DataDir, "")
@@ -139,6 +147,7 @@ func (c *Config) LoadFlags(arguments []string) error {
 	f.StringVar(&peers, "peers", "", "")
 	f.StringVar(&c.PrivateAddr, "private-addr", c.PrivateAddr, "")
 	f.StringVar(&c.PublicAddr, "public-addr", c.PublicAddr, "")
+	f.IntVar(&c.SnapshotCount, "snapshot-count", c.SnapshotCount, "")
 
 	f.StringVar(&c.Peer.Addr, "peer-addr", c.Peer.Addr, "")
 	f.StringVar(&c.Peer.CAFile, "peer-ca-file", c.Peer.CAFile, "")
@@ -211,6 +220,8 @@ func (c *Config) makeEtcdConfig() string {
 		peers = peers + `"` + addr + `"`
 	}
 	addLineToFileContent(`peers = [` + peers + `]`)
+	addLineToFileContent(`snapshot = ` + strconv.FormatBool(c.Snapshot))
+	addLineToFileContent(`snapshot_count = ` + strconv.FormatInt(int64(c.SnapshotCount), 10))
 	addLineToFileContent(`[peer]`)
 	addLineToFileContent(`addr = "` + c.Peer.Addr + `"`)
 	addLineToFileContent(`ca_file = "` + c.Peer.CAFile + `"`)
