@@ -16,8 +16,10 @@ type PrivateServer struct {
 
 func NewPrivateServer(l net.Listener) *PrivateServer {
 	var p = new(PrivateServer)
-	p.controllers = make([]controller.Controller, 1)
-	p.controllers[0] = controller.NewApplicationController()
+	p.registerControllers()
+	// p.controllers = make([]controller.Controller, 1)
+	// p.controllers[0] = controller.NewApplicationController()
+
 	// p.controllers = []*controller.Controller{}
 	// p.controllers = [...]controller.Controller{
 	// 	controller.NewApplicationController(),
@@ -25,6 +27,12 @@ func NewPrivateServer(l net.Listener) *PrivateServer {
 	p.Listener = l
 	p.Router = mux.NewRouter()
 	return p
+}
+
+func (p *PrivateServer) registerControllers() {
+	p.controllers = make([]controller.Controller, 2)
+	p.controllers[0], _ = controller.NewBasicController("/applications")
+	p.controllers[1], _ = controller.NewBasicController("/applications/{appId}/instances")
 }
 
 func (p *PrivateServer) RegisterControllers() {

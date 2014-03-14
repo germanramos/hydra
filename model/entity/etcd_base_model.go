@@ -18,28 +18,6 @@ type EtcdBaseModel map[string]interface{}
 type EtcdBaseModels []EtcdBaseModel
 
 func NewModelFromEvent(event *store.Event) (*EtcdBaseModel, error) {
-	// var proccessStruct func(interface{}, map[string]interface{}) error
-	// proccessStruct = func(s interface{}, m map[string]interface{}) error {
-	// 	if node := reflect.ValueOf(s).Elem().FieldByName("Node"); node.IsValid() {
-	// 		proccessStruct(node.Interface(), m)
-	// 	} else if exists := reflect.ValueOf(s).Elem().FieldByName("Nodes"); exists.IsValid() && !exists.IsNil() {
-	// 		key := reflect.ValueOf(s).Elem().FieldByName("Key").Interface().(string)
-	// 		nodes := []*store.NodeExtern(reflect.ValueOf(s).Elem().FieldByName("Nodes").Interface().(store.NodeExterns))
-	// 		m[key] = make(map[string]interface{})
-	// 		for _, node := range nodes {
-	// 			proccessStruct(node, m[key].(map[string]interface{}))
-	// 		}
-	// 	} else {
-	// 		value, err := CastInterfaceToString(reflect.ValueOf(s).Elem().FieldByName("Value").Interface())
-	// 		if err != nil {
-	// 			return err
-	// 		}
-	// 		key := reflect.ValueOf(s).Elem().FieldByName("Key").Interface().(string)
-	// 		m[key] = value
-	// 	}
-	// 	return nil
-	// }
-
 	model := make(map[string]interface{})
 	if err := proccessStruct(event, model); err != nil {
 		return nil, err

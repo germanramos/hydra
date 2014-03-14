@@ -19,14 +19,21 @@ type EtcdBaseRepository struct {
 	collection string
 }
 
-func NewEctdRepository(collection string) *EtcdBaseRepository {
+func NewEctdRepository() *EtcdBaseRepository {
 	var e = new(EtcdBaseRepository)
 	e.conn = connector.GetEtcdConnector()
-	e.collection = collection
 	return e
 }
 
-func (e EtcdBaseRepository) makePath(key string) string {
+func (e *EtcdBaseRepository) GetCollection() string {
+	return e.collection
+}
+
+func (e *EtcdBaseRepository) SetCollection(collection string) {
+	e.collection = collection
+}
+
+func (e *EtcdBaseRepository) makePath(key string) string {
 	prefix := KEY_PREFIX + e.collection
 	if key != "" {
 		return prefix + "/" + key
@@ -34,11 +41,12 @@ func (e EtcdBaseRepository) makePath(key string) string {
 	return prefix
 }
 
-func (e EtcdBaseRepository) Delete(key string) error {
+func (e *EtcdBaseRepository) Delete(key string) error {
+	// TODO
 	return nil
 }
 
-func (e EtcdBaseRepository) Get(key string) (*entity.EtcdBaseModel, error) {
+func (e *EtcdBaseRepository) Get(key string) (*entity.EtcdBaseModel, error) {
 	event, err := e.conn.Get(e.makePath(key), false, false)
 	if err != nil {
 		return nil, err
@@ -46,7 +54,7 @@ func (e EtcdBaseRepository) Get(key string) (*entity.EtcdBaseModel, error) {
 	return entity.NewModelFromEvent(event)
 }
 
-func (e EtcdBaseRepository) GetAll() (*entity.EtcdBaseModels, error) {
+func (e *EtcdBaseRepository) GetAll() (*entity.EtcdBaseModels, error) {
 	event, err := e.conn.Get(e.makePath(""), true, false)
 	if err != nil {
 		return nil, err
@@ -54,7 +62,7 @@ func (e EtcdBaseRepository) GetAll() (*entity.EtcdBaseModels, error) {
 	return entity.NewModelsFromEvent(event)
 }
 
-func (e EtcdBaseRepository) Set(entity *entity.EtcdBaseModel) error {
+func (e *EtcdBaseRepository) Set(entity *entity.EtcdBaseModel) error {
 	ops, err := entity.ExportEtcdOperations()
 	if err != nil {
 		return err

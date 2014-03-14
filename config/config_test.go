@@ -24,6 +24,7 @@ var _ = Describe("Config", func() {
 	Describe("loading from TOML", func() {
 		Context("when the TOML file exists", func() {
 			const (
+				APPS_FILE      string = "/etc/hydra-test/apps.json"
 				CA_FILE        string = "./fixtures/ca/server-chain.pem"
 				CERT_FILE      string = "./fixtures/ca/server.crt"
 				DATA_DIR       string = "/tmp/hydra-0"
@@ -45,6 +46,7 @@ var _ = Describe("Config", func() {
 			)
 			fileContent := `
 				addr = "` + ETCD_ADDR + `"
+				apps_file = "` + APPS_FILE + `"
 				ca_file = "` + CA_FILE + `"
 				cert_file = "` + CERT_FILE + `"
 				data_dir = "` + DATA_DIR + `"
@@ -67,6 +69,7 @@ var _ = Describe("Config", func() {
 				err := c.LoadFile(pathToFile)
 				It("should be loaded successfully", func() {
 					Expect(err).To(BeNil(), "error should be nil")
+					Expect(c.AppsFile).To(Equal(APPS_FILE))
 					Expect(c.CAFile).To(Equal(CA_FILE))
 					Expect(c.CertFile).To(Equal(CERT_FILE))
 					Expect(c.DataDir).To(Equal(DATA_DIR))
@@ -109,6 +112,7 @@ var _ = Describe("Config", func() {
 				c.ConfigFilePath = "/no-data-config"
 				err := c.Load([]string{})
 				Expect(err).To(BeNil(), "error should be nil")
+				Expect(c.AppsFile).To(Equal(DEFAULT_APPS_FILE))
 				Expect(c.DataDir).To(Equal(DEFAULT_DATA_DIR))
 				Expect(c.EtcdAddr).To(Equal(DEFAULT_ETCD_ADDR))
 				Expect(c.Peer.Addr).To(Equal(DEFAULT_PEER_ADDR))
@@ -153,6 +157,15 @@ var _ = Describe("Config", func() {
 			It("should be loaded successfully", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(c.EtcdAddr).To(Equal(ETCD_ADDR))
+			})
+		})
+		Context("When -apps-file flag exists", func() {
+			const APPS_FILE string = "/tmp/apps.json"
+			c := New()
+			err := c.LoadFlags([]string{"-apps-file", APPS_FILE})
+			It("should be loaded successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(c.AppsFile).To(Equal(APPS_FILE))
 			})
 		})
 		Context("When -ca-file flag exists", func() {

@@ -16,26 +16,36 @@ import (
 
 func main() {
 	// Load configuration.
-	var config = config.New()
-	if err := config.Load(os.Args[1:]); err != nil {
+	var conf = config.New()
+	if err := conf.Load(os.Args[1:]); err != nil {
 		log.Fatal(err.Error() + "\n")
 	}
 
-	if config.DataDir == "" {
+	if conf.DataDir == "" {
 		log.Fatal("Data dir does't exist")
 	}
 
 	// Create data directory if it doesn't already exist.
-	if err := os.MkdirAll(config.DataDir, 0744); err != nil {
+	if err := os.MkdirAll(conf.DataDir, 0744); err != nil {
 		log.Fatalf("Unable to create path: %s", err)
 	}
 
 	// Load etcd configuration.
-	if err := config.LoadEtcdConfig(); err != nil {
-		log.Fatalf("Unable to load etcd config: %s", err)
+	if err := conf.LoadEtcdConfig(); err != nil {
+		log.Fatalf("Unable to load etcd conf: %s", err)
 	}
 
-	var etcd = etcd.New(config.EtcdConf)
+	// Load applications.
+	var appsConfig = config.NewApplicationsConfig()
+	if _, err := os.Stat(conf.AppsFile); os.IsNotExist(err) {
+		log.Warnf("Unable to find apps file: %s", err)
+	} else {
+		if err := appsConfig.Load(conf.AppsFile); err != nil {
+			log.Fatalf("Unable to load applications: %s", err)
+		}
+	}
+
+	var etcd = etcd.New(conf.EtcdConf)
 	etcd.Load()
 	hydraEnv := os.Getenv("HYDRA_ENV")
 	if hydraEnv == "ETCD_TEST" {
@@ -46,19 +56,25 @@ func main() {
 		}()
 
 		connector.SetEtcdConnector(etcd)
+
+		// Persist Configured applications
+		if err := appsConfig.Persists(); err != nil {
+			log.Fatalf("Failed to save configured applications: ", err)
+		}
+
 		// etcdDriver := driver.NewEtcdDriver(etcd.EtcdServer, etcd.PeerServer)
 		// var server = server.NewServer(etcdDriver)
 		// server.Start()
 
 		// TODO: Use Config addr
-		privateHydraListener, err := net.Listen("tcp", config.PrivateAddr)
+		privateHydraListener, err := net.Listen("tcp", conf.PrivateAddr)
 		// privateHydraListener, err := net.Listen("tcp", ":8181")
 		if err != nil {
 			log.Fatalf("Failed to create hydra listener: ", err)
 		}
 		var privateServer = server.NewPrivateServer(privateHydraListener)
 		privateServer.RegisterControllers()
-		log.Infof("private hydra server [name %s, listen on %s, advertised url %s]", config.Name, config.PrivateAddr, "http://"+config.PrivateAddr)
+		log.Infof("private hydra server [name %s, listen on %s, advertised url %s]", conf.Name, conf.PrivateAddr, "http://"+conf.PrivateAddr)
 		log.Fatal(http.Serve(privateServer.Listener, privateServer.Router))
 	}
 }

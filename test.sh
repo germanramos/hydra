@@ -8,6 +8,9 @@ go test -v ./config
 # go test -i ./server
 # go test -v ./server
 
+go test -i ./server/controller
+go test -v ./server/controller
+
 # go test -i ./model/entity
 # go test -v ./model/entity
 
@@ -24,5 +27,5 @@ go test -v ./config
 # HYDRA_BIN_PATH=$(pwd)/bin/hydra go test -v ./tests/functional/api/application
 
 # echo "--- ETCD FUNCTIONAL TESTS ---\n"
-go test -i ./vendors/github.com/coreos/etcd/tests/functional
-ETCD_BIN_PATH=$(pwd)/bin/hydra HYDRA_ENV=ETCD_TEST go test -v ./vendors/github.com/coreos/etcd/tests/functional
+# go test -i ./vendors/github.com/coreos/etcd/tests/functional
+# ETCD_BIN_PATH=$(pwd)/bin/hydra HYDRA_ENV=ETCD_TEST go test -v ./vendors/github.com/coreos/etcd/tests/functional

@@ -17,6 +17,7 @@ import (
 )
 
 const (
+	DEFAULT_APPS_FILE        = "/etc/hydra/apps.json"
 	DEFAULT_CONFIG_FILE_PATH = "/etc/hydra/hydra.conf"
 	DEFAULT_DATA_DIR         = "./"
 	DEFAULT_ETCD_ADDR        = "127.0.0.1:4001"
@@ -29,7 +30,9 @@ const (
 
 type Config struct {
 	EtcdConf *etcdConfig.Config
+	AppsConf *ApplicationsConfig
 
+	AppsFile       string `toml:"apps_file"`
 	CAFile         string `toml:"ca_file"`
 	CertFile       string `toml:"cert_file"`
 	ConfigFilePath string
@@ -55,10 +58,10 @@ type Config struct {
 func New() *Config {
 	c := new(Config)
 	c.EtcdConf = etcdConfig.New()
+	c.AppsFile = DEFAULT_APPS_FILE
 	c.ConfigFilePath = DEFAULT_CONFIG_FILE_PATH
 	c.DataDir = DEFAULT_DATA_DIR
 	c.EtcdAddr = DEFAULT_ETCD_ADDR
-	// c.PeerAddr = DEFAULT_PEER_ADDR
 	c.PrivateAddr = DEFAULT_PRIVATE_ADDR
 	c.PublicAddr = DEFAULT_PUBLIC_ADDR
 	c.Snapshot = DEFAULT_SNAPSHOT
@@ -68,8 +71,7 @@ func New() *Config {
 	return c
 }
 
-// Loads the configuration from the system config, command line config,
-// environment variables, and finally command line arguments.
+// TODO: comment
 func (c *Config) Load(arguments []string) error {
 	var path string
 	f := flag.NewFlagSet("hydra", flag.ContinueOnError)
@@ -134,7 +136,7 @@ func (c *Config) LoadFlags(arguments []string) error {
 
 	f := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	f.SetOutput(ioutil.Discard)
-	f.BoolVar(&c.Snapshot, "snapshot", true, "")
+	f.StringVar(&c.AppsFile, "apps-file", c.AppsFile, "")
 	f.StringVar(&c.CAFile, "ca-file", c.CAFile, "")
 	f.StringVar(&c.CertFile, "cert-file", c.CertFile, "")
 	f.StringVar(&c.DataDir, "data-dir", c.DataDir, "")
@@ -147,6 +149,7 @@ func (c *Config) LoadFlags(arguments []string) error {
 	f.StringVar(&peers, "peers", "", "")
 	f.StringVar(&c.PrivateAddr, "private-addr", c.PrivateAddr, "")
 	f.StringVar(&c.PublicAddr, "public-addr", c.PublicAddr, "")
+	f.BoolVar(&c.Snapshot, "snapshot", true, "")
 	f.IntVar(&c.SnapshotCount, "snapshot-count", c.SnapshotCount, "")
 
 	f.StringVar(&c.Peer.Addr, "peer-addr", c.Peer.Addr, "")
