@@ -5,14 +5,17 @@
 go test -i ./config
 go test -v ./config
 
+go test -i ./model/entity
+go test -v ./model/entity
+
+go test -i ./balancer
+go test -v ./balancer
+
 # go test -i ./server
 # go test -v ./server
 
-go test -i ./server/controller
-go test -v ./server/controller
-
-# go test -i ./model/entity
-# go test -v ./model/entity
+# go test -i ./server/controller
+# go test -v ./server/controller
 
 # go test -i ./utils
 # go test -v ./utils
