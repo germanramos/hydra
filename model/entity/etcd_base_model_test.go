@@ -13,6 +13,62 @@ import (
 )
 
 var _ = Describe("EtcdBaseModel", func() {
+	Describe("Exploding", func() {
+		Context("When the entity is empty", func() {
+			e := new(EtcdBaseModel)
+			id, data := e.Explode()
+			It("should be returned an empty id", func() {
+				Expect(id).To(BeEmpty())
+			})
+			It("should not return data", func() {
+				Expect(data).To(BeNil())
+			})
+		})
+		Context("When the entity has more than one super key", func() {
+			var jsonBlob = []byte(`{
+				"Number": 12.657,
+				"Bool": true
+			}`)
+			var e EtcdBaseModel
+			err := json.Unmarshal(jsonBlob, &e)
+			if err != nil {
+				Fail("JSON blob wrongly defined")
+			}
+			id, data := e.Explode()
+			It("should be returned an empty id", func() {
+				Expect(id).To(BeEmpty())
+			})
+			It("should not return data", func() {
+				Expect(data).To(BeNil())
+			})
+		})
+		Context("When the entity has only one super key as entity id", func() {
+			var jsonBlob = []byte(`{
+				"entityID": {
+					"Number": 12.65,
+					"Bool": true
+				}
+			}`)
+			var e EtcdBaseModel
+			err := json.Unmarshal(jsonBlob, &e)
+			if err != nil {
+				Fail("JSON blob wrongly defined")
+			}
+			id, data := e.Explode()
+
+			It("should be returned an empty id", func() {
+				Expect(id).To(Equal("entityID"))
+			})
+			It("should not return data", func() {
+				Expect(data).ToNot(BeNil())
+				Expect(data).To(HaveLen(2))
+				Expect(data).To(HaveKey("Number"))
+				Expect(data["Number"]).To(Equal(12.65))
+				Expect(data).To(HaveKey("Bool"))
+				Expect(data["Bool"]).To(Equal(true))
+			})
+		})
+	})
 	Describe("Exporting etcd operations", func() {
 		var jsonBlob = []byte(`{
 			"Null": null,
@@ -29,7 +85,8 @@ var _ = Describe("EtcdBaseModel", func() {
 		var e EtcdBaseModel
 		err := json.Unmarshal(jsonBlob, &e)
 		if err != nil {
-			GinkgoT().Fatal("JSON blob wrongly defined")
+			Fail("JSON blob wrongly defined")
+			// GinkgoT().Fatal("JSON blob wrongly defined")
 		}
 		etcdOps, err := e.ExportEtcdOperations()
 		It("should be exported successfully", func() {

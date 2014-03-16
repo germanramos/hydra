@@ -144,3 +144,14 @@ func (e EtcdBaseModel) ExportEtcdOperations() (map[string]string, error) {
 	}
 	return operations, nil
 }
+
+func (e *EtcdBaseModel) Explode() (string, map[string]interface{}) {
+	eP := map[string]interface{}(*e)
+	if len(eP) != 1 {
+		return "", nil
+	}
+	for key, value := range eP {
+		return key, value.(map[string]interface{})
+	}
+	return "", nil
+}
