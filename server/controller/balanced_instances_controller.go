@@ -4,48 +4,60 @@ import (
 	"encoding/json"
 	"net/http"
 
-	zmq "github.com/alecthomas/gozmq"
-	uuid "github.com/nu7hatch/gouuid"
+	zmq "github.com/innotech/hydra/vendors/github.com/alecthomas/gozmq"
+	"github.com/innotech/hydra/vendors/github.com/gorilla/mux"
+	uuid "github.com/innotech/hydra/vendors/github.com/nu7hatch/gouuid"
 
-	"github.com/innotech/hydra/model/entity"
+	"github.com/innotech/hydra/balancer"
+	. "github.com/innotech/hydra/model/entity"
+	. "github.com/innotech/hydra/model/repository"
 )
 
-const ZMQ_EMPTY_PART []byte = []byte("")
+var ZMQ_EMPTY_PART = []byte("")
 
 type BalancedInstancesController struct {
 	*BasicController
 }
 
-func NewBalancedInstancesController() (*BasicController, error) {
+func NewBalancedInstancesController() (*BalancedInstancesController, error) {
 	var b = new(BalancedInstancesController)
 	b.basePath = "/applications"
 	var err error
-	b.PathVariables, err = extractPathVariables(basePath)
+	b.PathVariables, err = extractPathVariables(b.basePath)
 	if err != nil {
 		return nil, err
 	}
-	b.repo = repository.NewEctdRepository()
+	b.repo = NewEctdRepository()
 	// TODO: fixed routes to constants
 	b.repo.SetCollection("/applications")
 	return b, nil
 }
 
-func (b *BalancedInstancesController) sendZMQRequestToBalancer(jsonApp []byte) {
-	context, _ := zmq.NewContext()
-	defer context.Close()
-
-	// Set unique identity to make tracing possible
-	identity, _ := uuid.NewV4()
-
-	client, _ := context.NewSocket(zmq.REQ)
-	client.SetIdentity(identity)
-	// TODO: Make a constant address
-	client.Connect("ipc://frontend.ipc")
+func (b *BalancedInstancesController) sendZMQRequestToBalancer(app []byte, data [][]byte) (reply [][]byte) {
+	// TODO: Load Balancer from config
+	client := NewClient("tcp://localhost:5555" /*, verbose*/)
 	defer client.Close()
 
-	// Send request, get reply
-	client.SendMultipart([][]byte{identity, ZMQ_EMPTY_PART, jsonApp}, 0)
-	reply, _ := client.Recv(0)
+	reply = client.Send(app, data)
+	return
+
+	// context, _ := zmq.NewContext()
+	// defer context.Close()
+
+	// // Set unique identity to make tracing possible
+	// identityUUID, _ := uuid.NewV4()
+	// identity := identityUUID.String()
+
+	// client, _ := context.NewSocket(zmq.REQ)
+	// client.SetIdentity(identity)
+	// // TODO: Make a constant address
+	// client.Connect("ipc://frontend.ipc")
+	// defer client.Close()
+
+	// // Send request, get reply
+	// client.SendMultipart([][]byte{[]byte(identity), ZMQ_EMPTY_PART, jsonApp}, 0)
+	// reply, _ := client.Recv(0)
+	// return reply
 }
 
 func (b *BalancedInstancesController) RegisterHandlers(r *mux.Router) {
@@ -65,14 +77,19 @@ func (b *BalancedInstancesController) List(rw http.ResponseWriter, req *http.Req
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	jsonApp, err := json.Marshal(appEntity)
+	balancers, err := json.Marshal(appEntity.Balancers)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	instances, err := json.Marshal(appEntity.Instances)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Request to balancer server
-	response := sendZMQRequest(jsonApp)
+	response := b.sendZMQRequestToBalancer([]byte(appEntity.Id), [][]byte{balancers, instances})
 	// TODO: process response
 
 	jsonOutput, err := json.Marshal(response)

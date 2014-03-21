@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestTests(t *testing.T) {
+func TestApi(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Tests Suite")
 }

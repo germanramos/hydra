@@ -5,17 +5,17 @@ type Instance struct {
 	Info map[string]interface{}
 }
 
-func NewInstance(id string, data map[string]interface{}) (Application, error) {
-	return Balancer{
+func NewInstance(id string, data map[string]interface{}) (Instance, error) {
+	return Instance{
 		Id:   id,
 		Info: data,
 	}, nil
 }
 
-func NewBalancerFromEtcdBaseModel(e *EtcdBaseModel) (Application, error) {
+func NewInstanceFromEtcdBaseModel(e *EtcdBaseModel) (Instance, error) {
 	id, data, err := e.Explode()
 	if err != nil {
-		return nil, err
+		return Instance{}, err
 	}
-	return NewBalancer(id, data)
+	return NewInstance(id, data)
 }

@@ -145,13 +145,13 @@ func (e EtcdBaseModel) ExportEtcdOperations() (map[string]string, error) {
 	return operations, nil
 }
 
-func (e *EtcdBaseModel) Explode() (string, map[string]interface{}) {
+func (e *EtcdBaseModel) Explode() (string, map[string]interface{}, error) {
 	eP := map[string]interface{}(*e)
 	if len(eP) != 1 {
-		return "", nil
+		return "", nil, errors.New("This is not a valid Model, it contains more than one super key")
 	}
 	for key, value := range eP {
-		return key, value.(map[string]interface{})
+		return key, value.(map[string]interface{}), nil
 	}
-	return "", nil
+	return "", nil, nil
 }
