@@ -8,6 +8,7 @@ fi
 export GOBIN=${PWD}/bin
 export GOPATH=${PWD}
 
+go clean
 go install -tags zmq_3_x
 go install github.com/innotech/hydra
 # go install github.com/coreos/etcd/bench

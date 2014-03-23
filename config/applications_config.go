@@ -10,12 +10,15 @@ import (
 
 type ApplicationsConfig struct {
 	Apps EtcdBaseModels
-	Repo *EtcdBaseRepository
+	// Repo *EtcdBaseRepository
+	Repo EtcdAccessLayer
 }
 
 func NewApplicationsConfig() *ApplicationsConfig {
 	a := new(ApplicationsConfig)
 	a.Repo = NewEctdRepository()
+	// _ = a.Repo.Delete("foo")
+	// a.Repo.SetCollection("applications")
 	a.Repo.SetCollection("applications")
 	return a
 }

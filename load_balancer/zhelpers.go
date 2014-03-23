@@ -2,7 +2,7 @@
 //
 //  Author: iano <scaly.iano@gmail.com>
 
-package main
+package load_balancer
 
 import (
 	"container/list"

@@ -1,4 +1,4 @@
-package balancer
+package load_balancer
 
 const (
 	//  This is the version of MDP/Client we implement

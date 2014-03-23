@@ -9,9 +9,11 @@ const KEY_PREFIX string = "/db/"
 
 type EtcdAccessLayer interface {
 	Delete(key string) error
-	Get(key string) *entity.EtcdBaseModel
-	GetAll() []*entity.EtcdBaseModel
+	Get(key string) (*entity.EtcdBaseModel, error)
+	GetAll() (*entity.EtcdBaseModels, error)
+	GetCollection() string
 	Set(entity *entity.EtcdBaseModel) error
+	SetCollection(collection string)
 }
 
 type EtcdBaseRepository struct {

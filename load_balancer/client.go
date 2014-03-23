@@ -1,6 +1,8 @@
-package balancer
+package load_balancer
 
 import (
+	"time"
+
 	zmq "github.com/innotech/hydra/vendors/github.com/alecthomas/gozmq"
 	uuid "github.com/innotech/hydra/vendors/github.com/nu7hatch/gouuid"
 )
@@ -18,9 +20,9 @@ type client struct {
 	timeout time.Duration
 }
 
-func NewClient(server string) Client {
+func NewClient(server string) *client {
 	context, _ := zmq.NewContext()
-	self := &Client{
+	self := &client{
 		server:  server,
 		context: context,
 		timeout: 2500 * time.Millisecond,
@@ -53,8 +55,8 @@ func (self *client) Close() {
 func (self *client) Send(service []byte, request [][]byte) (reply [][]byte) {
 	frame := append([][]byte{service}, request...)
 
-	self.client.SendMultipart(frame, 0)
-	msg, _ := self.client.RecvMultipart(0)
+	self.socket.SendMultipart(frame, 0)
+	msg, _ := self.socket.RecvMultipart(0)
 	reply = msg[2:]
 	return
 }

@@ -3,9 +3,13 @@ package config_test
 import (
 	. "github.com/innotech/hydra/config"
 	. "github.com/innotech/hydra/model/entity"
+	"github.com/innotech/hydra/model/repository/mock_repository"
+	"github.com/innotech/hydra/vendors/code.google.com/p/gomock/gomock"
 	. "github.com/innotech/hydra/vendors/github.com/onsi/ginkgo"
+	"github.com/innotech/hydra/vendors/github.com/onsi/ginkgo/thirdparty/gomocktestreporter"
 	. "github.com/innotech/hydra/vendors/github.com/onsi/gomega"
 
+	"fmt"
 	"io/ioutil"
 	"os"
 )
@@ -21,8 +25,7 @@ var _ = Describe("ApplicationsConfig", func() {
 		fn(f.Name())
 	}
 	// END OF HELPERS /////////////////////////////////////////////////////////////////
-	Describe("Loading from JSON", func() {
-		fileContent := `[{
+	fileContent := `[{
 			"dummy1": {
  				"balancers": {
  					"cloud-map": {
@@ -41,6 +44,26 @@ var _ = Describe("ApplicationsConfig", func() {
 				}
 			}
 		}]`
+	Describe("Loading from JSON", func() {
+		// fileContent := `[{
+		// 	"dummy1": {
+		// 			"balancers": {
+		// 				"cloud-map": {
+		// 				},
+		// 			"cpu-load": {
+		// 			}
+		// 		}
+		// 	}
+		// }, {
+		// 	"dummy2": {
+		// 			"balancers": {
+		// 				"cloud-map": {
+		// 			},
+		// 			"mem-load": {
+		// 			}
+		// 		}
+		// 	}
+		// }]`
 		Context("When path of JSON file doesn't exist", func() {
 			WithTempFile(fileContent, func(pathToFile string) {
 				a := NewApplicationsConfig()
@@ -89,6 +112,65 @@ var _ = Describe("ApplicationsConfig", func() {
 						Expect(app1["dummy2"].(map[string]interface{})["balancers"]).To(HaveKey("mem-load"))
 					})
 				})
+			})
+		})
+	})
+	Describe("Saving loaded applications", func() {
+		var (
+			mockCtrl  *gomock.Controller
+			mockRepo  *mock_repository.MockEtcdAccessLayer
+			appConfig *ApplicationsConfig
+		)
+
+		// BeforeEach(func() {
+		// 	mockCtrl = gomock.NewController(gomocktestreporter.New())
+		// 	// mockThing = mockthing.NewMockThing(mockCtrl)
+		// 	mockRepo = mock_repository.NewMockEtcdAccessLayer(mockCtrl)
+		// 	appConfig = NewApplicationsConfig()
+		// 	repo := appConfig.Repo
+		// 	appConfig.Repo = mockRepo
+		// 	appConfig.Repo = repo
+		// })
+
+		// AfterEach(func() {
+		// 	mockCtrl.Finish()
+		// })
+
+		WithTempFile(fileContent, func(pathToFile string) {
+			mockCtrl = gomock.NewController(gomocktestreporter.New())
+			defer mockCtrl.Finish()
+			// mockThing = mockthing.NewMockThing(mockCtrl)
+			mockRepo = mock_repository.NewMockEtcdAccessLayer(mockCtrl)
+			// mockRepo.setCollection("applications")
+			appConfig = NewApplicationsConfig()
+			// appConfig.Repo = mockRepo
+			// repo := appConfig.Repo
+			// fmt.Println(pathToFile)
+			// a := NewApplicationsConfig()
+			// err := a.Load(pathToFile)
+			err := appConfig.Load(pathToFile)
+			fmt.Println("WWW")
+			if err != nil {
+				fmt.Println(err)
+			}
+			// var err error = nil
+			It("should persist applications successfully", func() {
+				Expect(err).ToNot(HaveOccurred())
+			})
+			It("should persist applications successfully", func() {
+				var previusCall gomock.Call
+				for _, app := range appConfig.Apps {
+					if previusCall {
+						previusCall = mockRepo.EXPECT().Set(app).Return(nil)
+					} else {
+						previusCall = mockRepo.EXPECT().Set(app).After(previusCall)
+					}
+				}
+				appConfig.Repo = mockRepo
+				// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
+				err := appConfig.Persists()
+				// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
+				Expect(err).ToNot(HaveOccurred())
 			})
 		})
 	})

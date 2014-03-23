@@ -2,14 +2,14 @@
 
 . ./build
 
-# go test -i ./config
-# go test -v ./config
+go test -i ./config
+go test -v ./config
 
 # go test -i ./model/entity
 # go test -v ./model/entity
 
-# go test -i ./balancer
-# go test -v ./balancer
+# go test -i ./load_balancer
+# go test -v ./load_balancer
 
 # go test -i ./server
 # go test -v ./server
@@ -26,8 +26,8 @@
 # go test -i ./tests/functional
 # HYDRA_BIN_PATH=$(pwd)/bin/hydra go test -v ./tests/functional
 
-go test -i ./tests/functional/api
-HYDRA_BIN_PATH=$(pwd)/bin/hydra go test -v ./tests/functional/api
+# go test -i ./tests/functional/api
+# HYDRA_BIN_PATH=$(pwd)/bin/hydra go test -v ./tests/functional/api
 
 # go test -i ./tests/functional/api/application
 # HYDRA_BIN_PATH=$(pwd)/bin/hydra go test -v ./tests/functional/api/application

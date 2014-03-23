@@ -10,6 +10,7 @@ import (
 	"github.com/innotech/hydra/config"
 	"github.com/innotech/hydra/database/connector"
 	"github.com/innotech/hydra/etcd"
+	// "github.com/innotech/hydra/load_balancer"
 	"github.com/innotech/hydra/log"
 	"github.com/innotech/hydra/server"
 )
@@ -44,6 +45,11 @@ func main() {
 			log.Fatalf("Unable to load applications: %s", err)
 		}
 	}
+
+	// Run Load Balancer
+	// loadBalancer := NewLoadBalancer("tcp://*:5555")
+	// defer loadBalancer.Close()
+	// loadBalancer.Run()
 
 	var etcd = etcd.New(conf.EtcdConf)
 	etcd.Load()
