@@ -122,19 +122,40 @@ var _ = Describe("ApplicationsConfig", func() {
 			appConfig *ApplicationsConfig
 		)
 
-		// BeforeEach(func() {
-		// 	mockCtrl = gomock.NewController(gomocktestreporter.New())
-		// 	// mockThing = mockthing.NewMockThing(mockCtrl)
-		// 	mockRepo = mock_repository.NewMockEtcdAccessLayer(mockCtrl)
-		// 	appConfig = NewApplicationsConfig()
-		// 	repo := appConfig.Repo
-		// 	appConfig.Repo = mockRepo
-		// 	appConfig.Repo = repo
-		// })
+		BeforeEach(func() {
+			mockCtrl = gomock.NewController(gomocktestreporter.New())
+			// mockThing = mockthing.NewMockThing(mockCtrl)
+			mockRepo = mock_repository.NewMockEtcdAccessLayer(mockCtrl)
+			appConfig = NewApplicationsConfig()
+			// repo := appConfig.Repo
+			// appConfig.Repo = mockRepo
+			// appConfig.Repo = repo
+		})
 
-		// AfterEach(func() {
-		// 	mockCtrl.Finish()
-		// })
+		AfterEach(func() {
+			mockCtrl.Finish()
+		})
+
+		It("should persist applications successfully", func() {
+			// var previusCall *gomock.Call
+			// hasPreviusCall := false
+			// for _, app := range appConfig.Apps {
+			// 	if !hasPreviusCall {
+			// 		previusCall = mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
+			// 		hasPreviusCall = true
+			// 	} else {
+			// 		previusCall = mockRepo.EXPECT().Set(app).After(previusCall)
+			// 	}
+			// }
+			appConfig = NewApplicationsConfig()
+			appConfig.Repo = mockRepo
+			Expect(appConfig.Repo).To(Equal(mockRepo))
+
+			// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
+			err := appConfig.Persists()
+			// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
+			Expect(err).ToNot(HaveOccurred())
+		})
 
 		WithTempFile(fileContent, func(pathToFile string) {
 			mockCtrl = gomock.NewController(gomocktestreporter.New())
@@ -158,15 +179,19 @@ var _ = Describe("ApplicationsConfig", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 			It("should persist applications successfully", func() {
-				var previusCall gomock.Call
-				for _, app := range appConfig.Apps {
-					if previusCall {
-						previusCall = mockRepo.EXPECT().Set(app).Return(nil)
-					} else {
-						previusCall = mockRepo.EXPECT().Set(app).After(previusCall)
-					}
-				}
+				// var previusCall *gomock.Call
+				// hasPreviusCall := false
+				// for _, app := range appConfig.Apps {
+				// 	if !hasPreviusCall {
+				// 		previusCall = mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
+				// 		hasPreviusCall = true
+				// 	} else {
+				// 		previusCall = mockRepo.EXPECT().Set(app).After(previusCall)
+				// 	}
+				// }
 				appConfig.Repo = mockRepo
+				Expect(appConfig.Repo).To(Equal(mockRepo))
+
 				// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
 				err := appConfig.Persists()
 				// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
