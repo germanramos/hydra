@@ -6,71 +6,60 @@ import (
 
 	"bytes"
 	"encoding/json"
+	// "fmt"
 	"strings"
 	"time"
 )
 
 type ServiceTester struct {
-	baseURI    string
-	entity     string
-	httpUtils  *HTTPClientHelper
-	serverAddr string
+	baseId            string
+	baseURI           string
+	collection        string
+	entity            string
+	entityAbstractKey string
+	httpUtils         *HTTPClientHelper
+	serverAddr        string
 }
 
-func NewServiceTester(serverAddr, entity string /*, parentEntities []string*/) *ServiceTester {
+func NewServiceTester(serverAddr, collection string, entity string, baseId string) *ServiceTester {
 	s := new(ServiceTester)
-	s.baseURI = "http://" + serverAddr + "/" + Pluralize(entity)
-	// s.baseURI = "http://" + serverAddr + "/"
+	s.collection = collection
+	s.baseId = baseId
+	s.baseURI = "http://" + serverAddr + "/" + s.collection
 	s.entity = entity
+	s.entityAbstractKey = strings.Title(s.entity)
 	s.httpUtils = NewHTTPClientHelper()
 	s.serverAddr = serverAddr
 	return s
 }
 
-func Pluralize(word string) string {
+func (s *ServiceTester) Pluralize(word string) string {
 	return word + "s"
 }
 
-// func fake(s *ServiceTester) {
-// 	Describe("Sending a correct request to get a missing "+s.entity, func() {
-// 		response, err := s.httpUtils.Get(s.baseURI + "/" + strings.Title(s.entity) + "1")
-// 		It("should be got a not found response", func() {
-// 			Expect(err).NotTo(HaveOccurred())
-// 			Expect(response.StatusCode).To(Equal(404))
-// 		})
-// 	})
-// }
-
-func (s *ServiceTester) DefineServiceTests() bool {
-	return Describe(Pluralize(strings.Title(s.entity)), func() {
+func (s *ServiceTester) DefineServiceTests(entity1 map[string]interface{}, entity2 map[string]interface{}) bool {
+	return Describe(s.Pluralize(s.entityAbstractKey), func() {
 		process := RunHydraInStandaloneAndReturnProcess(s.serverAddr)
 		defer KillHydraProcess(process)
 		time.Sleep(time.Second)
 
 		Context("When database is empty", func() {
 			Describe("Sending a correct request to get a missing "+s.entity, func() {
-				response, getError := s.httpUtils.Get(s.baseURI + "/" + strings.Title(s.entity) + "1")
+				response, getError := s.httpUtils.Get(s.baseURI + "/" + s.entityAbstractKey + "1")
 				It("should be got a not found response", func() {
 					Expect(getError).NotTo(HaveOccurred())
 					Expect(response.StatusCode).To(Equal(404))
 				})
 			})
-			// fake(s)
-			Describe("Sending a correct request to get all "+Pluralize(s.entity), func() {
+			Describe("Sending a correct request to get all "+s.collection, func() {
 				response, getAllError := s.httpUtils.Get(s.baseURI)
 				It("should be got a not found response", func() {
 					Expect(getAllError).To(BeNil())
 					Expect(response.StatusCode).To(Equal(404))
 				})
 			})
-			app1 := map[string]interface{}{
-				"App1": map[string]interface{}{
-					"Cloud": "google",
-					"WWW":   12.98,
-				},
-			}
-			appJson, _ := json.Marshal(app1)
-			Describe("Sending a bad request to set App1 application", func() {
+			appJson, _ := json.Marshal(entity1)
+			Describe("Sending a bad request to set "+s.entityAbstractKey+"1 application", func() {
 				badAppJson := appJson[5:]
 				response, err := s.httpUtils.Post(s.baseURI, "application/json", bytes.NewReader(badAppJson))
 				It("should return a bad request status code", func() {
@@ -78,58 +67,47 @@ func (s *ServiceTester) DefineServiceTests() bool {
 					Expect(response.StatusCode).To(Equal(400))
 				})
 			})
-			Describe("Setting App1 application and getting it", func() {
+			Describe("Setting "+s.entityAbstractKey+"1 application and getting it", func() {
 				response1, err1 := s.httpUtils.Post(s.baseURI, "application/json", bytes.NewReader(appJson))
 				It("should be created successfully", func() {
 					Expect(err1).NotTo(HaveOccurred())
 					Expect(response1.StatusCode).To(Equal(200))
 				})
-				response2, err2 := s.httpUtils.Get(s.baseURI + "/App1")
+				response2, err2 := s.httpUtils.Get(s.baseURI + "/" + s.baseId + "1")
 				It("should return a success response", func() {
 					Expect(err2).NotTo(HaveOccurred())
 					Expect(response2.StatusCode).To(Equal(200))
 				})
-				app, err3 := s.httpUtils.ReadBodyJsonObject(response2)
+				entity, err3 := s.httpUtils.ReadBodyJsonObject(response2)
 				It("should be got the correct application", func() {
 					Expect(err3).NotTo(HaveOccurred(), "HTTP body JSON should be a valid json")
-					Expect(app).NotTo(BeNil())
-					Expect(app["App1"].(map[string]interface{})["Cloud"].(string)).To(Equal("google"))
-					Expect(app["App1"].(map[string]interface{})["WWW"].(string)).To(Equal("12.98"))
+					Expect(entity).NotTo(BeNil())
+					Expect(entity).To(Equal(entity1))
 				})
 			})
 		})
 		Context("When App1 have been created", func() {
-			app1 := map[string]interface{}{
-				"App1": map[string]interface{}{
-					"Cloud": "amazon",
-				},
-			}
-			appJson, _ := json.Marshal(app1)
-			Describe("Overriding App1 application", func() {
+			appJson, _ := json.Marshal(entity1)
+			Describe("Overriding "+s.entityAbstractKey+"1 application", func() {
 				response, err := s.httpUtils.Post(s.baseURI, "application/json", bytes.NewReader(appJson))
 				It("should be created successfully", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(response.StatusCode).To(Equal(200))
 				})
-				response, err = s.httpUtils.Get(s.baseURI + "/App1")
+				response, err = s.httpUtils.Get(s.baseURI + "/" + s.baseId + "1")
 				It("should return a success response", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(response.StatusCode).To(Equal(200))
 				})
-				app, err := s.httpUtils.ReadBodyJsonObject(response)
+				entity, err := s.httpUtils.ReadBodyJsonObject(response)
 				It("should be got the correct application", func() {
 					Expect(err).NotTo(HaveOccurred(), "HTTP body JSON should be a valid json")
-					Expect(app).NotTo(BeEmpty())
-					Expect(app["App1"].(map[string]interface{})["Cloud"].(string)).To(Equal("amazon"))
+					Expect(entity).NotTo(BeEmpty())
+					Expect(entity).To(Equal(entity1))
 				})
 			})
-			app2 := map[string]interface{}{
-				"App2": map[string]interface{}{
-					"Cloud": "azure",
-				},
-			}
-			appJson, _ = json.Marshal(app2)
-			Describe("Setting App2 application and getting all applications (App1 and App2)", func() {
+			appJson, _ = json.Marshal(entity2)
+			Describe("Setting "+s.entityAbstractKey+"2 application and getting all applications ("+s.entityAbstractKey+"1 and "+s.entityAbstractKey+"2)", func() {
 				response, err := s.httpUtils.Post(s.baseURI, "application/json", bytes.NewReader(appJson))
 				It("should be created successfully", func() {
 					Expect(err).NotTo(HaveOccurred())
@@ -140,13 +118,13 @@ func (s *ServiceTester) DefineServiceTests() bool {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(response.StatusCode).To(Equal(200))
 				})
-				apps, err := s.httpUtils.ReadBodyJsonArray(response)
+				entities, err := s.httpUtils.ReadBodyJsonArray(response)
 				It("should be got the correct application", func() {
 					Expect(err).NotTo(HaveOccurred(), "HTTP body JSON should be a valid json")
-					Expect(apps).NotTo(BeEmpty())
-					Expect(apps).To(HaveLen(2))
-					Expect(apps[0]["App1"].(map[string]interface{})["Cloud"].(string)).To(Equal("amazon"))
-					Expect(apps[1]["App2"].(map[string]interface{})["Cloud"].(string)).To(Equal("azure"))
+					Expect(entities).NotTo(BeEmpty())
+					Expect(entities).To(HaveLen(2))
+					Expect(entities[0]).To(Equal(entity1))
+					Expect(entities[1]).To(Equal(entity2))
 				})
 			})
 		})
