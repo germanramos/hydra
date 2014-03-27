@@ -3,7 +3,6 @@ package load_balancer
 import (
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"time"
 
 	zmq "github.com/innotech/hydra/vendors/github.com/alecthomas/gozmq"
@@ -25,22 +24,22 @@ type Broker interface {
 }
 
 type lbWorker struct {
-	identity string    //  UUID Identity of worker
-	address  []byte    //  Address to route to
-	expiry   time.Time //  Expires at this point, unless heartbeat
-	service  *service  //  Owning service, if known
+	identity string     //  UUID Identity of worker
+	address  []byte     //  Address to route to
+	expiry   time.Time  //  Expires at this point, unless heartbeat
+	service  *lbService //  Owning service, if known
 }
 
 type lbChain struct {
 	app      string
 	client   string
 	msg      []byte
-	shackles []ZList
+	shackles *ZList
 }
 
 type lbShackle struct {
 	serviceName string
-	serviceArgs []string
+	serviceArgs map[string]interface{}
 }
 
 type lbService struct {
@@ -58,7 +57,7 @@ type loadBalancer struct {
 	backend     *zmq.Socket           //  Socket for workers
 	waiting     *ZList                //  Idle workers
 	workers     map[string]*lbWorker  //  Known workers
-	chains      map[string]chain      //  Peding Requests
+	chains      map[string]lbChain    //  Peding Requests
 }
 
 func NewLoadBalancer(frontendEndpoint, backendEndpoint string) *loadBalancer {
@@ -75,16 +74,16 @@ func NewLoadBalancer(frontendEndpoint, backendEndpoint string) *loadBalancer {
 	return &loadBalancer{
 		context:     context,
 		heartbeatAt: time.Now().Add(HEARTBEAT_INTERVAL),
-		services:    make(map[string]*service),
+		services:    make(map[string]*lbService),
 		frontend:    frontend,
 		backend:     backend,
 		waiting:     NewList(),
-		workers:     make(map[string]*bsWorker),
+		workers:     make(map[string]*lbWorker),
 	}
 }
 
 // Deletes worker from all data structures, and deletes worker.
-func (self *loadBalancer) deleteWorker(worker *bsWorker, disconnect bool) {
+func (self *loadBalancer) deleteWorker(worker *lbWorker, disconnect bool) {
 	if worker == nil {
 		log.Warn("Nil worker")
 	}
@@ -102,25 +101,24 @@ func (self *loadBalancer) deleteWorker(worker *bsWorker, disconnect bool) {
 
 // Dispatch chains advancing a shackle
 func (self *loadBalancer) advanceShackle(chain lbChain) {
-	if chain == nil {
-		log.Fatal("Nil chain")
-	}
-	shakle := chain.Pop()
-	if shakle == nil {
-		msg = append([][]byte{msg[0], nil}, msg[2:]...)
+	elem := chain.shackles.Pop()
+	if elem == nil {
+		msg := [][]byte{[]byte(chain.client), nil, chain.msg}
 		self.frontend.SendMultipart(msg, 0)
 		return
 	}
-	msg := [][]byte{chain.client, nil, chain.msg, shakle.serviceArgs}
+	shackle, _ := elem.Value.(*lbShackle)
+	args, _ := json.Marshal(shackle.serviceArgs)
+	msg := [][]byte{[]byte(chain.client), nil, chain.msg, args}
 	self.dispatch(self.requireService(shackle.serviceName), msg)
 }
 
 // Dispatch requests to waiting workers as possible
-func (self *loadBalancer) dispatch(service *service, msg [][]byte) {
+func (self *loadBalancer) dispatch(service *lbService, msg [][]byte) {
 	if service == nil {
 		log.Fatal("Nil service")
 	}
-	//  Queue message if any
+	// Queue message if any
 	if len(msg) != 0 {
 		service.requests = append(service.requests, msg)
 	}
@@ -141,21 +139,21 @@ func (self *loadBalancer) registerChain(client []byte, msg [][]byte) {
 		panic(err)
 	}
 	chain := lbChain{
-		app:    msg[0],
-		client: client,
+		app:    string(msg[0]),
+		client: string(client),
 		msg:    msg[2],
 	}
 	for _, service := range services {
-		chain.shackles = append(chain.shackles, shackle{
+		chain.shackles.PushBack(lbShackle{
 			serviceName: service.Id,
 			serviceArgs: service.Args,
 		})
 	}
-	self.chains[client] = chain
+	self.chains[string(client)] = chain
 }
 
 // Process a request coming from a client.
-func (self *server) processClient(client []byte, msg [][]byte) {
+func (self *loadBalancer) processClient(client []byte, msg [][]byte) {
 	// Application + Services + Instances
 	if len(msg) < 3 {
 		log.Fatal("Invalid message from client sender")
@@ -163,11 +161,11 @@ func (self *server) processClient(client []byte, msg [][]byte) {
 	// Register chain
 	self.registerChain(client, msg)
 	// Start chain of requests
-	self.advanceShackle(self.chains[client])
+	self.advanceShackle(self.chains[string(client)])
 }
 
 // Process message sent to us by a worker.
-func (self *loadBalancer) ProcessWorker(sender []byte, msg [][]byte) {
+func (self *loadBalancer) processWorker(sender []byte, msg [][]byte) {
 	//  At least, command
 	if len(msg) < 1 {
 		log.Warn("Invalid message from Worker, this doesn contain command")
@@ -178,7 +176,7 @@ func (self *loadBalancer) ProcessWorker(sender []byte, msg [][]byte) {
 	identity := hex.EncodeToString(sender)
 	worker, workerReady := self.workers[identity]
 	if !workerReady {
-		worker = &bsWorker{
+		worker = &lbWorker{
 			identity: identity,
 			address:  sender,
 			expiry:   time.Now().Add(HEARTBEAT_EXPIRY),
@@ -210,8 +208,8 @@ func (self *loadBalancer) ProcessWorker(sender []byte, msg [][]byte) {
 			//  Remove & save client return envelope and insert the
 			//  protocol header and service name, then rewrap envelope.
 			client := msg[0]
-			chain := self.chains[client]
-			chain.msg = msg
+			chain := self.chains[string(client)]
+			chain.msg = msg[2]
 			self.advanceShackle(chain)
 			self.workerWaiting(worker)
 		} else {
@@ -226,18 +224,18 @@ func (self *loadBalancer) ProcessWorker(sender []byte, msg [][]byte) {
 	case SIGNAL_DISCONNECT:
 		self.deleteWorker(worker, false)
 	default:
-		log.Warn("E: invalid message:")
+		log.Warn("Invalid message in Load Balancer")
 		Dump(msg)
 	}
-	return nil
+	return
 }
 
 //  Look for & kill expired workers.
 //  Workers are oldest to most recent, so we stop at the first alive worker.
-func (self *server) purgeWorkers() {
+func (self *loadBalancer) purgeWorkers() {
 	now := time.Now()
 	for elem := self.waiting.Front(); elem != nil; elem = self.waiting.Front() {
-		worker, _ := elem.Value.(*worker)
+		worker, _ := elem.Value.(*lbWorker)
 		if worker.expiry.After(now) {
 			// TODO: continue
 			break
@@ -247,13 +245,13 @@ func (self *server) purgeWorkers() {
 }
 
 // Locates the service (creates if necessary).
-func (self *loadBalancer) requireService(name string) *service {
+func (self *loadBalancer) requireService(name string) *lbService {
 	if len(name) == 0 {
 		log.Warn("Invalid service name have been required")
 	}
 	service, ok := self.services[name]
 	if !ok {
-		service = &service{
+		service = &lbService{
 			name:    name,
 			waiting: NewList(),
 		}
@@ -264,7 +262,7 @@ func (self *loadBalancer) requireService(name string) *service {
 
 //  Send message to worker.
 //  If message is provided, sends that message.
-func (self *server) sendToWorker(worker *worker, command string, option []byte, msg [][]byte) {
+func (self *loadBalancer) sendToWorker(worker *lbWorker, command string, option []byte, msg [][]byte) {
 	//  Stack routing and protocol envelopes to start of message and routing envelope
 	if len(option) > 0 {
 		msg = append([][]byte{option}, msg...)
@@ -275,7 +273,7 @@ func (self *server) sendToWorker(worker *worker, command string, option []byte, 
 	// 	log.Printf("I: sending %X to worker\n", command)
 	// 	Dump(msg)
 	// }
-	self.socket.SendMultipart(msg, 0)
+	self.backend.SendMultipart(msg, 0)
 }
 
 //  Handle internal service according to 8/MMI specification
@@ -297,7 +295,7 @@ func (self *server) sendToWorker(worker *worker, command string, option []byte, 
 // }
 
 // This worker is now waiting for work.
-func (self *loadBalancer) workerWaiting(worker *worker) {
+func (self *loadBalancer) workerWaiting(worker *lbWorker) {
 	//  Queue to broker and service waiting lists
 	self.waiting.PushBack(worker)
 	worker.service.waiting.PushBack(worker)
@@ -316,7 +314,7 @@ func (self *loadBalancer) Close() {
 }
 
 // Main broker working loop
-func (self *server) Run() {
+func (self *loadBalancer) Run() {
 	for {
 		items := zmq.PollItems{
 			zmq.PollItem{Socket: self.frontend, Events: zmq.POLLIN},
@@ -329,14 +327,14 @@ func (self *server) Run() {
 		}
 
 		if items[0].REvents&zmq.POLLIN != 0 {
-			msg, _ := frontend.RecvMultipart(0)
+			msg, _ := self.frontend.RecvMultipart(0)
 			// TODO: check msg parts
 			requestId := msg[0]
 			msg = msg[2:]
 			self.processClient(requestId, msg)
 		}
 		if items[1].REvents&zmq.POLLIN != 0 {
-			msg, _ := backend.RecvMultipart(0)
+			msg, _ := self.backend.RecvMultipart(0)
 			sender := msg[0]
 			msg = msg[3:]
 			self.processWorker(sender, msg)
@@ -345,7 +343,7 @@ func (self *server) Run() {
 		if self.heartbeatAt.Before(time.Now()) {
 			self.purgeWorkers()
 			for elem := self.waiting.Front(); elem != nil; elem = elem.Next() {
-				worker, _ := elem.Value.(*worker)
+				worker, _ := elem.Value.(*lbWorker)
 				self.sendToWorker(worker, SIGNAL_HEARTBEAT, nil, nil)
 			}
 			self.heartbeatAt = time.Now().Add(HEARTBEAT_INTERVAL)
