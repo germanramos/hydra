@@ -10,7 +10,7 @@ import (
 	"github.com/innotech/hydra/config"
 	"github.com/innotech/hydra/database/connector"
 	"github.com/innotech/hydra/etcd"
-	// "github.com/innotech/hydra/load_balancer"
+	"github.com/innotech/hydra/load_balancer"
 	"github.com/innotech/hydra/log"
 	"github.com/innotech/hydra/server"
 )
@@ -46,11 +46,7 @@ func main() {
 		}
 	}
 
-	// Run Load Balancer
-	// loadBalancer := NewLoadBalancer("tcp://*:5555")
-	// defer loadBalancer.Close()
-	// loadBalancer.Run()
-
+	// Launch services
 	var etcd = etcd.New(conf.EtcdConf)
 	etcd.Load()
 	hydraEnv := os.Getenv("HYDRA_ENV")
@@ -63,24 +59,39 @@ func main() {
 
 		connector.SetEtcdConnector(etcd)
 
+		// Private Server API
+		privateHydraListener, err := net.Listen("tcp", conf.PrivateAddr)
+		if err != nil {
+			log.Fatalf("Failed to create hydra private listener: ", err)
+		}
+		var privateServer = server.NewPrivateServer(privateHydraListener)
+		privateServer.RegisterHandlers()
+		go func() {
+			log.Infof("hydra private server [name %s, listen on %s, advertised url %s]", conf.Name, conf.PrivateAddr, "http://"+conf.PrivateAddr)
+			log.Fatal(http.Serve(privateServer.Listener, privateServer.Router))
+		}()
+
+		// Public Server API
+		const loadBalancerFrontendEndpoint string = "ipc://frontend.ipc"
+		publicHydraListener, err := net.Listen("tcp", conf.PublicAddr)
+		if err != nil {
+			log.Fatalf("Failed to create hydra public listener: ", err)
+		}
+		var publicServer = server.NewPublicServer(publicHydraListener, loadBalancerFrontendEndpoint)
+		publicServer.RegisterHandlers()
+		go func() {
+			log.Infof("hydra public server [name %s, listen on %s, advertised url %s]", conf.Name, conf.PublicAddr, "http://"+conf.PublicAddr)
+			log.Fatal(http.Serve(publicServer.Listener, publicServer.Router))
+		}()
+
 		// Persist Configured applications
 		if err := appsConfig.Persists(); err != nil {
 			log.Fatalf("Failed to save configured applications: ", err)
 		}
 
-		// etcdDriver := driver.NewEtcdDriver(etcd.EtcdServer, etcd.PeerServer)
-		// var server = server.NewServer(etcdDriver)
-		// server.Start()
-
-		// TODO: Use Config addr
-		privateHydraListener, err := net.Listen("tcp", conf.PrivateAddr)
-		// privateHydraListener, err := net.Listen("tcp", ":8181")
-		if err != nil {
-			log.Fatalf("Failed to create hydra listener: ", err)
-		}
-		var privateServer = server.NewPrivateServer(privateHydraListener)
-		privateServer.RegisterControllers()
-		log.Infof("private hydra server [name %s, listen on %s, advertised url %s]", conf.Name, conf.PrivateAddr, "http://"+conf.PrivateAddr)
-		log.Fatal(http.Serve(privateServer.Listener, privateServer.Router))
+		// Load Balancer
+		loadBalancer := load_balancer.NewLoadBalancer(loadBalancerFrontendEndpoint, conf.LoadBalancerAddr)
+		defer loadBalancer.Close()
+		loadBalancer.Run()
 	}
 }
