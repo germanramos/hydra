@@ -9,7 +9,7 @@ import (
 	"github.com/innotech/hydra/vendors/github.com/onsi/ginkgo/thirdparty/gomocktestreporter"
 	. "github.com/innotech/hydra/vendors/github.com/onsi/gomega"
 
-	"fmt"
+	// "fmt"
 	"io/ioutil"
 	"os"
 )
@@ -124,79 +124,94 @@ var _ = Describe("ApplicationsConfig", func() {
 
 		BeforeEach(func() {
 			mockCtrl = gomock.NewController(gomocktestreporter.New())
-			// mockThing = mockthing.NewMockThing(mockCtrl)
 			mockRepo = mock_repository.NewMockEtcdAccessLayer(mockCtrl)
 			appConfig = NewApplicationsConfig()
-			// repo := appConfig.Repo
-			// appConfig.Repo = mockRepo
-			// appConfig.Repo = repo
+			appConfig.Repo = mockRepo
+			// appConfig.Repo = mock_repository.NewMockEtcdAccessLayer(mockCtrl)
+			// mockRepo = appConfig.Repo
 		})
 
 		AfterEach(func() {
 			mockCtrl.Finish()
 		})
 
-		It("should persist applications successfully", func() {
-			// var previusCall *gomock.Call
-			// hasPreviusCall := false
-			// for _, app := range appConfig.Apps {
-			// 	if !hasPreviusCall {
-			// 		previusCall = mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
-			// 		hasPreviusCall = true
-			// 	} else {
-			// 		previusCall = mockRepo.EXPECT().Set(app).After(previusCall)
-			// 	}
-			// }
-			appConfig = NewApplicationsConfig()
-			appConfig.Repo = mockRepo
-			Expect(appConfig.Repo).To(Equal(mockRepo))
+		// It("should persist applications successfully", func() {
+		// 	// var previusCall *gomock.Call
+		// 	// hasPreviusCall := false
+		// 	// for _, app := range appConfig.Apps {
+		// 	// 	if !hasPreviusCall {
+		// 	// 		previusCall = mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
+		// 	// 		hasPreviusCall = true
+		// 	// 	} else {
+		// 	// 		previusCall = mockRepo.EXPECT().Set(app).After(previusCall)
+		// 	// 	}
+		// 	// }
+		// 	// appConfig = NewApplicationsConfig()
+		// 	// appConfig.Repo = nil
+		// 	// appConfig.Repo = mockRepo
+		// 	// Expect(appConfig.Repo).To(Equal(mockRepo))
+		// 	// mockRepo = mock_repository.NewMockEtcdAccessLayer(mockCtrl)
 
-			// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
-			err := appConfig.Persists()
-			// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
-			Expect(err).ToNot(HaveOccurred())
-		})
+		// 	mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
+		// 	_ = appConfig.Persists()
+		// 	// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
+		// 	// Expect(err).ToNot(HaveOccurred())
+		// })
 
 		WithTempFile(fileContent, func(pathToFile string) {
-			mockCtrl = gomock.NewController(gomocktestreporter.New())
-			defer mockCtrl.Finish()
-			// mockThing = mockthing.NewMockThing(mockCtrl)
-			mockRepo = mock_repository.NewMockEtcdAccessLayer(mockCtrl)
-			// mockRepo.setCollection("applications")
-			appConfig = NewApplicationsConfig()
-			// appConfig.Repo = mockRepo
-			// repo := appConfig.Repo
-			// fmt.Println(pathToFile)
-			// a := NewApplicationsConfig()
-			// err := a.Load(pathToFile)
-			err := appConfig.Load(pathToFile)
-			fmt.Println("WWW")
-			if err != nil {
-				fmt.Println(err)
-			}
-			// var err error = nil
 			It("should persist applications successfully", func() {
+				var err error
+				err = appConfig.Load(pathToFile)
 				Expect(err).ToNot(HaveOccurred())
-			})
-			It("should persist applications successfully", func() {
-				// var previusCall *gomock.Call
-				// hasPreviusCall := false
-				// for _, app := range appConfig.Apps {
-				// 	if !hasPreviusCall {
-				// 		previusCall = mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
-				// 		hasPreviusCall = true
-				// 	} else {
-				// 		previusCall = mockRepo.EXPECT().Set(app).After(previusCall)
-				// 	}
-				// }
-				appConfig.Repo = mockRepo
+				Expect(err).To(BeNil(), "error should be nil")
+				Expect(appConfig.Apps).ToNot(BeNil())
 				Expect(appConfig.Repo).To(Equal(mockRepo))
-
-				// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
-				err := appConfig.Persists()
-				// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
+				mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
+				err = appConfig.Persists()
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
+
+		// WithTempFile(fileContent, func(pathToFile string) {
+		// 	mockCtrl = gomock.NewController(gomocktestreporter.New())
+		// 	// defer mockCtrl.Finish()
+		// 	// mockThing = mockthing.NewMockThing(mockCtrl)
+		// 	mockRepo = mock_repository.NewMockEtcdAccessLayer(mockCtrl)
+		// 	// mockRepo.setCollection("applications")
+		// 	appConfig = NewApplicationsConfig()
+		// 	// appConfig.Repo = mockRepo
+		// 	// repo := appConfig.Repo
+		// 	// fmt.Println(pathToFile)
+		// 	// a := NewApplicationsConfig()
+		// 	// err := a.Load(pathToFile)
+		// 	err := appConfig.Load(pathToFile)
+		// 	if err != nil {
+		// 		fmt.Println(err)
+		// 	}
+		// 	// var err error = nil
+		// 	It("should persist applications successfully", func() {
+		// 		Expect(err).ToNot(HaveOccurred())
+		// 	})
+		// 	It("should persist applications successfully", func() {
+		// 		// var previusCall *gomock.Call
+		// 		// hasPreviusCall := false
+		// 		// for _, app := range appConfig.Apps {
+		// 		// 	if !hasPreviusCall {
+		// 		// 		previusCall = mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
+		// 		// 		hasPreviusCall = true
+		// 		// 	} else {
+		// 		// 		previusCall = mockRepo.EXPECT().Set(app).After(previusCall)
+		// 		// 	}
+		// 		// }
+		// 		appConfig.Repo = mockRepo
+		// 		Expect(appConfig.Repo).To(Equal(mockRepo))
+		// 		// mockRepo.EXPECT().Set(gomock.Any())
+		// 		// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
+		// 		err := appConfig.Persists()
+		// 		mockRepo.EXPECT().Set(gomock.Any())
+		// 		// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
+		// 		Expect(err).ToNot(HaveOccurred())
+		// 	})
+		// })
 	})
 })
