@@ -17,37 +17,39 @@ import (
 )
 
 const (
-	DEFAULT_APPS_FILE        = "/etc/hydra/apps.json"
-	DEFAULT_CONFIG_FILE_PATH = "/etc/hydra/hydra.conf"
-	DEFAULT_DATA_DIR         = "./"
-	DEFAULT_ETCD_ADDR        = "127.0.0.1:4001"
-	DEFAULT_PEER_ADDR        = "127.0.0.1:7001"
-	DEFAULT_PRIVATE_ADDR     = "127.0.0.1:7771"
-	DEFAULT_PUBLIC_ADDR      = "127.0.0.1:7772"
-	DEFAULT_SNAPSHOT         = true
-	DEFAULT_SNAPSHOT_COUNT   = 20000
+	DEFAULT_APPS_FILE          = "/etc/hydra/apps.json"
+	DEFAULT_CONFIG_FILE_PATH   = "/etc/hydra/hydra.conf"
+	DEFAULT_DATA_DIR           = "./"
+	DEFAULT_ETCD_ADDR          = "127.0.0.1:4001"
+	DEFAULT_LOAD_BALANCER_ADDR = "*:7777"
+	DEFAULT_PEER_ADDR          = "127.0.0.1:7001"
+	DEFAULT_PRIVATE_ADDR       = "127.0.0.1:7771"
+	DEFAULT_PUBLIC_ADDR        = "127.0.0.1:7772"
+	DEFAULT_SNAPSHOT           = true
+	DEFAULT_SNAPSHOT_COUNT     = 20000
 )
 
 type Config struct {
 	EtcdConf *etcdConfig.Config
 	AppsConf *ApplicationsConfig
 
-	AppsFile       string `toml:"apps_file"`
-	CAFile         string `toml:"ca_file"`
-	CertFile       string `toml:"cert_file"`
-	ConfigFilePath string
-	DataDir        string `toml:"data_dir"`
-	Discovery      string
-	EtcdAddr       string `toml:"addr"`
-	Force          bool
-	KeyFile        string `toml:"key_file"`
-	Name           string
-	Peers          []string
-	PrivateAddr    string `toml:"private_addr"`
-	PublicAddr     string `toml:"public_addr"`
-	Snapshot       bool
-	SnapshotCount  int `toml:"snapshot_count"`
-	Peer           struct {
+	AppsFile         string `toml:"apps_file"`
+	CAFile           string `toml:"ca_file"`
+	CertFile         string `toml:"cert_file"`
+	ConfigFilePath   string
+	DataDir          string `toml:"data_dir"`
+	Discovery        string
+	EtcdAddr         string `toml:"addr"`
+	Force            bool
+	KeyFile          string `toml:"key_file"`
+	LoadBalancerAddr string `toml:"load_balancer_addr"`
+	Name             string
+	Peers            []string
+	PrivateAddr      string `toml:"private_addr"`
+	PublicAddr       string `toml:"public_addr"`
+	Snapshot         bool
+	SnapshotCount    int `toml:"snapshot_count"`
+	Peer             struct {
 		Addr     string `toml:"addr"`
 		CAFile   string `toml:"ca_file"`
 		CertFile string `toml:"cert_file"`
@@ -62,6 +64,7 @@ func New() *Config {
 	c.ConfigFilePath = DEFAULT_CONFIG_FILE_PATH
 	c.DataDir = DEFAULT_DATA_DIR
 	c.EtcdAddr = DEFAULT_ETCD_ADDR
+	c.LoadBalancerAddr = DEFAULT_LOAD_BALANCER_ADDR
 	c.PrivateAddr = DEFAULT_PRIVATE_ADDR
 	c.PublicAddr = DEFAULT_PUBLIC_ADDR
 	c.Snapshot = DEFAULT_SNAPSHOT
@@ -145,6 +148,7 @@ func (c *Config) LoadFlags(arguments []string) error {
 	f.StringVar(&c.KeyFile, "key-file", c.KeyFile, "")
 	f.BoolVar(&c.Force, "f", false, "")
 	f.BoolVar(&c.Force, "force", false, "")
+	f.StringVar(&c.LoadBalancerAddr, "load-balancer-addr", c.LoadBalancerAddr, "")
 	f.StringVar(&c.Name, "name", c.Name, "")
 	f.StringVar(&peers, "peers", "", "")
 	f.StringVar(&c.PrivateAddr, "private-addr", c.PrivateAddr, "")

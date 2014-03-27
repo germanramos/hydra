@@ -45,25 +45,6 @@ var _ = Describe("ApplicationsConfig", func() {
 			}
 		}]`
 	Describe("Loading from JSON", func() {
-		// fileContent := `[{
-		// 	"dummy1": {
-		// 			"balancers": {
-		// 				"cloud-map": {
-		// 				},
-		// 			"cpu-load": {
-		// 			}
-		// 		}
-		// 	}
-		// }, {
-		// 	"dummy2": {
-		// 			"balancers": {
-		// 				"cloud-map": {
-		// 			},
-		// 			"mem-load": {
-		// 			}
-		// 		}
-		// 	}
-		// }]`
 		Context("When path of JSON file doesn't exist", func() {
 			WithTempFile(fileContent, func(pathToFile string) {
 				a := NewApplicationsConfig()

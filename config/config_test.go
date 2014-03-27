@@ -24,20 +24,21 @@ var _ = Describe("Config", func() {
 	Describe("loading from TOML", func() {
 		Context("when the TOML file exists", func() {
 			const (
-				APPS_FILE      string = "/etc/hydra-test/apps.json"
-				CA_FILE        string = "./fixtures/ca/server-chain.pem"
-				CERT_FILE      string = "./fixtures/ca/server.crt"
-				DATA_DIR       string = "/tmp/hydra-0"
-				DISCOVERY      string = "http://etcd.local:4001/v2/keys/_etcd/registry/examplecluster"
-				ETCD_ADDR      string = "127.0.0.1:5001"
-				KEY_FILE       string = "./fixtures/ca/server.key.insecure"
-				NAME           string = "hydra-0"
-				PEER_1         string = "192.168.113.101:7001"
-				PEER_2         string = "192.168.113.102:7001"
-				PRIVATE_ADDR   string = "127.0.0.1:8771"
-				PUBLIC_ADDR    string = "127.0.0.1:8772"
-				SNAPSHOT       bool   = false
-				SNAPSHOT_COUNT int    = 333
+				APPS_FILE          string = "/etc/hydra-test/apps.json"
+				CA_FILE            string = "./fixtures/ca/server-chain.pem"
+				CERT_FILE          string = "./fixtures/ca/server.crt"
+				DATA_DIR           string = "/tmp/hydra-0"
+				DISCOVERY          string = "http://etcd.local:4001/v2/keys/_etcd/registry/examplecluster"
+				ETCD_ADDR          string = "127.0.0.1:5001"
+				KEY_FILE           string = "./fixtures/ca/server.key.insecure"
+				LOAD_BALANCER_ADDR string = "*:5555"
+				NAME               string = "hydra-0"
+				PEER_1             string = "192.168.113.101:7001"
+				PEER_2             string = "192.168.113.102:7001"
+				PRIVATE_ADDR       string = "127.0.0.1:8771"
+				PUBLIC_ADDR        string = "127.0.0.1:8772"
+				SNAPSHOT           bool   = false
+				SNAPSHOT_COUNT     int    = 333
 
 				PEER_ADDR      string = "127.0.0.1:8001"
 				PEER_CA_FILE   string = "./fixtures/ca/peer_server-chain.pem"
@@ -52,6 +53,7 @@ var _ = Describe("Config", func() {
 				data_dir = "` + DATA_DIR + `"
 				discovery = "` + DISCOVERY + `"
 				key_file = "` + KEY_FILE + `"
+				load_balancer_addr = "` + LOAD_BALANCER_ADDR + `"
 				name = "` + NAME + `"
 				peers = ["` + PEER_1 + `","` + PEER_2 + `"]
 				private_addr = "` + PRIVATE_ADDR + `"
@@ -76,6 +78,7 @@ var _ = Describe("Config", func() {
 					Expect(c.Discovery).To(Equal(DISCOVERY))
 					Expect(c.EtcdAddr).To(Equal(ETCD_ADDR))
 					Expect(c.KeyFile).To(Equal(KEY_FILE))
+					Expect(c.LoadBalancerAddr).To(Equal(LOAD_BALANCER_ADDR))
 					Expect(c.Name).To(Equal(NAME))
 					Expect(c.Peers).To(HaveLen(2))
 					Expect(c.Peers).To(ContainElement(PEER_1))
@@ -107,7 +110,7 @@ var _ = Describe("Config", func() {
 	Describe("loading without flags", func() {
 		Context("when default system cofig file doesn't exist", func() {
 			c := New()
-			It("should be loaded successfully", func() {
+			It("should be loaded the default configuration successfully", func() {
 				Expect(c.ConfigFilePath).To(Equal(DEFAULT_CONFIG_FILE_PATH))
 				c.ConfigFilePath = "/no-data-config"
 				err := c.Load([]string{})
@@ -115,6 +118,7 @@ var _ = Describe("Config", func() {
 				Expect(c.AppsFile).To(Equal(DEFAULT_APPS_FILE))
 				Expect(c.DataDir).To(Equal(DEFAULT_DATA_DIR))
 				Expect(c.EtcdAddr).To(Equal(DEFAULT_ETCD_ADDR))
+				Expect(c.LoadBalancerAddr).To(Equal(DEFAULT_LOAD_BALANCER_ADDR))
 				Expect(c.Peer.Addr).To(Equal(DEFAULT_PEER_ADDR))
 				Expect(c.PrivateAddr).To(Equal(DEFAULT_PRIVATE_ADDR))
 				Expect(c.PublicAddr).To(Equal(DEFAULT_PUBLIC_ADDR))
@@ -236,6 +240,15 @@ var _ = Describe("Config", func() {
 			It("should be loaded successfully", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(c.KeyFile).To(Equal(KEY_FILE))
+			})
+		})
+		Context("When -load-balancer-addr flag exists", func() {
+			const LOAD_BALANCER_ADDR string = "*:2222"
+			c := New()
+			err := c.LoadFlags([]string{"-load-balancer-addr", LOAD_BALANCER_ADDR})
+			It("should be loaded successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(c.LoadBalancerAddr).To(Equal(LOAD_BALANCER_ADDR))
 			})
 		})
 		Context("When -peer-addr flag exists", func() {
