@@ -6,7 +6,7 @@ if [ ! -h src/github.com/innotech/hydra ]; then
 fi
 
 export GOBIN=${PWD}/bin
-export GOPATH=${PWD}
+#export GOPATH=${PWD}
 
 go clean
 go install -tags zmq_3_x
