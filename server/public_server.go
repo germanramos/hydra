@@ -26,7 +26,7 @@ func NewPublicServer(l net.Listener, loadBalancerFrontendAddress string) *Public
 }
 
 func (p *PublicServer) registerControllers() {
-	p.controllers = make([]controller.Controller, 2)
+	p.controllers = make([]controller.Controller, 1)
 	p.controllers[0], _ = controller.NewBalancedInstancesController(p.loadBalancerFrontendAddress)
 }
 

@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ./build
+. ./build2
 
 # go test -i ./config
 # go test -v ./config
@@ -16,9 +16,6 @@
 
 # go test -i ./server/controller
 # go test -v ./server/controller
-
-# go test -i ./utils
-# go test -v ./utils
 
 go test -i ./tests/functional/api
 HYDRA_BIN_PATH=$(pwd)/bin/hydra go test -v ./tests/functional/api

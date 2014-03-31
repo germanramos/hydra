@@ -13,7 +13,7 @@ import (
 // var ZMQ_EMPTY_PART = []byte("")
 
 type BalancedInstancesController struct {
-	*BasicController
+	BasicController
 	loadBalancerAddress string
 }
 
@@ -27,7 +27,7 @@ func NewBalancedInstancesController(loadBalancerAddresss string) (*BalancedInsta
 		return nil, err
 	}
 	b.repo = NewEctdRepository()
-	b.repo.SetCollection("/apps")
+	b.repo.SetCollection(b.basePath)
 	return b, nil
 }
 
@@ -40,7 +40,7 @@ func (b *BalancedInstancesController) sendZMQRequestToBalancer(app []byte, data 
 }
 
 func (b *BalancedInstancesController) RegisterHandlers(r *mux.Router) {
-	r.HandleFunc("/applications/{appId}/instances", b.List).Methods("GET")
+	r.HandleFunc(b.basePath, b.List).Methods("GET")
 }
 
 func (b *BalancedInstancesController) List(rw http.ResponseWriter, req *http.Request) {

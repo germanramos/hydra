@@ -1,0 +1,19 @@
+#!/bin/sh -e
+
+if [ ! -h src/github.com/innotech/hydra ]; then
+	mkdir -p src/github.com/innotech/
+	ln -s ../../.. src/github.com/innotech/hydra
+fi
+
+export GOBIN=${PWD}/bin
+export GOPATH=${PWD}
+
+MOD_ROOT=github.com/innotech/hydra/
+
+rm -rf bin pkg
+
+go clean
+go install -tags zmq_3_x
+go build ${MOD_ROOT}config ${MOD_ROOT}database/connector ${MOD_ROOT}etcd ${MOD_ROOT}load_balancer ${MOD_ROOT}log ${MOD_ROOT}model/entity ${MOD_ROOT}model/repository ${MOD_ROOT}server ${MOD_ROOT}server/controller
+go install github.com/innotech/hydra
+# go install github.com/coreos/etcd/bench
