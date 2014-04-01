@@ -5,7 +5,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	// "time"
 
 	"github.com/innotech/hydra/config"
 	"github.com/innotech/hydra/database/connector"
@@ -36,15 +35,9 @@ func main() {
 		log.Fatalf("Unable to load etcd conf: %s", err)
 	}
 
-	// Load applications.
-	var appsConfig = config.NewApplicationsConfig()
-	if _, err := os.Stat(conf.AppsFile); os.IsNotExist(err) {
-		log.Warnf("Unable to find apps file: %s", err)
-	} else {
-		if err := appsConfig.Load(conf.AppsFile); err != nil {
-			log.Fatalf("Unable to load applications: %s", err)
-		}
-	}
+	// connector.SetEtcdConnector(etcd)
+
+	
 
 	// Launch services
 	var etcd = etcd.New(conf.EtcdConf)
@@ -84,11 +77,21 @@ func main() {
 			log.Fatal(http.Serve(publicServer.Listener, publicServer.Router))
 		}()
 
+		// Load applications.
+		var appsConfig = config.NewApplicationsConfig()
+		if _, err := os.Stat(conf.AppsFile); os.IsNotExist(err) {
+			log.Warnf("Unable to find apps file: %s", err)
+		} else {
+			if err := appsConfig.Load(conf.AppsFile); err != nil {
+				log.Fatalf("Unable to load applications: %s", err)
+			}
+		}
+		
 		// Persist Configured applications
 		if err := appsConfig.Persists(); err != nil {
 			log.Fatalf("Failed to save configured applications: ", err)
 		}
-
+		
 		// Load Balancer
 		loadBalancer := load_balancer.NewLoadBalancer(loadBalancerFrontendEndpoint, "tcp://"+conf.LoadBalancerAddr)
 		defer loadBalancer.Close()
