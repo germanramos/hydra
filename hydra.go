@@ -90,8 +90,10 @@ func main() {
 		}
 
 		// Load Balancer
-		loadBalancer := load_balancer.NewLoadBalancer(loadBalancerFrontendEndpoint, conf.LoadBalancerAddr)
+		loadBalancer := load_balancer.NewLoadBalancer(loadBalancerFrontendEndpoint, "tcp://"+conf.LoadBalancerAddr)
 		defer loadBalancer.Close()
+		log.Info("PRE LOAD BALANCER")
 		loadBalancer.Run()
+		log.Info("POST LOAD BALANCER")
 	}
 }

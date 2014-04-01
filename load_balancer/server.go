@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"time"
-		
+
 	zmq "github.com/innotech/hydra/vendors/github.com/alecthomas/gozmq"
 
 	"github.com/innotech/hydra/log"
@@ -166,7 +166,7 @@ func (self *loadBalancer) processClient(client []byte, msg [][]byte) {
 
 // Process message sent to us by a worker.
 func (self *loadBalancer) processWorker(sender []byte, msg [][]byte) {
-	log.Debug("processWorker")
+	log.Info("processWorker")
 
 	//  At least, command
 	if len(msg) < 1 {
@@ -318,17 +318,16 @@ func (self *loadBalancer) Close() {
 
 // Main broker working loop
 func (self *loadBalancer) Run() {
-	log.Debugf("RUN BALANCER")  // !!!!!!!!!!!!!!!!!!!! The balancer do not start!!!!!!
+	log.Info("RUN LOAD BALANCER")
 	for {
 		items := zmq.PollItems{
 			zmq.PollItem{Socket: self.frontend, Events: zmq.POLLIN},
 			zmq.PollItem{Socket: self.backend, Events: zmq.POLLIN},
 		}
 
-		log.Debugf("RECV %d", len(items))
-		log.Debugf("RECV items[0] %d", items[0])
-		log.Debugf("RECV POLLIN %d", items[0].REvents&zmq.POLLIN )
-
+		// log.Infof("RECV %d", len(items))
+		// log.Infof("RECV items[0] %d", items[0])
+		// log.Infof("RECV POLLIN %d", items[0].REvents&zmq.POLLIN)
 
 		_, err := zmq.Poll(items, HEARTBEAT_INTERVAL)
 		if err != nil {
@@ -343,9 +342,12 @@ func (self *loadBalancer) Run() {
 			self.processClient(requestId, msg)
 		}
 		if items[1].REvents&zmq.POLLIN != 0 {
+			// log.Info("POLLIN BACKEND")
 			msg, _ := self.backend.RecvMultipart(0)
+			Dump(msg)
 			sender := msg[0]
-			msg = msg[3:]
+			msg = msg[2:]
+			// Dump(msg)
 			self.processWorker(sender, msg)
 		}
 
