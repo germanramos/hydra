@@ -6,7 +6,7 @@ if [ ! -h src/github.com/innotech/hydra ]; then
 fi
 
 export GOBIN=${PWD}/bin
-export GOPATH=${PWD}
+#export GOPATH=${PWD}
 
 MOD_ROOT=github.com/innotech/hydra/
 

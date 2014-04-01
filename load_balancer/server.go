@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"time"
-
+		
 	zmq "github.com/innotech/hydra/vendors/github.com/alecthomas/gozmq"
 
 	"github.com/innotech/hydra/log"
@@ -14,7 +14,7 @@ import (
 const (
 	INTERNAL_SERVICE_PREFIX = "isb."
 	// Merge all heartbeat
-	HEARTBEAT_INTERVAL = 2500 * time.Millisecond
+	HEARTBEAT_INTERVAL = 250 * time.Millisecond
 	HEARTBEAT_EXPIRY   = HEARTBEAT_INTERVAL * HEARTBEAT_LIVENESS
 )
 
@@ -166,6 +166,8 @@ func (self *loadBalancer) processClient(client []byte, msg [][]byte) {
 
 // Process message sent to us by a worker.
 func (self *loadBalancer) processWorker(sender []byte, msg [][]byte) {
+	log.Debug("processWorker")
+
 	//  At least, command
 	if len(msg) < 1 {
 		log.Warn("Invalid message from Worker, this doesn contain command")
@@ -185,6 +187,7 @@ func (self *loadBalancer) processWorker(sender []byte, msg [][]byte) {
 		// log.Infof("Registering new worker: %s\n", identity)
 	}
 
+	log.Debugf("COMMAND: %s", string(command))
 	switch string(command) {
 	case SIGNAL_READY:
 		//  At least, a service name
@@ -315,11 +318,17 @@ func (self *loadBalancer) Close() {
 
 // Main broker working loop
 func (self *loadBalancer) Run() {
+	log.Debugf("RUN BALANCER")  // !!!!!!!!!!!!!!!!!!!! The balancer do not start!!!!!!
 	for {
 		items := zmq.PollItems{
 			zmq.PollItem{Socket: self.frontend, Events: zmq.POLLIN},
 			zmq.PollItem{Socket: self.backend, Events: zmq.POLLIN},
 		}
+
+		log.Debugf("RECV %d", len(items))
+		log.Debugf("RECV items[0] %d", items[0])
+		log.Debugf("RECV POLLIN %d", items[0].REvents&zmq.POLLIN )
+
 
 		_, err := zmq.Poll(items, HEARTBEAT_INTERVAL)
 		if err != nil {
