@@ -3,7 +3,7 @@ package config
 import (
 	"encoding/json"
 	"io/ioutil"
-
+	"log"
 	. "github.com/innotech/hydra/model/entity"
 	. "github.com/innotech/hydra/model/repository"
 )
@@ -17,9 +17,7 @@ type ApplicationsConfig struct {
 func NewApplicationsConfig() *ApplicationsConfig {
 	a := new(ApplicationsConfig)
 	a.Repo = NewEctdRepository()
-	// _ = a.Repo.Delete("foo")
-	// a.Repo.SetCollection("applications")
-	a.Repo.SetCollection("applications")
+	a.Repo.SetCollection("apps")
 	return a
 }
 
@@ -43,9 +41,13 @@ func (a *ApplicationsConfig) loadAppsFromJSON(pathToFile string) error {
 
 // TODO: Test
 func (a *ApplicationsConfig) Persists() error {
+	log.Printf("PESISTING...")
 	for _, app := range a.Apps {
+		log.Printf("MAKING SET of %v", app)
 		err := a.Repo.Set(&app)
+		log.Printf("END MAKING SET of %v", app)
 		if err != nil {
+			log.Fatal("Error persisting app config")
 			// TODO: delete applications directory
 			return err
 		}

@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/innotech/hydra/database/connector"
 	"github.com/innotech/hydra/model/entity"
+	"log"
 )
 
 const KEY_PREFIX string = "/db/"
@@ -65,12 +66,16 @@ func (e *EtcdBaseRepository) GetAll() (*entity.EtcdBaseModels, error) {
 }
 
 func (e *EtcdBaseRepository) Set(entity *entity.EtcdBaseModel) error {
+	log.Print("REPO ENTER SET. Entity:", *entity);
 	ops, err := entity.ExportEtcdOperations()
 	if err != nil {
+		log.Fatal("Error expoting etcd operations")
 		return err
 	}
 	// var i = 0
+	log.Print("REPO OPS", ops);
 	for key, value := range ops {
+		log.Printf("REPO SET %s - %s - %s", key, value, e.makePath(key))
 		if err := e.conn.Set(e.makePath(key), false, value, PERMANENT); err != nil {
 			// TODO: logger
 			return err
