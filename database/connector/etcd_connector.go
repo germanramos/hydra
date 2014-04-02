@@ -3,9 +3,8 @@ package connector
 import (
 	// "encoding/json"
 	// "fmt"
-	"time"
-	"log"
 	"github.com/innotech/hydra/etcd"
+	"time"
 
 	// . "github.com/innotech/hydra/vendors/github.com/coreos/etcd/server"
 	"github.com/innotech/hydra/vendors/github.com/coreos/etcd/store"
@@ -43,7 +42,6 @@ func (e EtcdConnector) Get(key string, recursive bool, sort bool) (*store.Event,
 }
 
 func (e EtcdConnector) Set(key string, dir bool, value string, expireTime time.Time) error {
-	log.Printf("Setting key %s with value %s", key, value)
 	c := e.etcd.EtcdServer.Store().CommandFactory().CreateSetCommand(key, dir, value, expireTime)
 	// c := e.etcd.Store().CommandFactory().CreateSetCommand(key, dir, value, expireTime)
 	// return e.dispatch(c)

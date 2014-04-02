@@ -41,11 +41,8 @@ func (a *ApplicationsConfig) loadAppsFromJSON(pathToFile string) error {
 
 // TODO: Test
 func (a *ApplicationsConfig) Persists() error {
-	log.Printf("PESISTING...")
 	for _, app := range a.Apps {
-		log.Printf("MAKING SET of %v", app)
 		err := a.Repo.Set(&app)
-		log.Printf("END MAKING SET of %v", app)
 		if err != nil {
 			log.Fatal("Error persisting app config")
 			// TODO: delete applications directory

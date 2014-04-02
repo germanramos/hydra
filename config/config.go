@@ -19,7 +19,7 @@ import (
 const (
 	DEFAULT_APPS_FILE          = "/etc/hydra/apps.json"
 	DEFAULT_CONFIG_FILE_PATH   = "/etc/hydra/hydra.conf"
-	DEFAULT_DATA_DIR           = "./"
+	DEFAULT_DATA_DIR           = "/tmp/hydra"
 	DEFAULT_ETCD_ADDR          = "127.0.0.1:4001"
 	DEFAULT_LOAD_BALANCER_ADDR = "*:7777"
 	DEFAULT_PEER_ADDR          = "127.0.0.1:7001"

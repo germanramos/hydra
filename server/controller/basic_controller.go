@@ -6,7 +6,6 @@ import (
 	// "fmt"
 	"net/http"
 	// "strconv"
-	"log"
 	"strings"
 
 	"github.com/innotech/hydra/model/entity"
@@ -63,7 +62,6 @@ func (b *BasicController) GetConfiguredRepository(pathVars map[string]string) *r
 	for key, value := range pathVars {
 		finalPath = strings.Replace(finalPath, "{"+key+"}", value, 1)
 	}
-	log.Println("----------::: " + finalPath)
 	b.repo.SetCollection(finalPath)
 	return b.repo
 }

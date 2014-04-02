@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-const KEY_PREFIX string = "/db/"
+const KEY_PREFIX string = "/db"
 
 type EtcdAccessLayer interface {
 	Delete(key string) error
@@ -34,7 +34,6 @@ func (e *EtcdBaseRepository) GetCollection() string {
 
 func (e *EtcdBaseRepository) SetCollection(collection string) {
 	e.collection = collection
-	log.Println("REPO SET collection: " + e.collection)
 }
 
 func (e *EtcdBaseRepository) makePath(key string) string {
@@ -51,7 +50,7 @@ func (e *EtcdBaseRepository) Delete(key string) error {
 }
 
 func (e *EtcdBaseRepository) Get(key string) (*entity.EtcdBaseModel, error) {
-	event, err := e.conn.Get(e.makePath(key), false, false)
+	event, err := e.conn.Get(e.makePath(key), true, false)
 	if err != nil {
 		return nil, err
 	}
@@ -67,17 +66,13 @@ func (e *EtcdBaseRepository) GetAll() (*entity.EtcdBaseModels, error) {
 }
 
 func (e *EtcdBaseRepository) Set(entity *entity.EtcdBaseModel) error {
-	log.Print("REPO ENTER SET. Entity:", *entity)
 	ops, err := entity.ExportEtcdOperations()
 	if err != nil {
 		log.Fatal("Error expoting etcd operations")
 		return err
 	}
 	// var i = 0
-	log.Println("REPO collection: " + e.collection)
-	log.Print("REPO OPS", ops)
 	for key, value := range ops {
-		log.Printf("REPO SET %s - %s - %s", key, value, e.makePath(key))
 		if err := e.conn.Set(e.makePath(key), false, value, PERMANENT); err != nil {
 			// TODO: logger
 			return err

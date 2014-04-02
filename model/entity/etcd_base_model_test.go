@@ -16,7 +16,7 @@ var _ = Describe("EtcdBaseModel", func() {
 	Describe("Exploding", func() {
 		Context("When the entity is empty", func() {
 			e := new(EtcdBaseModel)
-			id, data := e.Explode()
+			id, data, _ := e.Explode()
 			It("should be returned an empty id", func() {
 				Expect(id).To(BeEmpty())
 			})
@@ -34,7 +34,7 @@ var _ = Describe("EtcdBaseModel", func() {
 			if err != nil {
 				Fail("JSON blob wrongly defined")
 			}
-			id, data := e.Explode()
+			id, data, _ := e.Explode()
 			It("should be returned an empty id", func() {
 				Expect(id).To(BeEmpty())
 			})
@@ -54,7 +54,7 @@ var _ = Describe("EtcdBaseModel", func() {
 			if err != nil {
 				Fail("JSON blob wrongly defined")
 			}
-			id, data := e.Explode()
+			id, data, _ := e.Explode()
 
 			It("should be returned an empty id", func() {
 				Expect(id).To(Equal("entityID"))
@@ -78,7 +78,13 @@ var _ = Describe("EtcdBaseModel", func() {
 			"Array": ["element0", "element1"],
 			"Object": {
 				"Number1": 55,
-				"String1": "Choose your strategy"
+				"String1": "Choose your strategy",
+				"NestedObject": {
+					"Number2": 2,
+					"ReNestedObject": {
+						"String3": "And Run"
+					}
+				}
 			},
 			"ArrayOfObjects": [{"ObjectKey0": false}, {"ObjectKey0": "And start your broker"}]
 		}`)
@@ -99,6 +105,8 @@ var _ = Describe("EtcdBaseModel", func() {
 			Expect(etcdOps["/Array/1"]).To(Equal("element1"))
 			Expect(etcdOps["/Object/Number1"]).To(Equal("55.00"))
 			Expect(etcdOps["/Object/String1"]).To(Equal("Choose your strategy"))
+			Expect(etcdOps["/Object/NestedObject/Number2"]).To(Equal("2.00"))
+			Expect(etcdOps["/Object/NestedObject/ReNestedObject/String3"]).To(Equal("And Run"))
 			Expect(etcdOps["/ArrayOfObjects/0/ObjectKey0"]).To(Equal("false"))
 			Expect(etcdOps["/ArrayOfObjects/1/ObjectKey0"]).To(Equal("And start your broker"))
 		})

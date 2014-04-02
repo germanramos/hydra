@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/innotech/hydra/config"
 	"github.com/innotech/hydra/database/connector"
@@ -36,8 +37,6 @@ func main() {
 	}
 
 	// connector.SetEtcdConnector(etcd)
-
-	
 
 	// Launch services
 	var etcd = etcd.New(conf.EtcdConf)
@@ -86,12 +85,13 @@ func main() {
 				log.Fatalf("Unable to load applications: %s", err)
 			}
 		}
-		
+
+		time.Sleep(1 * time.Second)
 		// Persist Configured applications
 		if err := appsConfig.Persists(); err != nil {
 			log.Fatalf("Failed to save configured applications: ", err)
 		}
-		
+
 		// Load Balancer
 		loadBalancer := load_balancer.NewLoadBalancer(loadBalancerFrontendEndpoint, "tcp://"+conf.LoadBalancerAddr)
 		defer loadBalancer.Close()
