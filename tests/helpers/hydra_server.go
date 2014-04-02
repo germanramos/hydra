@@ -9,7 +9,7 @@ import (
 func RunHydraInStandaloneAndReturnProcess(privateAddr string) *os.Process {
 	procAttr := new(os.ProcAttr)
 	procAttr.Files = []*os.File{nil, os.Stdout, os.Stderr}
-	args := []string{"hydra", "-f", "-name=node0", "-private-addr=" + privateAddr, "-data-dir=/tmp/node0"}
+	args := []string{"hydra", "-f", "-name=node0", "-private-addr=" + privateAddr, "-data-dir=/tmp/node0 -apps_file=fixtures/apps.empty.json"}
 
 	process, err := os.StartProcess(HydraBinPath, args, procAttr)
 	if err != nil {

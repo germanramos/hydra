@@ -9,6 +9,7 @@ import (
 	// "fmt"
 	"strings"
 	"time"
+	"log"
 )
 
 type ServiceTester struct {
@@ -73,7 +74,9 @@ func (s *ServiceTester) DefineServiceTests(entity1 map[string]interface{}, entit
 					Expect(err1).NotTo(HaveOccurred())
 					Expect(response1.StatusCode).To(Equal(200))
 				})
+				log.Print("********************" + s.baseURI + "/" + s.baseId + "1")
 				response2, err2 := s.httpUtils.Get(s.baseURI + "/" + s.baseId + "1")
+				log.Print(response2)
 				It("should return a success response", func() {
 					Expect(err2).NotTo(HaveOccurred())
 					Expect(response2.StatusCode).To(Equal(200))
