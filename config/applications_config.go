@@ -2,10 +2,10 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"log"
 	. "github.com/innotech/hydra/model/entity"
 	. "github.com/innotech/hydra/model/repository"
+	"io/ioutil"
+	"log"
 )
 
 type ApplicationsConfig struct {
@@ -17,7 +17,7 @@ type ApplicationsConfig struct {
 func NewApplicationsConfig() *ApplicationsConfig {
 	a := new(ApplicationsConfig)
 	a.Repo = NewEctdRepository()
-	a.Repo.SetCollection("apps")
+	a.Repo.SetCollection("/apps")
 	return a
 }
 
