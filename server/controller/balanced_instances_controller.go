@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	. "github.com/innotech/hydra/load_balancer"
@@ -40,14 +41,17 @@ func (b *BalancedInstancesController) sendZMQRequestToBalancer(app []byte, data 
 }
 
 func (b *BalancedInstancesController) RegisterHandlers(r *mux.Router) {
-	r.HandleFunc(b.basePath, b.List).Methods("GET")
+	// r.HandleFunc(b.basePath, b.List).Methods("GET")
+	r.HandleFunc(b.basePath+"/{id}", b.Get).Methods("GET")
 }
 
-func (b *BalancedInstancesController) List(rw http.ResponseWriter, req *http.Request) {
+func (b *BalancedInstancesController) Get(rw http.ResponseWriter, req *http.Request) {
+	log.Print("¿¿¿¿¿ Entra List")
 	vars := mux.Vars(req)
 	appId := vars["appId"]
 	app, err := b.repo.Get(appId)
 	if err != nil {
+		log.Print("¿¿¿¿¿ Entra Not Found")
 		http.Error(rw, err.Error(), http.StatusNotFound)
 		return
 	}

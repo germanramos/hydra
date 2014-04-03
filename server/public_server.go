@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net"
 
 	"github.com/innotech/hydra/server/controller"
@@ -31,6 +32,7 @@ func (p *PublicServer) registerControllers() {
 }
 
 func (p *PublicServer) RegisterHandlers() {
+	log.Println("Entra Public Register Handler")
 	for _, c := range p.controllers {
 		c.RegisterHandlers(p.Router)
 	}

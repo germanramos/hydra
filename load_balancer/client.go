@@ -57,6 +57,11 @@ func (self *client) Send(service []byte, request [][]byte) (reply [][]byte) {
 
 	self.socket.SendMultipart(frame, 0)
 	msg, _ := self.socket.RecvMultipart(0)
-	reply = msg[2:]
+	if len(msg) < 3 {
+		reply = [][]byte{}
+	} else {
+		reply = msg[2:]
+	}
+
 	return
 }

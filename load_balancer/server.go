@@ -79,6 +79,7 @@ func NewLoadBalancer(frontendEndpoint, backendEndpoint string) *loadBalancer {
 		backend:     backend,
 		waiting:     NewList(),
 		workers:     make(map[string]*lbWorker),
+		chains:      make(map[string]lbChain),
 	}
 }
 
@@ -139,9 +140,10 @@ func (self *loadBalancer) registerChain(client []byte, msg [][]byte) {
 		panic(err)
 	}
 	chain := lbChain{
-		app:    string(msg[0]),
-		client: string(client),
-		msg:    msg[2],
+		app:      string(msg[0]),
+		client:   string(client),
+		msg:      msg[2],
+		shackles: NewList(),
 	}
 	for _, service := range services {
 		chain.shackles.PushBack(lbShackle{

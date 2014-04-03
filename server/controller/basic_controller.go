@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	// "fmt"
 	"net/http"
 	// "strconv"
@@ -62,6 +63,7 @@ func (b *BasicController) GetConfiguredRepository(pathVars map[string]string) *r
 	for key, value := range pathVars {
 		finalPath = strings.Replace(finalPath, "{"+key+"}", value, 1)
 	}
+	log.Println("Controller Set Collection " + finalPath)
 	b.repo.SetCollection(finalPath)
 	return b.repo
 }
