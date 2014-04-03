@@ -14,7 +14,7 @@ import (
 const (
 	INTERNAL_SERVICE_PREFIX = "isb."
 	// Merge all heartbeat
-	HEARTBEAT_INTERVAL = 250 * time.Millisecond
+	HEARTBEAT_INTERVAL = 2500 * time.Millisecond
 	HEARTBEAT_EXPIRY   = HEARTBEAT_INTERVAL * HEARTBEAT_LIVENESS
 )
 
@@ -168,8 +168,6 @@ func (self *loadBalancer) processClient(client []byte, msg [][]byte) {
 
 // Process message sent to us by a worker.
 func (self *loadBalancer) processWorker(sender []byte, msg [][]byte) {
-	log.Info("processWorker")
-
 	//  At least, command
 	if len(msg) < 1 {
 		log.Warn("Invalid message from Worker, this doesn contain command")
@@ -320,16 +318,11 @@ func (self *loadBalancer) Close() {
 
 // Main broker working loop
 func (self *loadBalancer) Run() {
-	log.Info("RUN LOAD BALANCER")
 	for {
 		items := zmq.PollItems{
 			zmq.PollItem{Socket: self.frontend, Events: zmq.POLLIN},
 			zmq.PollItem{Socket: self.backend, Events: zmq.POLLIN},
 		}
-
-		// log.Infof("RECV %d", len(items))
-		// log.Infof("RECV items[0] %d", items[0])
-		// log.Infof("RECV POLLIN %d", items[0].REvents&zmq.POLLIN)
 
 		_, err := zmq.Poll(items, HEARTBEAT_INTERVAL)
 		if err != nil {
@@ -346,7 +339,7 @@ func (self *loadBalancer) Run() {
 		if items[1].REvents&zmq.POLLIN != 0 {
 			// log.Info("POLLIN BACKEND")
 			msg, _ := self.backend.RecvMultipart(0)
-			Dump(msg)
+			// Dump(msg)
 			sender := msg[0]
 			msg = msg[2:]
 			// Dump(msg)
