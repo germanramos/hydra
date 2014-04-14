@@ -24,6 +24,7 @@ func NewList() *ZList {
 }
 
 func (self *ZList) Delete(value interface{}) {
+	fmt.Println("Delete ZList")
 	for elem := self.Front(); elem != nil; elem = elem.Next() {
 		if reflect.DeepEqual(elem.Value, value) {
 			self.Remove(elem)
@@ -33,6 +34,7 @@ func (self *ZList) Delete(value interface{}) {
 }
 
 func (self *ZList) Pop() *list.Element {
+	fmt.Println("Pop ZList")
 	if self.Len() == 0 {
 		return nil
 	}

@@ -50,7 +50,7 @@ func checkIfDataContainsElementsInMap(data map[string]interface{}, key string) (
 }
 
 func extractBalancers(data map[string]interface{}) ([]Balancer, error) {
-	const BALANCERS_KEY string = "balancers"
+	const BALANCERS_KEY string = "Balancers"
 	var balancers []Balancer = make([]Balancer, 0)
 	hasBalancers, err := checkIfDataContainsElementsInMap(data, BALANCERS_KEY)
 	if err != nil {
@@ -75,7 +75,7 @@ func generateBalancers(balancers map[string]interface{}) ([]Balancer, error) {
 }
 
 func extractInstances(data map[string]interface{}) ([]Instance, error) {
-	const INSTANCES_KEY string = "instances"
+	const INSTANCES_KEY string = "Instances"
 	var instances []Instance = make([]Instance, 0)
 	hasInstances, err := checkIfDataContainsElementsInMap(data, INSTANCES_KEY)
 	if err != nil {

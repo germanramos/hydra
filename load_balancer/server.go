@@ -66,11 +66,12 @@ func NewLoadBalancer(frontendEndpoint, backendEndpoint string) *loadBalancer {
 	frontend, _ := context.NewSocket(zmq.ROUTER)
 	frontend.SetLinger(0)
 	frontend.Bind(frontendEndpoint)
+	log.Infof("Load Balancer Frontend is active at %s\n", frontendEndpoint)
 	// Define tcp socket to talk with Workers
 	backend, _ := context.NewSocket(zmq.ROUTER)
 	backend.SetLinger(0)
 	backend.Bind(backendEndpoint)
-	log.Infof("Load Balancer is active at %s\n", backendEndpoint)
+	log.Infof("Load Balancer Backend is active at %s\n", backendEndpoint)
 	return &loadBalancer{
 		context:     context,
 		heartbeatAt: time.Now().Add(HEARTBEAT_INTERVAL),
@@ -85,6 +86,8 @@ func NewLoadBalancer(frontendEndpoint, backendEndpoint string) *loadBalancer {
 
 // Deletes worker from all data structures, and deletes worker.
 func (self *loadBalancer) deleteWorker(worker *lbWorker, disconnect bool) {
+	log.Info("----------------------------- Entra en deleteWorker")
+	log.Info("***************************** %d", worker.service.waiting.Len())
 	if worker == nil {
 		log.Warn("Nil worker")
 	}
@@ -94,47 +97,69 @@ func (self *loadBalancer) deleteWorker(worker *lbWorker, disconnect bool) {
 	}
 
 	if worker.service != nil {
+		log.Info("Delete Worker Service")
 		worker.service.waiting.Delete(worker)
 	}
 	self.waiting.Delete(worker)
 	delete(self.workers, worker.identity)
+	log.Info("***************************** %d", worker.service.waiting.Len())
 }
 
 // Dispatch chains advancing a shackle
 func (self *loadBalancer) advanceShackle(chain lbChain) {
+	log.Info("----------------------------- Entra en advanceShackle")
+	log.Infof("Chain Shackles Len %d", chain.shackles.Len())
 	elem := chain.shackles.Pop()
+	log.Infof("Elem %#v", elem)
 	if elem == nil {
 		msg := [][]byte{[]byte(chain.client), nil, chain.msg}
+		log.Info(">>>>>>>>>>>>>>> Sending message to Client from Server")
+		Dump(msg)
 		self.frontend.SendMultipart(msg, 0)
 		return
 	}
-	shackle, _ := elem.Value.(*lbShackle)
+	shackle, _ := elem.Value.(lbShackle)
+	log.Infof("shackle: %#v", shackle)
+	log.Infof("shackle.serviceArgs: %#v", shackle.serviceArgs)
 	args, _ := json.Marshal(shackle.serviceArgs)
 	msg := [][]byte{[]byte(chain.client), nil, chain.msg, args}
+	log.Info("Service for dispatch: " + shackle.serviceName)
 	self.dispatch(self.requireService(shackle.serviceName), msg)
 }
 
 // Dispatch requests to waiting workers as possible
 func (self *loadBalancer) dispatch(service *lbService, msg [][]byte) {
+	log.Info("----------------------------- Entra en dispatch")
+	log.Infof("***************************** %d", service.waiting.Len())
+	log.Infof("Service Object: %#v", service)
+	log.Info("Sending DISPATCH")
 	if service == nil {
 		log.Fatal("Nil service")
 	}
 	// Queue message if any
 	if len(msg) != 0 {
+		log.Info("Queue message if any")
 		service.requests = append(service.requests, msg)
 	}
 	self.purgeWorkers()
+	log.Infof("??? service.waiting.Len: %d", service.waiting.Len())
+	log.Infof("??? len(service.requests): %d", len(service.requests))
 	for service.waiting.Len() > 0 && len(service.requests) > 0 {
 		msg, service.requests = service.requests[0], service.requests[1:]
+		log.Info("------- service.waiting.Pop")
 		elem := service.waiting.Pop()
 		self.waiting.Remove(elem)
 		worker, _ := elem.Value.(*lbWorker)
+		log.Info("Sending SIGNAL REQUEST")
+
 		self.sendToWorker(worker, SIGNAL_REQUEST, nil, msg)
 	}
+	log.Infof("***************************** %d", service.waiting.Len())
 }
 
 // Register chain from new client request
 func (self *loadBalancer) registerChain(client []byte, msg [][]byte) {
+	log.Info("----------------------------- Entra en registerChain")
 	var services []Balancer
 	if err := json.Unmarshal(msg[1], &services); err != nil {
 		panic(err)
@@ -146,6 +171,7 @@ func (self *loadBalancer) registerChain(client []byte, msg [][]byte) {
 		shackles: NewList(),
 	}
 	for _, service := range services {
+		log.Infof("serviceArgs %#v", service.Args)
 		chain.shackles.PushBack(lbShackle{
 			serviceName: service.Id,
 			serviceArgs: service.Args,
@@ -156,6 +182,7 @@ func (self *loadBalancer) registerChain(client []byte, msg [][]byte) {
 
 // Process a request coming from a client.
 func (self *loadBalancer) processClient(client []byte, msg [][]byte) {
+	log.Info("----------------------------- Entra en processClient")
 	// Application + Services + Instances
 	if len(msg) < 3 {
 		log.Fatal("Invalid message from client sender")
@@ -168,6 +195,7 @@ func (self *loadBalancer) processClient(client []byte, msg [][]byte) {
 
 // Process message sent to us by a worker.
 func (self *loadBalancer) processWorker(sender []byte, msg [][]byte) {
+	log.Info("----------------------------- Entra en processWorker")
 	//  At least, command
 	if len(msg) < 1 {
 		log.Warn("Invalid message from Worker, this doesn contain command")
@@ -198,10 +226,12 @@ func (self *loadBalancer) processWorker(sender []byte, msg [][]byte) {
 		}
 		service := msg[0]
 		//  Not first command in session or Reserved service name
+		log.Info("workerReady %t", workerReady)
 		if workerReady || string(service[:4]) == INTERNAL_SERVICE_PREFIX {
 			self.deleteWorker(worker, true)
 		} else {
 			//  Attach worker to service and mark as idle
+			log.Info("++++++++++++++++++ Attach worker")
 			worker.service = self.requireService(string(service))
 			self.workerWaiting(worker)
 			log.Infof("Registered new worker for service %s\n", worker.service.name)
@@ -210,6 +240,8 @@ func (self *loadBalancer) processWorker(sender []byte, msg [][]byte) {
 		if workerReady {
 			//  Remove & save client return envelope and insert the
 			//  protocol header and service name, then rewrap envelope.
+			log.Info(">>>>>>>>>>>>>>>> Message REPLY from WORKER: ")
+			Dump(msg)
 			client := msg[0]
 			chain := self.chains[string(client)]
 			chain.msg = msg[2]
@@ -236,6 +268,7 @@ func (self *loadBalancer) processWorker(sender []byte, msg [][]byte) {
 //  Look for & kill expired workers.
 //  Workers are oldest to most recent, so we stop at the first alive worker.
 func (self *loadBalancer) purgeWorkers() {
+	log.Info("----------------------------- Entra en purgeWorkers")
 	now := time.Now()
 	for elem := self.waiting.Front(); elem != nil; elem = self.waiting.Front() {
 		worker, _ := elem.Value.(*lbWorker)
@@ -249,10 +282,16 @@ func (self *loadBalancer) purgeWorkers() {
 
 // Locates the service (creates if necessary).
 func (self *loadBalancer) requireService(name string) *lbService {
+	log.Info("----------------------------- Entra en requireService: " + name)
 	if len(name) == 0 {
 		log.Warn("Invalid service name have been required")
 	}
+	log.Infof("***************************** Service Len: %d", len(self.services))
+	for key, _ := range self.services {
+		log.Info(">>>>>>>>>>>>>>>> Service KEY: " + key)
+	}
 	service, ok := self.services[name]
+	log.Info("Require Service is OK = %t", ok)
 	if !ok {
 		service = &lbService{
 			name:    name,
@@ -266,6 +305,8 @@ func (self *loadBalancer) requireService(name string) *lbService {
 //  Send message to worker.
 //  If message is provided, sends that message.
 func (self *loadBalancer) sendToWorker(worker *lbWorker, command string, option []byte, msg [][]byte) {
+	log.Info("----------------------------- Entra en sendToWorker")
+	log.Infof("***************************** %d", worker.service.waiting.Len())
 	//  Stack routing and protocol envelopes to start of message and routing envelope
 	if len(option) > 0 {
 		msg = append([][]byte{option}, msg...)
@@ -300,13 +341,17 @@ func (self *loadBalancer) sendToWorker(worker *lbWorker, command string, option 
 // This worker is now waiting for work.
 func (self *loadBalancer) workerWaiting(worker *lbWorker) {
 	//  Queue to broker and service waiting lists
+	log.Info("----------------------------- Entra en workerWaiting")
+	log.Info("***************************** %d", worker.service.waiting.Len())
 	self.waiting.PushBack(worker)
+	log.Info("***************************** %d", worker.service.waiting.Len())
 	worker.service.waiting.PushBack(worker)
 	worker.expiry = time.Now().Add(HEARTBEAT_EXPIRY)
 	self.dispatch(worker.service, nil)
 }
 
 func (self *loadBalancer) Close() {
+	log.Info("----------------------------- Entra en Close")
 	if self.frontend != nil {
 		self.frontend.Close()
 	}
@@ -330,7 +375,10 @@ func (self *loadBalancer) Run() {
 		}
 
 		if items[0].REvents&zmq.POLLIN != 0 {
+			log.Info("Load Balancer Recv Msg")
 			msg, _ := self.frontend.RecvMultipart(0)
+			log.Info(">>>>>>>>>>>>>>>>>>> Receiving message from Client <<<<<<<<<<<<<<<<<<<<<")
+			Dump(msg)
 			// TODO: check msg parts
 			requestId := msg[0]
 			msg = msg[2:]

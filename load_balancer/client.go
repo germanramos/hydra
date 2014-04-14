@@ -1,6 +1,7 @@
 package load_balancer
 
 import (
+	"log"
 	"time"
 
 	zmq "github.com/innotech/hydra/vendors/github.com/alecthomas/gozmq"
@@ -55,12 +56,18 @@ func (self *client) Close() {
 func (self *client) Send(service []byte, request [][]byte) (reply [][]byte) {
 	frame := append([][]byte{service}, request...)
 
+	log.Println("^^^^^^^^^^^^^^ PRE SEND TO SERVER")
 	self.socket.SendMultipart(frame, 0)
+
 	msg, _ := self.socket.RecvMultipart(0)
-	if len(msg) < 3 {
+	log.Println("^^^^^^^^^^^^^^ RECV FROM SERVER")
+	Dump(msg)
+	log.Println("^^^^^^^^^^^^^^ END RECV FROM SERVER")
+
+	if len(msg) < 1 {
 		reply = [][]byte{}
 	} else {
-		reply = msg[2:]
+		reply = msg
 	}
 
 	return

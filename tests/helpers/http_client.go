@@ -33,6 +33,17 @@ func (h HTTPClientHelper) ReadBody(resp *http.Response) []byte {
 }
 
 // Reads the body from the response and parses it as JSON Object.
+func (h HTTPClientHelper) ReadBodyStringArray(resp *http.Response) ([]string, error) {
+	var m []string
+	decoder := json.NewDecoder(resp.Body)
+	err := decoder.Decode(&m)
+	if err != nil {
+		panic(fmt.Sprintf("HTTP body JSON parse error: %v", err))
+	}
+	return m, nil
+}
+
+// Reads the body from the response and parses it as JSON Object.
 func (h HTTPClientHelper) ReadBodyJsonArray(resp *http.Response) ([]map[string]interface{}, error) {
 	var m []map[string]interface{}
 	decoder := json.NewDecoder(resp.Body)

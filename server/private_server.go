@@ -3,10 +3,10 @@ package server
 import (
 	"net"
 
-	"github.com/innotech/hydra/server/controller"
-	"github.com/innotech/hydra/vendors/github.com/gorilla/mux"
 	"github.com/innotech/hydra/log"
 	"github.com/innotech/hydra/model/repository"
+	"github.com/innotech/hydra/server/controller"
+	"github.com/innotech/hydra/vendors/github.com/gorilla/mux"
 )
 
 type PrivateServer struct {
@@ -29,11 +29,14 @@ func validateApp(app map[string]interface{}, vars map[string]string) bool {
 }
 
 func validateInstance(app map[string]interface{}, vars map[string]string) bool {
-	if (len(app) == 1) {
+	log.Infof(">>>>>>>>>>> validateInstance APP: %#v", app)
+	log.Infof(">>>>>>>>>>> validateInstance VARS: %#v", vars)
+	if len(app) == 1 {
 		var repo *repository.EtcdBaseRepository = repository.NewEctdRepository()
 		repo.SetCollection("/apps")
 		_, err := repo.Get(vars["appId"])
 		if err != nil {
+			log.Warn(err)
 			log.Warn("validateInstance: Error getting app " + vars["appId"])
 			return false
 		}
@@ -46,7 +49,7 @@ func validateInstance(app map[string]interface{}, vars map[string]string) bool {
 func (p *PrivateServer) registerControllers() {
 	p.controllers = make([]controller.Controller, 2)
 	p.controllers[0], _ = controller.NewBasicController("/apps", validateApp)
-	p.controllers[1], _ = controller.NewBasicController("/apps/{appId}/instances", validateInstance)
+	p.controllers[1], _ = controller.NewBasicController("/apps/{appId}/Instances", validateInstance)
 }
 
 func (p *PrivateServer) RegisterHandlers() {

@@ -24,10 +24,10 @@ type BasicController struct {
 	basePath      string
 	PathVariables []string
 	repo          *repository.EtcdBaseRepository
-	setValidation func(map[string]interface{},map[string]string) bool
+	setValidation func(map[string]interface{}, map[string]string) bool
 }
 
-func NewBasicController(basePath string, setValidation func(map[string]interface{},map[string]string) bool) (*BasicController, error) {
+func NewBasicController(basePath string, setValidation func(map[string]interface{}, map[string]string) bool) (*BasicController, error) {
 	var b = new(BasicController)
 	b.basePath = basePath
 	b.setValidation = setValidation
@@ -122,17 +122,19 @@ func (a *BasicController) Set(rw http.ResponseWriter, req *http.Request) {
 	var app entity.EtcdBaseModel
 	err := decoder.Decode(&app)
 	if err != nil {
-		http.Error(rw, err.Error(), http.StatusBadRequest)	
+		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
 	vars := mux.Vars(req)
-	
-	if (a.setValidation(app, vars) != true) {
-		log.Warn("Post Instance: Set validation fail");
+
+	// log.Infof("%#v", app)
+	// log.Infof("%#v", vars)
+	if a.setValidation(app, vars) != true {
+		log.Warn("Post Instance: Set validation fail")
 		http.Error(rw, "Post Instance: Set validation fail", http.StatusBadRequest)
 		return
 	}
-	
+
 	err = a.GetConfiguredRepository(vars).Set(&app)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)

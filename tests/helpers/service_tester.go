@@ -7,9 +7,9 @@ import (
 	"bytes"
 	"encoding/json"
 	// "fmt"
+	"log"
 	"strings"
 	"time"
-	"log"
 )
 
 type ServiceTester struct {
@@ -40,7 +40,15 @@ func (s *ServiceTester) Pluralize(word string) string {
 
 func (s *ServiceTester) DefineServiceTests(entity1 map[string]interface{}, entity2 map[string]interface{}) bool {
 	return Describe(s.Pluralize(s.entityAbstractKey), func() {
-		process := RunHydraInStandaloneAndReturnProcess(s.serverAddr)
+		app_config := "fixtures/apps.empty.json"
+		hydra_name := "hydra0"
+		data_dir_path := DATA_DIR_PATH + hydra_name
+		// loadBalancerAddr := "tcp://127.0.0.1:7777"
+		privateAddr := "127.0.0.1:7771"
+		// publicAddr := "127.0.0.1:7772"
+		// pingInstancesAddr := "http://" + privateAddr + "/apps/Ping/Instances"
+		args := []string{"-name=" + hydra_name, "-private-addr=" + privateAddr, "-data-dir=" + data_dir_path, "-apps-file=" + app_config}
+		process := RunHydraInStandaloneAndReturnProcess(args)
 		defer KillHydraProcess(process)
 		time.Sleep(time.Second)
 
