@@ -105,6 +105,36 @@ func (self *loadBalancer) deleteWorker(worker *lbWorker, disconnect bool) {
 	log.Info("***************************** %d", worker.service.waiting.Len())
 }
 
+// Decompose
+func (self *loadBalancer) decomposeMapOfInstancesMsg(msg []byte) []byte {
+	var levels []interface{}
+	if err := json.Unmarshal(msg, &levels); err != nil {
+		// TODO: Send an error
+	}
+	var computedInstances []interface{}
+	var processMapLevels func([]interface{})
+	processMapLevels = func(levels []interface{}) {
+		for _, level := range levels {
+			kind := reflect.TypeOf(level).Kind()
+			if kind == reflect.Slice || kind == reflect.Array {
+				processMapLevels(level.([]interface{}))
+			} else {
+				computedInstances = append(computedInstances, levels...)
+				return
+			}
+		}
+	}
+	processMapLevels(levels)
+	// TODO: extract uris
+	sortedInstanceUris := make([]string, 0)
+	for _, instance := range computedInstances {
+		sortedInstanceUris = append(sortedInstanceUris, instance["Info"].(map[string]interface{})["uri"].(string))
+	}
+
+	uris, err := json.Marshal(sortedInstanceUris)
+	return uris
+}
+
 // Dispatch chains advancing a shackle
 func (self *loadBalancer) advanceShackle(chain lbChain) {
 	log.Info("----------------------------- Entra en advanceShackle")
@@ -112,7 +142,10 @@ func (self *loadBalancer) advanceShackle(chain lbChain) {
 	elem := chain.shackles.Pop()
 	log.Infof("Elem %#v", elem)
 	if elem == nil {
-		msg := [][]byte{[]byte(chain.client), nil, chain.msg}
+		// Decompose
+		instanceUrisMsg := decomposeMapOfInstancesMsg(chain.msg)
+		msg := [][]byte{[]byte(chain.client), nil, instanceUrisMsg}
+		// msg := [][]byte{[]byte(chain.client), nil, chain.msg}
 		log.Info(">>>>>>>>>>>>>>> Sending message to Client from Server")
 		Dump(msg)
 		self.frontend.SendMultipart(msg, 0)
