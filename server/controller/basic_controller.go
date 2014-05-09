@@ -65,7 +65,7 @@ func (b *BasicController) GetConfiguredRepository(pathVars map[string]string) *r
 	for key, value := range pathVars {
 		finalPath = strings.Replace(finalPath, "{"+key+"}", value, 1)
 	}
-	log.Info("Controller Set Collection " + finalPath)
+	// log.Info("Controller Set Collection " + finalPath)
 	b.repo.SetCollection(finalPath)
 	return b.repo
 }

@@ -60,9 +60,9 @@ func (self *client) Send(service []byte, request [][]byte) (reply [][]byte) {
 	self.socket.SendMultipart(frame, 0)
 
 	msg, _ := self.socket.RecvMultipart(0)
-	log.Println("^^^^^^^^^^^^^^ RECV FROM SERVER")
-	Dump(msg)
-	log.Println("^^^^^^^^^^^^^^ END RECV FROM SERVER")
+	// log.Println("^^^^^^^^^^^^^^ RECV FROM SERVER")
+	// Dump(msg)
+	// log.Println("^^^^^^^^^^^^^^ END RECV FROM SERVER")
 
 	if len(msg) < 1 {
 		reply = [][]byte{}

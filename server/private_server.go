@@ -29,8 +29,8 @@ func validateApp(app map[string]interface{}, vars map[string]string) bool {
 }
 
 func validateInstance(app map[string]interface{}, vars map[string]string) bool {
-	log.Infof(">>>>>>>>>>> validateInstance APP: %#v", app)
-	log.Infof(">>>>>>>>>>> validateInstance VARS: %#v", vars)
+	// log.Infof(">>>>>>>>>>> validateInstance APP: %#v", app)
+	// log.Infof(">>>>>>>>>>> validateInstance VARS: %#v", vars)
 	if len(app) == 1 {
 		var repo *repository.EtcdBaseRepository = repository.NewEctdRepository()
 		repo.SetCollection("/apps")

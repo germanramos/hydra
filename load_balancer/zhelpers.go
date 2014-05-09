@@ -34,7 +34,7 @@ func (self *ZList) Delete(value interface{}) {
 }
 
 func (self *ZList) Pop() *list.Element {
-	fmt.Println("Pop ZList")
+	// fmt.Println("Pop ZList")
 	if self.Len() == 0 {
 		return nil
 	}

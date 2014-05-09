@@ -1,0 +1,14 @@
+[{
+	"App1": {
+		"Balancers": {
+			"MapAndSort": {	
+				"mapAttr": "cloud",
+				"mapSort": ["google", "amazon", "azure"]
+			},
+			"SortByNumber": {
+				"sortAttr": "cpuLoad",
+				"order": 1
+			}
+		}
+	}
+}]

@@ -3,6 +3,7 @@ package load_balancer
 import (
 	"encoding/hex"
 	"encoding/json"
+	"reflect"
 	"time"
 
 	zmq "github.com/innotech/hydra/vendors/github.com/alecthomas/gozmq"
@@ -66,12 +67,12 @@ func NewLoadBalancer(frontendEndpoint, backendEndpoint string) *loadBalancer {
 	frontend, _ := context.NewSocket(zmq.ROUTER)
 	frontend.SetLinger(0)
 	frontend.Bind(frontendEndpoint)
-	log.Infof("Load Balancer Frontend is active at %s\n", frontendEndpoint)
+	// log.Infof("Load Balancer Frontend is active at %s\n", frontendEndpoint)
 	// Define tcp socket to talk with Workers
 	backend, _ := context.NewSocket(zmq.ROUTER)
 	backend.SetLinger(0)
 	backend.Bind(backendEndpoint)
-	log.Infof("Load Balancer Backend is active at %s\n", backendEndpoint)
+	// log.Infof("Load Balancer Backend is active at %s\n", backendEndpoint)
 	return &loadBalancer{
 		context:     context,
 		heartbeatAt: time.Now().Add(HEARTBEAT_INTERVAL),
@@ -87,7 +88,7 @@ func NewLoadBalancer(frontendEndpoint, backendEndpoint string) *loadBalancer {
 // Deletes worker from all data structures, and deletes worker.
 func (self *loadBalancer) deleteWorker(worker *lbWorker, disconnect bool) {
 	log.Info("----------------------------- Entra en deleteWorker")
-	log.Info("***************************** %d", worker.service.waiting.Len())
+	log.Infof("***************************** %d", worker.service.waiting.Len())
 	if worker == nil {
 		log.Warn("Nil worker")
 	}
@@ -102,19 +103,22 @@ func (self *loadBalancer) deleteWorker(worker *lbWorker, disconnect bool) {
 	}
 	self.waiting.Delete(worker)
 	delete(self.workers, worker.identity)
-	log.Info("***************************** %d", worker.service.waiting.Len())
+	log.Infof("***************************** %d", worker.service.waiting.Len())
 }
 
 // Decompose
 func (self *loadBalancer) decomposeMapOfInstancesMsg(msg []byte) []byte {
+	log.Info("----------------------------- Entra en decomposeMapOfInstancesMsg")
 	var levels []interface{}
 	if err := json.Unmarshal(msg, &levels); err != nil {
 		// TODO: Send an error
 	}
+	log.Infof("+Levels: %#v", levels)
 	var computedInstances []interface{}
 	var processMapLevels func([]interface{})
 	processMapLevels = func(levels []interface{}) {
 		for _, level := range levels {
+			log.Infof("-Level: %#v", level)
 			kind := reflect.TypeOf(level).Kind()
 			if kind == reflect.Slice || kind == reflect.Array {
 				processMapLevels(level.([]interface{}))
@@ -128,10 +132,13 @@ func (self *loadBalancer) decomposeMapOfInstancesMsg(msg []byte) []byte {
 	// TODO: extract uris
 	sortedInstanceUris := make([]string, 0)
 	for _, instance := range computedInstances {
-		sortedInstanceUris = append(sortedInstanceUris, instance["Info"].(map[string]interface{})["uri"].(string))
+		sortedInstanceUris = append(sortedInstanceUris, instance.(map[string]interface{})["Info"].(map[string]interface{})["uri"].(string))
 	}
 
 	uris, err := json.Marshal(sortedInstanceUris)
+	if err != nil {
+		// TODO
+	}
 	return uris
 }
 
@@ -143,11 +150,11 @@ func (self *loadBalancer) advanceShackle(chain lbChain) {
 	log.Infof("Elem %#v", elem)
 	if elem == nil {
 		// Decompose
-		instanceUrisMsg := decomposeMapOfInstancesMsg(chain.msg)
+		instanceUrisMsg := self.decomposeMapOfInstancesMsg(chain.msg)
 		msg := [][]byte{[]byte(chain.client), nil, instanceUrisMsg}
 		// msg := [][]byte{[]byte(chain.client), nil, chain.msg}
-		log.Info(">>>>>>>>>>>>>>> Sending message to Client from Server")
-		Dump(msg)
+		// log.Info(">>>>>>>>>>>>>>> Sending message to Client from Server")
+		// Dump(msg)
 		self.frontend.SendMultipart(msg, 0)
 		return
 	}
@@ -164,14 +171,14 @@ func (self *loadBalancer) advanceShackle(chain lbChain) {
 func (self *loadBalancer) dispatch(service *lbService, msg [][]byte) {
 	log.Info("----------------------------- Entra en dispatch")
 	log.Infof("***************************** %d", service.waiting.Len())
-	log.Infof("Service Object: %#v", service)
-	log.Info("Sending DISPATCH")
+	// log.Infof("Service Object: %#v", service)
+	// log.Info("Sending DISPATCH")
 	if service == nil {
 		log.Fatal("Nil service")
 	}
 	// Queue message if any
 	if len(msg) != 0 {
-		log.Info("Queue message if any")
+		// log.Info("Queue message if any")
 		service.requests = append(service.requests, msg)
 	}
 	self.purgeWorkers()
@@ -179,7 +186,7 @@ func (self *loadBalancer) dispatch(service *lbService, msg [][]byte) {
 	log.Infof("??? len(service.requests): %d", len(service.requests))
 	for service.waiting.Len() > 0 && len(service.requests) > 0 {
 		msg, service.requests = service.requests[0], service.requests[1:]
-		log.Info("------- service.waiting.Pop")
+		log.Info("------- service.waiting.Pop ----------------------------------------------------------------------------------------------------------")
 		elem := service.waiting.Pop()
 		self.waiting.Remove(elem)
 		worker, _ := elem.Value.(*lbWorker)
@@ -204,12 +211,16 @@ func (self *loadBalancer) registerChain(client []byte, msg [][]byte) {
 		shackles: NewList(),
 	}
 	for _, service := range services {
-		log.Infof("serviceArgs %#v", service.Args)
+		// log.Infof("serviceArgs %#v", service.Args)
+		args := service.Args
+		args["appId"] = chain.app
 		chain.shackles.PushBack(lbShackle{
 			serviceName: service.Id,
-			serviceArgs: service.Args,
+			// serviceArgs: service.Args,
+			serviceArgs: args,
 		})
 	}
+	log.Infof("%#v", chain.shackles)
 	self.chains[string(client)] = chain
 }
 
@@ -248,9 +259,10 @@ func (self *loadBalancer) processWorker(sender []byte, msg [][]byte) {
 		// log.Infof("Registering new worker: %s\n", identity)
 	}
 
-	log.Debugf("COMMAND: %s", string(command))
+	// log.Infof("COMMAND: %s", string(command))
 	switch string(command) {
 	case SIGNAL_READY:
+		log.Info("COMMAND: READY")
 		//  At least, a service name
 		if len(msg) < 1 {
 			log.Warn("Invalid message from worker, service name is missing")
@@ -259,22 +271,25 @@ func (self *loadBalancer) processWorker(sender []byte, msg [][]byte) {
 		}
 		service := msg[0]
 		//  Not first command in session or Reserved service name
-		log.Info("workerReady %t", workerReady)
+		// log.Info("workerReady %t", workerReady)
 		if workerReady || string(service[:4]) == INTERNAL_SERVICE_PREFIX {
 			self.deleteWorker(worker, true)
 		} else {
 			//  Attach worker to service and mark as idle
-			log.Info("++++++++++++++++++ Attach worker")
+			// log.Info("++++++++++++++++++ Attach worker")
 			worker.service = self.requireService(string(service))
+			log.Infof("***************************** %d", worker.service.waiting.Len())
 			self.workerWaiting(worker)
 			log.Infof("Registered new worker for service %s\n", worker.service.name)
+			log.Infof("***************************** %d", worker.service.waiting.Len())
 		}
 	case SIGNAL_REPLY:
+		log.Info("COMMAND: REPLY")
 		if workerReady {
 			//  Remove & save client return envelope and insert the
 			//  protocol header and service name, then rewrap envelope.
-			log.Info(">>>>>>>>>>>>>>>> Message REPLY from WORKER: ")
-			Dump(msg)
+			// log.Info(">>>>>>>>>>>>>>>> Message REPLY from WORKER: ")
+			// Dump(msg)
 			client := msg[0]
 			chain := self.chains[string(client)]
 			chain.msg = msg[2]
@@ -284,14 +299,17 @@ func (self *loadBalancer) processWorker(sender []byte, msg [][]byte) {
 			self.deleteWorker(worker, true)
 		}
 	case SIGNAL_HEARTBEAT:
+		log.Info("COMMAND: HEARTBEAT")
 		if workerReady {
 			worker.expiry = time.Now().Add(HEARTBEAT_EXPIRY)
 		} else {
 			self.deleteWorker(worker, true)
 		}
 	case SIGNAL_DISCONNECT:
+		log.Info("COMMAND: DISCONNECT")
 		self.deleteWorker(worker, false)
 	default:
+		log.Info("COMMAND: OTHER")
 		log.Warn("Invalid message in Load Balancer")
 		Dump(msg)
 	}
@@ -302,6 +320,7 @@ func (self *loadBalancer) processWorker(sender []byte, msg [][]byte) {
 //  Workers are oldest to most recent, so we stop at the first alive worker.
 func (self *loadBalancer) purgeWorkers() {
 	log.Info("----------------------------- Entra en purgeWorkers")
+	log.Infof("?????? self.waiting.Len: %d", self.waiting.Len())
 	now := time.Now()
 	for elem := self.waiting.Front(); elem != nil; elem = self.waiting.Front() {
 		worker, _ := elem.Value.(*lbWorker)
@@ -311,6 +330,7 @@ func (self *loadBalancer) purgeWorkers() {
 		}
 		self.deleteWorker(worker, false)
 	}
+	log.Infof("?????? self.waiting.Len: %d", self.waiting.Len())
 }
 
 // Locates the service (creates if necessary).
@@ -319,19 +339,22 @@ func (self *loadBalancer) requireService(name string) *lbService {
 	if len(name) == 0 {
 		log.Warn("Invalid service name have been required")
 	}
-	log.Infof("***************************** Service Len: %d", len(self.services))
-	for key, _ := range self.services {
-		log.Info(">>>>>>>>>>>>>>>> Service KEY: " + key)
-	}
+	// log.Infof("***************************** Service Len: %d", len(self.services))
+	// for key, _ := range self.services {
+	// 	log.Info(">>>>>>>>>>>>>>>> Service KEY: " + key)
+	// }
 	service, ok := self.services[name]
-	log.Info("Require Service is OK = %t", ok)
+	// log.Info("Require Service is OK = %t", ok)
+	// log.Infof("***************************** %d", service.waiting.Len())
 	if !ok {
+		log.Info("---------------UUUUUUUUUUUUUUUUUUU OK IS FALSE UUUUUUUUUUUUUUUUUUU----------------")
 		service = &lbService{
 			name:    name,
 			waiting: NewList(),
 		}
 		self.services[name] = service
 	}
+	log.Infof("***************************** %d", service.waiting.Len())
 	return service
 }
 
@@ -351,6 +374,7 @@ func (self *loadBalancer) sendToWorker(worker *lbWorker, command string, option 
 	// 	Dump(msg)
 	// }
 	self.backend.SendMultipart(msg, 0)
+	log.Infof("***************************** %d", worker.service.waiting.Len())
 }
 
 //  Handle internal service according to 8/MMI specification
@@ -377,10 +401,11 @@ func (self *loadBalancer) workerWaiting(worker *lbWorker) {
 	log.Info("----------------------------- Entra en workerWaiting")
 	log.Info("***************************** %d", worker.service.waiting.Len())
 	self.waiting.PushBack(worker)
-	log.Info("***************************** %d", worker.service.waiting.Len())
+	// log.Info("***************************** %d", worker.service.waiting.Len())
 	worker.service.waiting.PushBack(worker)
 	worker.expiry = time.Now().Add(HEARTBEAT_EXPIRY)
 	self.dispatch(worker.service, nil)
+	log.Info("***************************** %d", worker.service.waiting.Len())
 }
 
 func (self *loadBalancer) Close() {
@@ -408,7 +433,7 @@ func (self *loadBalancer) Run() {
 		}
 
 		if items[0].REvents&zmq.POLLIN != 0 {
-			log.Info("Load Balancer Recv Msg")
+			// log.Info("Load Balancer Recv Msg")
 			msg, _ := self.frontend.RecvMultipart(0)
 			log.Info(">>>>>>>>>>>>>>>>>>> Receiving message from Client <<<<<<<<<<<<<<<<<<<<<")
 			Dump(msg)
