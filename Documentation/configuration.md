@@ -73,10 +73,8 @@ key_file = ""
 # Applications Configuration
 
 The applications settings allow to define for each application how they will be balanced by specifying 
-the (balancers) workers that will be part of the chain
+the (balancers) workers that will be part of the chain and their arguments. For example:
 
-La configuración de las aplicaciones permite definir por cada aplicación como estas serán balanceadas expecificando 
-los (workers) balanceadores que intervendrán, en que orden lo harán y que argumentos les serán pasados. Por ejemplo:
 
 ```JSON
 [{
