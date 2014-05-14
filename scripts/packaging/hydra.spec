@@ -2,12 +2,13 @@ Name: hydra
 Version: 3
 Release: 0
 Summary: Hydra
-Source0: hydra.tar.gz
+Source0: hydra-3.0.tar.gz
 License: MIT
 Group: custom
 URL: https://github.com/innotech/hydra
 BuildArch: x86_64
 BuildRoot: %{_tmppath}/%{name}-buildroot
+Requires: libzmq3
 %description
 Hydra is multi-cloud application discovery, management and balancing service.
 Hydra attempts to ease the routing and balancing burden from servers and delegate it on the client (browser, mobile app, etc).
@@ -16,6 +17,7 @@ Hydra attempts to ease the routing and balancing burden from servers and delegat
 %build
 %install
 install -m 0755 -d $RPM_BUILD_ROOT/usr/local/hydra
+install -m 0755 hydra $RPM_BUILD_ROOT/usr/local/hydra/hydra
 
 install -m 0755 -d $RPM_BUILD_ROOT/etc/init.d
 install -m 0755 hydra-init.d.sh $RPM_BUILD_ROOT/etc/init.d/hydra
