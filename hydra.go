@@ -64,7 +64,7 @@ func main() {
 		}()
 
 		// Public Server API
-		const loadBalancerFrontendEndpoint string = "ipc://frontend.ipc"
+		var loadBalancerFrontendEndpoint string = "ipc://" + conf.Name + "-frontend.ipc"
 		publicHydraListener, err := net.Listen("tcp", conf.PublicAddr)
 		if err != nil {
 			log.Fatalf("Failed to create hydra public listener: ", err)
