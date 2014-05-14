@@ -6,9 +6,8 @@ Source0: hydra.tar.gz
 License: MIT
 Group: custom
 URL: https://github.com/innotech/hydra
-BuildArch: noarch
+BuildArch: x86_64
 BuildRoot: %{_tmppath}/%{name}-buildroot
-# Requires: python-psutil
 %description
 Hydra is multi-cloud application discovery, management and balancing service.
 Hydra attempts to ease the routing and balancing burden from servers and delegate it on the client (browser, mobile app, etc).

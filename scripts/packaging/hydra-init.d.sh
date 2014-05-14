@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# Hydra Basic Probe - Startup script for Hydra Basic Probe
+# Hydra - Startup script for Hydra Server
 
 # chkconfig: 35 99 15
-# description: App for monitoring process to report status to Hydra 
-# processname: python
+# description: Service for application discovery, management and balancing services
+# processname: hydra
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
 # config: 
-# pidfile: /var/run/hydra-basic-probe.pid
+# pidfile: /var/run/hydra.pid
 
 DISTRO_INFO=$(cat /proc/version)
 
@@ -16,11 +16,11 @@ if [[ $(echo $DISTRO_INFO | grep 'Debian\|Ubuntu') == "" ]]; then
 	. /etc/rc.d/init.d/functions
 fi
 
-APP_NAME=hydra-basic-probe
+APP_NAME=hydra
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/usr/local/hydra-basic-probe/hydra-basic-probe.py
-DAEMON_ARGS="-c /etc/hydra-basic-probe/hydra-basic-probe.cfg"
-RUNDIR=/usr/local/hydra-basic-probe
+DAEMON=/usr/local/hydra/hydra
+DAEMON_ARGS=""
+RUNDIR=/usr/local/hydra
 PID_DIR=/var/run
 PID_NAME=$APP_NAME.pid
 PID_FILE=$PID_DIR/$PID_NAME
