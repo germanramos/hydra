@@ -9,6 +9,7 @@ URL: https://github.com/innotech/hydra
 BuildArch: x86_64
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Requires: libzmq3
+AutoReqProv: no
 %description
 Hydra is multi-cloud application discovery, management and balancing service.
 Hydra attempts to ease the routing and balancing burden from servers and delegate it on the client (browser, mobile app, etc).
