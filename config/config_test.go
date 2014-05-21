@@ -25,6 +25,7 @@ var _ = Describe("Config", func() {
 		Context("when the TOML file exists", func() {
 			const (
 				APPS_FILE          string = "/etc/hydra-test/apps.json"
+				BIND_ADDR          string = "127.0.0.1:5011"
 				CA_FILE            string = "./fixtures/ca/server-chain.pem"
 				CERT_FILE          string = "./fixtures/ca/server.crt"
 				DATA_DIR           string = "/tmp/hydra-0"
@@ -40,13 +41,17 @@ var _ = Describe("Config", func() {
 				SNAPSHOT           bool   = false
 				SNAPSHOT_COUNT     int    = 333
 
-				PEER_ADDR      string = "127.0.0.1:8001"
-				PEER_CA_FILE   string = "./fixtures/ca/peer_server-chain.pem"
-				PEER_CERT_FILE string = "./fixtures/ca/peer_server.crt"
-				PEER_KEY_FILE  string = "./fixtures/ca/peer_server.key.insecure"
+				PEER_ADDR              string = "127.0.0.1:8001"
+				PEER_BIND_ADDR         string = "127.0.0.1:8011"
+				PEER_CA_FILE           string = "./fixtures/ca/peer_server-chain.pem"
+				PEER_CERT_FILE         string = "./fixtures/ca/peer_server.crt"
+				PEER_KEY_FILE          string = "./fixtures/ca/peer_server.key.insecure"
+				PEER_HEARTBEAT_TIMEOUT int    = 55
+				PEER_ELECTION_TIMEOUT  int    = 207
 			)
 			fileContent := `
 				addr = "` + ETCD_ADDR + `"
+				bind_addr = "` + BIND_ADDR + `"
 				apps_file = "` + APPS_FILE + `"
 				ca_file = "` + CA_FILE + `"
 				cert_file = "` + CERT_FILE + `"
@@ -62,9 +67,12 @@ var _ = Describe("Config", func() {
 				snapshot_count = ` + strconv.FormatInt(int64(SNAPSHOT_COUNT), 10) + `
 				[peer]
 				addr = "` + PEER_ADDR + `"
+				bind_addr = "` + PEER_BIND_ADDR + `"
 				ca_file = "` + PEER_CA_FILE + `"
 				cert_file = "` + PEER_CERT_FILE + `"
 				key_file = "` + PEER_KEY_FILE + `"
+				heartbeat_timeout = ` + strconv.FormatInt(int64(PEER_HEARTBEAT_TIMEOUT), 10) + `
+				election_timeout = ` + strconv.FormatInt(int64(PEER_ELECTION_TIMEOUT), 10) + ` 
 			`
 			WithTempFile(fileContent, func(pathToFile string) {
 				c := New()
@@ -72,6 +80,7 @@ var _ = Describe("Config", func() {
 				It("should be loaded successfully", func() {
 					Expect(err).To(BeNil(), "error should be nil")
 					Expect(c.AppsFile).To(Equal(APPS_FILE))
+					Expect(c.BindAddr).To(Equal(BIND_ADDR))
 					Expect(c.CAFile).To(Equal(CA_FILE))
 					Expect(c.CertFile).To(Equal(CERT_FILE))
 					Expect(c.DataDir).To(Equal(DATA_DIR))
@@ -88,9 +97,12 @@ var _ = Describe("Config", func() {
 					Expect(c.Snapshot).To(Equal(SNAPSHOT))
 					Expect(c.SnapshotCount).To(Equal(SNAPSHOT_COUNT))
 					Expect(c.Peer.Addr).To(Equal(PEER_ADDR))
+					Expect(c.Peer.BindAddr).To(Equal(PEER_BIND_ADDR))
 					Expect(c.Peer.CAFile).To(Equal(PEER_CA_FILE))
 					Expect(c.Peer.CertFile).To(Equal(PEER_CERT_FILE))
 					Expect(c.Peer.KeyFile).To(Equal(PEER_KEY_FILE))
+					Expect(c.Peer.HeartbeatTimeout).To(Equal(PEER_HEARTBEAT_TIMEOUT))
+					Expect(c.Peer.ElectionTimeout).To(Equal(PEER_ELECTION_TIMEOUT))
 				})
 			})
 		})
@@ -117,9 +129,11 @@ var _ = Describe("Config", func() {
 				Expect(err).To(BeNil(), "error should be nil")
 				Expect(c.AppsFile).To(Equal(DEFAULT_APPS_FILE))
 				Expect(c.DataDir).To(Equal(DEFAULT_DATA_DIR))
-				Expect(c.EtcdAddr).To(Equal(DEFAULT_ETCD_ADDR))
+				// Expect(c.EtcdAddr).To(Equal(DEFAULT_ETCD_ADDR))
 				Expect(c.LoadBalancerAddr).To(Equal(DEFAULT_LOAD_BALANCER_ADDR))
 				Expect(c.Peer.Addr).To(Equal(DEFAULT_PEER_ADDR))
+				Expect(c.Peer.HeartbeatTimeout).To(Equal(DEFAULT_PEER_HEARTBEAT_TIMEOUT))
+				Expect(c.Peer.ElectionTimeout).To(Equal(DEFAULT_PEER_ELECTION_TIMEOUT))
 				Expect(c.PrivateAddr).To(Equal(DEFAULT_PRIVATE_ADDR))
 				Expect(c.PublicAddr).To(Equal(DEFAULT_PUBLIC_ADDR))
 				Expect(c.Snapshot).To(Equal(DEFAULT_SNAPSHOT))
@@ -161,6 +175,15 @@ var _ = Describe("Config", func() {
 			It("should be loaded successfully", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(c.EtcdAddr).To(Equal(ETCD_ADDR))
+			})
+		})
+		Context("When -bind-addr flag exists", func() {
+			const BIND_ADDR string = "127.0.0.1:6011"
+			c := New()
+			err := c.LoadFlags([]string{"-bind-addr", BIND_ADDR})
+			It("should be loaded successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(c.BindAddr).To(Equal(BIND_ADDR))
 			})
 		})
 		Context("When -apps-file flag exists", func() {
@@ -260,6 +283,15 @@ var _ = Describe("Config", func() {
 				Expect(c.Peer.Addr).To(Equal(PEER_ADDR))
 			})
 		})
+		Context("When -peer-bind-addr flag exists", func() {
+			const PEER_BIND_ADDR string = "127.0.0.1:8011"
+			c := New()
+			err := c.LoadFlags([]string{"-peer-bind-addr", PEER_BIND_ADDR})
+			It("should be loaded successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(c.Peer.BindAddr).To(Equal(PEER_BIND_ADDR))
+			})
+		})
 		Context("When -peer-ca-file flag exists", func() {
 			const PEER_CA_FILE string = "./fixtures/ca/peer_server-chain.pem"
 			c := New()
@@ -269,7 +301,7 @@ var _ = Describe("Config", func() {
 				Expect(c.Peer.CAFile).To(Equal(PEER_CA_FILE))
 			})
 		})
-		Context("When -peer-cert-file flag exists", func() {
+		Context("When -peer-heartbeat-timeout flag exists", func() {
 			const PEER_CERT_FILE string = "./fixtures/ca/peer_server.crt"
 			c := New()
 			err := c.LoadFlags([]string{"-peer-cert-file", PEER_CERT_FILE})
@@ -285,6 +317,24 @@ var _ = Describe("Config", func() {
 			It("should be loaded successfully", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(c.Peer.KeyFile).To(Equal(PEER_KEY_FILE))
+			})
+		})
+		Context("When -peer-heartbeat-timeout flag exists", func() {
+			const PEER_HEARTBEAT_TIMEOUT int = 21
+			c := New()
+			err := c.LoadFlags([]string{"-peer-heartbeat-timeout", strconv.FormatInt(int64(PEER_HEARTBEAT_TIMEOUT), 10)})
+			It("should be loaded successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(c.Peer.HeartbeatTimeout).To(Equal(PEER_HEARTBEAT_TIMEOUT))
+			})
+		})
+		Context("When -peer-election-timeout flag exists", func() {
+			const PEER_ELECTION_TIMEOUT int = 201
+			c := New()
+			err := c.LoadFlags([]string{"-peer-election-timeout", strconv.FormatInt(int64(PEER_ELECTION_TIMEOUT), 10)})
+			It("should be loaded successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(c.Peer.ElectionTimeout).To(Equal(PEER_ELECTION_TIMEOUT))
 			})
 		})
 		Context("When -peers flag exists", func() {
@@ -408,6 +458,9 @@ var _ = Describe("Config", func() {
 			c.Snapshot = false
 			c.SnapshotCount = 222
 			c.Peer.Addr = "127.0.0.1:7711"
+			c.Peer.BindAddr = "127.0.0.1:7722"
+			c.Peer.HeartbeatTimeout = 23
+			c.Peer.ElectionTimeout = 203
 			err := c.LoadEtcdConfig()
 			It("should be loaded successfully", func() {
 				Expect(err).To(BeNil(), "error should be nil")
@@ -418,6 +471,9 @@ var _ = Describe("Config", func() {
 				Expect(c.EtcdConf.Snapshot).To(Equal(c.Snapshot))
 				Expect(c.EtcdConf.SnapshotCount).To(Equal(c.SnapshotCount))
 				Expect(c.EtcdConf.Peer.Addr).To(Equal("http://" + c.Peer.Addr))
+				Expect(c.EtcdConf.Peer.BindAddr).To(Equal(c.Peer.BindAddr))
+				Expect(c.EtcdConf.Peer.HeartbeatTimeout).To(Equal(c.Peer.HeartbeatTimeout))
+				Expect(c.EtcdConf.Peer.ElectionTimeout).To(Equal(c.Peer.ElectionTimeout))
 			})
 		})
 		Context("When transport Security with HTTPS will be enabled", func() {

@@ -17,16 +17,18 @@ import (
 )
 
 const (
-	DEFAULT_APPS_FILE          = "/etc/hydra/apps.json"
-	DEFAULT_CONFIG_FILE_PATH   = "/etc/hydra/hydra.conf"
-	DEFAULT_DATA_DIR           = "/tmp/hydra"
-	DEFAULT_ETCD_ADDR          = "127.0.0.1:4001"
-	DEFAULT_LOAD_BALANCER_ADDR = "*:7777"
-	DEFAULT_PEER_ADDR          = "127.0.0.1:7001"
-	DEFAULT_PRIVATE_ADDR       = "127.0.0.1:7771"
-	DEFAULT_PUBLIC_ADDR        = "127.0.0.1:7772"
-	DEFAULT_SNAPSHOT           = true
-	DEFAULT_SNAPSHOT_COUNT     = 20000
+	DEFAULT_APPS_FILE              = "/etc/hydra/apps.json"
+	DEFAULT_CONFIG_FILE_PATH       = "/etc/hydra/hydra.conf"
+	DEFAULT_DATA_DIR               = "/tmp/hydra"
+	DEFAULT_ETCD_ADDR              = "127.0.0.1:7401"
+	DEFAULT_LOAD_BALANCER_ADDR     = "*:7777"
+	DEFAULT_PEER_ADDR              = "127.0.0.1:7701"
+	DEFAULT_PEER_HEARTBEAT_TIMEOUT = 50
+	DEFAULT_PEER_ELECTION_TIMEOUT  = 200
+	DEFAULT_PRIVATE_ADDR           = "127.0.0.1:7771"
+	DEFAULT_PUBLIC_ADDR            = "127.0.0.1:7772"
+	DEFAULT_SNAPSHOT               = true
+	DEFAULT_SNAPSHOT_COUNT         = 20000
 )
 
 type Config struct {
@@ -34,6 +36,7 @@ type Config struct {
 	AppsConf *ApplicationsConfig
 
 	AppsFile         string `toml:"apps_file"`
+	BindAddr         string `toml:"bind_addr"`
 	CAFile           string `toml:"ca_file"`
 	CertFile         string `toml:"cert_file"`
 	ConfigFilePath   string
@@ -50,10 +53,13 @@ type Config struct {
 	Snapshot         bool
 	SnapshotCount    int `toml:"snapshot_count"`
 	Peer             struct {
-		Addr     string `toml:"addr"`
-		CAFile   string `toml:"ca_file"`
-		CertFile string `toml:"cert_file"`
-		KeyFile  string `toml:"key_file"`
+		Addr             string `toml:"addr"`
+		BindAddr         string `toml:"bind_addr"`
+		CAFile           string `toml:"ca_file"`
+		CertFile         string `toml:"cert_file"`
+		KeyFile          string `toml:"key_file"`
+		HeartbeatTimeout int    `toml:"heartbeat_timeout"`
+		ElectionTimeout  int    `toml:"election_timeout"`
 	}
 }
 
@@ -63,13 +69,15 @@ func New() *Config {
 	c.AppsFile = DEFAULT_APPS_FILE
 	c.ConfigFilePath = DEFAULT_CONFIG_FILE_PATH
 	c.DataDir = DEFAULT_DATA_DIR
-	c.EtcdAddr = DEFAULT_ETCD_ADDR
+	// c.EtcdAddr = DEFAULT_ETCD_ADDR
 	c.LoadBalancerAddr = DEFAULT_LOAD_BALANCER_ADDR
 	c.PrivateAddr = DEFAULT_PRIVATE_ADDR
 	c.PublicAddr = DEFAULT_PUBLIC_ADDR
 	c.Snapshot = DEFAULT_SNAPSHOT
 	c.SnapshotCount = DEFAULT_SNAPSHOT_COUNT
 	c.Peer.Addr = DEFAULT_PEER_ADDR
+	c.Peer.HeartbeatTimeout = DEFAULT_PEER_HEARTBEAT_TIMEOUT
+	c.Peer.ElectionTimeout = DEFAULT_PEER_ELECTION_TIMEOUT
 
 	return c
 }
@@ -139,12 +147,13 @@ func (c *Config) LoadFlags(arguments []string) error {
 
 	f := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	f.SetOutput(ioutil.Discard)
+	f.StringVar(&c.EtcdAddr, "addr", c.EtcdAddr, "")
 	f.StringVar(&c.AppsFile, "apps-file", c.AppsFile, "")
+	f.StringVar(&c.BindAddr, "bind-addr", c.BindAddr, "")
 	f.StringVar(&c.CAFile, "ca-file", c.CAFile, "")
 	f.StringVar(&c.CertFile, "cert-file", c.CertFile, "")
 	f.StringVar(&c.DataDir, "data-dir", c.DataDir, "")
 	f.StringVar(&c.Discovery, "discovery", c.Discovery, "")
-	f.StringVar(&c.EtcdAddr, "addr", c.EtcdAddr, "")
 	f.StringVar(&c.KeyFile, "key-file", c.KeyFile, "")
 	f.BoolVar(&c.Force, "f", false, "")
 	f.BoolVar(&c.Force, "force", false, "")
@@ -157,9 +166,12 @@ func (c *Config) LoadFlags(arguments []string) error {
 	f.IntVar(&c.SnapshotCount, "snapshot-count", c.SnapshotCount, "")
 
 	f.StringVar(&c.Peer.Addr, "peer-addr", c.Peer.Addr, "")
+	f.StringVar(&c.Peer.BindAddr, "peer-bind-addr", c.Peer.BindAddr, "")
 	f.StringVar(&c.Peer.CAFile, "peer-ca-file", c.Peer.CAFile, "")
 	f.StringVar(&c.Peer.CertFile, "peer-cert-file", c.Peer.CertFile, "")
 	f.StringVar(&c.Peer.KeyFile, "peer-key-file", c.Peer.KeyFile, "")
+	f.IntVar(&c.Peer.HeartbeatTimeout, "peer-heartbeat-timeout", c.Peer.HeartbeatTimeout, "")
+	f.IntVar(&c.Peer.ElectionTimeout, "peer-election-timeout", c.Peer.ElectionTimeout, "")
 
 	// BEGIN IGNORED FLAGS
 	f.StringVar(&ignoredString, "config", "", "")
@@ -213,7 +225,11 @@ func (c *Config) makeEtcdConfig() string {
 		// *fileContent = *fileContent + line + "\n"
 		content = content + line + "\n"
 	}
-	addLineToFileContent(`addr = "` + c.EtcdAddr + `"`)
+	if c.EtcdAddr == "" {
+		addLineToFileContent(`addr = "` + DEFAULT_ETCD_ADDR + `"`)
+	} else {
+		addLineToFileContent(`addr = "` + c.EtcdAddr + `"`)
+	}
 	addLineToFileContent(`ca_file = "` + c.CAFile + `"`)
 	addLineToFileContent(`cert_file = "` + c.CertFile + `"`)
 	addLineToFileContent(`data_dir = "` + c.DataDir + `"`)
@@ -231,9 +247,12 @@ func (c *Config) makeEtcdConfig() string {
 	addLineToFileContent(`snapshot_count = ` + strconv.FormatInt(int64(c.SnapshotCount), 10))
 	addLineToFileContent(`[peer]`)
 	addLineToFileContent(`addr = "` + c.Peer.Addr + `"`)
+	addLineToFileContent(`bind_addr = "` + c.Peer.BindAddr + `"`)
 	addLineToFileContent(`ca_file = "` + c.Peer.CAFile + `"`)
 	addLineToFileContent(`cert_file = "` + c.Peer.CertFile + `"`)
 	addLineToFileContent(`key_file = "` + c.Peer.KeyFile + `"`)
+	addLineToFileContent(`heartbeat_timeout = ` + strconv.FormatInt(int64(c.Peer.HeartbeatTimeout), 10))
+	addLineToFileContent(`election_timeout = ` + strconv.FormatInt(int64(c.Peer.ElectionTimeout), 10))
 
 	return content
 }
