@@ -161,10 +161,12 @@ func (e *Etcd) Load() {
 	e.PeerServerListener = psListener
 }
 
-func (e *Etcd) Start(withEtcdServer string) {
+// func (e *Etcd) Start(withEtcdServer string) {
+func (e *Etcd) Start(withEtcdServer bool) {
 	e.PeerServer.Start(e.Config.Snapshot, e.Config.Peers)
 
-	if withEtcdServer == "ETCD_TEST" {
+	// if withEtcdServer == "ETCD_TEST" {
+	if withEtcdServer {
 		sListener := e.configEtcdListener()
 		go func() {
 			log.Infof("etcd server [name %s, listen on %s, advertised url %s]", e.EtcdServer.Name, sListener.Addr(), e.EtcdServer.URL())

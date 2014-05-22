@@ -48,10 +48,16 @@ func main() {
 	etcd.Load()
 	hydraEnv := os.Getenv("HYDRA_ENV")
 	if hydraEnv == "ETCD_TEST" {
-		etcd.Start(hydraEnv)
+		etcd.Start(true)
+		// etcd.Start(hydraEnv)
 	} else {
 		go func() {
-			etcd.Start(hydraEnv)
+			var withEtcdServer bool = false
+			if conf.EtcdAddr != "" {
+				withEtcdServer = true
+			}
+			etcd.Start(withEtcdServer)
+			// etcd.Start(hydraEnv)
 		}()
 
 		connector.SetEtcdConnector(etcd)
