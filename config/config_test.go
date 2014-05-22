@@ -40,6 +40,7 @@ var _ = Describe("Config", func() {
 				PUBLIC_ADDR        string = "127.0.0.1:8772"
 				SNAPSHOT           bool   = false
 				SNAPSHOT_COUNT     int    = 333
+				VERBOSE            bool   = false
 
 				PEER_ADDR              string = "127.0.0.1:8001"
 				PEER_BIND_ADDR         string = "127.0.0.1:8011"
@@ -65,6 +66,7 @@ var _ = Describe("Config", func() {
 				public_addr = "` + PUBLIC_ADDR + `"
 				snapshot = ` + strconv.FormatBool(SNAPSHOT) + `
 				snapshot_count = ` + strconv.FormatInt(int64(SNAPSHOT_COUNT), 10) + `
+				verbose = ` + strconv.FormatBool(VERBOSE) + `
 				[peer]
 				addr = "` + PEER_ADDR + `"
 				bind_addr = "` + PEER_BIND_ADDR + `"
@@ -96,6 +98,7 @@ var _ = Describe("Config", func() {
 					Expect(c.PublicAddr).To(Equal(PUBLIC_ADDR))
 					Expect(c.Snapshot).To(Equal(SNAPSHOT))
 					Expect(c.SnapshotCount).To(Equal(SNAPSHOT_COUNT))
+					Expect(c.Verbose).To(Equal(VERBOSE))
 					Expect(c.Peer.Addr).To(Equal(PEER_ADDR))
 					Expect(c.Peer.BindAddr).To(Equal(PEER_BIND_ADDR))
 					Expect(c.Peer.CAFile).To(Equal(PEER_CA_FILE))
@@ -138,6 +141,7 @@ var _ = Describe("Config", func() {
 				Expect(c.PublicAddr).To(Equal(DEFAULT_PUBLIC_ADDR))
 				Expect(c.Snapshot).To(Equal(DEFAULT_SNAPSHOT))
 				Expect(c.SnapshotCount).To(Equal(DEFAULT_SNAPSHOT_COUNT))
+				Expect(c.Verbose).To(Equal(DEFAULT_VERBOSE))
 			})
 		})
 		Context("when default system cofig file exists", func() {
@@ -383,6 +387,15 @@ var _ = Describe("Config", func() {
 			It("should be loaded successfully", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(c.SnapshotCount).To(Equal(SNAPSHOT_COUNT))
+			})
+		})
+		Context("When -verbose flag exists", func() {
+			c := New()
+			c.Verbose = false
+			err := c.LoadFlags([]string{"-verbose"})
+			It("should be loaded successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(c.Verbose).To(BeTrue())
 			})
 		})
 		Context("When -name flag exists", func() {

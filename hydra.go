@@ -22,6 +22,11 @@ func main() {
 		log.Fatal(err.Error() + "\n")
 	}
 
+	// Enable verbose option.
+	if conf.Verbose {
+		log.Verbose = true
+	}
+
 	if conf.DataDir == "" {
 		log.Fatal("Data dir does't exist")
 	}

@@ -29,6 +29,7 @@ const (
 	DEFAULT_PUBLIC_ADDR            = "127.0.0.1:7772"
 	DEFAULT_SNAPSHOT               = true
 	DEFAULT_SNAPSHOT_COUNT         = 20000
+	DEFAULT_VERBOSE                = false
 )
 
 type Config struct {
@@ -51,7 +52,8 @@ type Config struct {
 	PrivateAddr      string `toml:"private_addr"`
 	PublicAddr       string `toml:"public_addr"`
 	Snapshot         bool
-	SnapshotCount    int `toml:"snapshot_count"`
+	SnapshotCount    int  `toml:"snapshot_count"`
+	Verbose          bool `toml:"verbose"`
 	Peer             struct {
 		Addr             string `toml:"addr"`
 		BindAddr         string `toml:"bind_addr"`
@@ -75,6 +77,7 @@ func New() *Config {
 	c.PublicAddr = DEFAULT_PUBLIC_ADDR
 	c.Snapshot = DEFAULT_SNAPSHOT
 	c.SnapshotCount = DEFAULT_SNAPSHOT_COUNT
+	c.Verbose = DEFAULT_VERBOSE
 	c.Peer.Addr = DEFAULT_PEER_ADDR
 	c.Peer.HeartbeatTimeout = DEFAULT_PEER_HEARTBEAT_TIMEOUT
 	c.Peer.ElectionTimeout = DEFAULT_PEER_ELECTION_TIMEOUT
@@ -164,6 +167,7 @@ func (c *Config) LoadFlags(arguments []string) error {
 	f.StringVar(&c.PublicAddr, "public-addr", c.PublicAddr, "")
 	f.BoolVar(&c.Snapshot, "snapshot", true, "")
 	f.IntVar(&c.SnapshotCount, "snapshot-count", c.SnapshotCount, "")
+	f.BoolVar(&c.Verbose, "verbose", c.Verbose, "")
 
 	f.StringVar(&c.Peer.Addr, "peer-addr", c.Peer.Addr, "")
 	f.StringVar(&c.Peer.BindAddr, "peer-bind-addr", c.Peer.BindAddr, "")
