@@ -1,7 +1,7 @@
 # Roadmap
 
-* Upgrade to new etcd version.
+* Upgrade to new etcd's version.
 * Add security layer.
-* Deploy workers automatically.
-* Compile workers written in GO and Hydra in only one binary for high performance.
-* Distinguir los balanceadores corriendo en la misma máquina que el hydra server. Comunicate workers run in local machine throught zeromq inproc protocol.
+* Deploy workers automatically through Hydra server.
+* Compile workers written in GO and Hydra together in only one binary for increased performance and packaging.
+* Communicate workers running in local machine through inproc protocol.
