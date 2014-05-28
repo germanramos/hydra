@@ -19,7 +19,7 @@ fi
 APP_NAME=hydra
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/local/hydra/hydra
-DAEMON_ARGS=""
+DAEMON_ARGS=" &> /var/log/${APP_NAME}/hydra.log"
 RUNDIR=/usr/local/hydra
 PID_DIR=/var/run
 PID_NAME=$APP_NAME.pid
