@@ -27,6 +27,7 @@ type Etcd struct {
 	EtcdServer         *server.Server
 	PeerServer         *server.PeerServer
 	PeerServerListener net.Listener
+	Registry           *server.Registry
 }
 
 func New(conf *config.Config) *Etcd {
@@ -159,6 +160,7 @@ func (e *Etcd) Load() {
 	e.EtcdServer = s
 	e.PeerServer = ps
 	e.PeerServerListener = psListener
+	e.Registry = registry
 }
 
 // func (e *Etcd) Start(withEtcdServer string) {

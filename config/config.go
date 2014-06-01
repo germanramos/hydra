@@ -17,44 +17,46 @@ import (
 )
 
 const (
-	DEFAULT_APPS_FILE              = "/etc/hydra/apps.json"
-	DEFAULT_CONFIG_FILE_PATH       = "/etc/hydra/hydra.conf"
-	DEFAULT_DATA_DIR               = "/tmp/hydra"
-	DEFAULT_ETCD_ADDR              = "127.0.0.1:7401"
-	DEFAULT_LOAD_BALANCER_ADDR     = "*:7777"
-	DEFAULT_PEER_ADDR              = "127.0.0.1:7701"
-	DEFAULT_PEER_HEARTBEAT_TIMEOUT = 50
-	DEFAULT_PEER_ELECTION_TIMEOUT  = 200
-	DEFAULT_PRIVATE_ADDR           = "127.0.0.1:7771"
-	DEFAULT_PUBLIC_ADDR            = "127.0.0.1:7772"
-	DEFAULT_SNAPSHOT               = true
-	DEFAULT_SNAPSHOT_COUNT         = 20000
-	DEFAULT_VERBOSE                = false
+	DEFAULT_APPS_FILE                = "/etc/hydra/apps.json"
+	DEFAULT_CONFIG_FILE_PATH         = "/etc/hydra/hydra.conf"
+	DEFAULT_DATA_DIR                 = "/tmp/hydra"
+	DEFAULT_ETCD_ADDR                = "127.0.0.1:7401"
+	DEFAULT_INSTANCE_EXPIRATION_TIME = 30
+	DEFAULT_LOAD_BALANCER_ADDR       = "*:7777"
+	DEFAULT_PEER_ADDR                = "127.0.0.1:7701"
+	DEFAULT_PEER_HEARTBEAT_TIMEOUT   = 50
+	DEFAULT_PEER_ELECTION_TIMEOUT    = 200
+	DEFAULT_PRIVATE_ADDR             = "127.0.0.1:7771"
+	DEFAULT_PUBLIC_ADDR              = "127.0.0.1:7772"
+	DEFAULT_SNAPSHOT                 = true
+	DEFAULT_SNAPSHOT_COUNT           = 20000
+	DEFAULT_VERBOSE                  = false
 )
 
 type Config struct {
 	EtcdConf *etcdConfig.Config
 	AppsConf *ApplicationsConfig
 
-	AppsFile         string `toml:"apps_file"`
-	BindAddr         string `toml:"bind_addr"`
-	CAFile           string `toml:"ca_file"`
-	CertFile         string `toml:"cert_file"`
-	ConfigFilePath   string
-	DataDir          string `toml:"data_dir"`
-	Discovery        string
-	EtcdAddr         string `toml:"addr"`
-	Force            bool
-	KeyFile          string `toml:"key_file"`
-	LoadBalancerAddr string `toml:"load_balancer_addr"`
-	Name             string
-	Peers            []string
-	PrivateAddr      string `toml:"private_addr"`
-	PublicAddr       string `toml:"public_addr"`
-	Snapshot         bool
-	SnapshotCount    int  `toml:"snapshot_count"`
-	Verbose          bool `toml:"verbose"`
-	Peer             struct {
+	AppsFile               string `toml:"apps_file"`
+	BindAddr               string `toml:"bind_addr"`
+	CAFile                 string `toml:"ca_file"`
+	CertFile               string `toml:"cert_file"`
+	ConfigFilePath         string
+	DataDir                string `toml:"data_dir"`
+	Discovery              string
+	EtcdAddr               string `toml:"addr"`
+	Force                  bool
+	InstanceExpirationTime int    `toml:"instance_expiration_time"`
+	KeyFile                string `toml:"key_file"`
+	LoadBalancerAddr       string `toml:"load_balancer_addr"`
+	Name                   string
+	Peers                  []string
+	PrivateAddr            string `toml:"private_addr"`
+	PublicAddr             string `toml:"public_addr"`
+	Snapshot               bool
+	SnapshotCount          int  `toml:"snapshot_count"`
+	Verbose                bool `toml:"verbose"`
+	Peer                   struct {
 		Addr             string `toml:"addr"`
 		BindAddr         string `toml:"bind_addr"`
 		CAFile           string `toml:"ca_file"`
@@ -72,6 +74,7 @@ func New() *Config {
 	c.ConfigFilePath = DEFAULT_CONFIG_FILE_PATH
 	c.DataDir = DEFAULT_DATA_DIR
 	// c.EtcdAddr = DEFAULT_ETCD_ADDR
+	c.InstanceExpirationTime = DEFAULT_INSTANCE_EXPIRATION_TIME
 	c.LoadBalancerAddr = DEFAULT_LOAD_BALANCER_ADDR
 	c.PrivateAddr = DEFAULT_PRIVATE_ADDR
 	c.PublicAddr = DEFAULT_PUBLIC_ADDR
@@ -157,6 +160,7 @@ func (c *Config) LoadFlags(arguments []string) error {
 	f.StringVar(&c.CertFile, "cert-file", c.CertFile, "")
 	f.StringVar(&c.DataDir, "data-dir", c.DataDir, "")
 	f.StringVar(&c.Discovery, "discovery", c.Discovery, "")
+	f.IntVar(&c.InstanceExpirationTime, "instance-expiration-time", c.InstanceExpirationTime, "")
 	f.StringVar(&c.KeyFile, "key-file", c.KeyFile, "")
 	f.BoolVar(&c.Force, "f", false, "")
 	f.BoolVar(&c.Force, "force", false, "")
@@ -167,6 +171,7 @@ func (c *Config) LoadFlags(arguments []string) error {
 	f.StringVar(&c.PublicAddr, "public-addr", c.PublicAddr, "")
 	f.BoolVar(&c.Snapshot, "snapshot", true, "")
 	f.IntVar(&c.SnapshotCount, "snapshot-count", c.SnapshotCount, "")
+	f.BoolVar(&c.Verbose, "v", c.Verbose, "")
 	f.BoolVar(&c.Verbose, "verbose", c.Verbose, "")
 
 	f.StringVar(&c.Peer.Addr, "peer-addr", c.Peer.Addr, "")

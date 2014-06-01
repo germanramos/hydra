@@ -15,11 +15,11 @@ type PrivateServer struct {
 	Router      *mux.Router
 }
 
-func NewPrivateServer(l net.Listener) *PrivateServer {
+func NewPrivateServer(l net.Listener, defaultTTL int) *PrivateServer {
 	var p = new(PrivateServer)
 	p.Listener = l
 	p.Router = mux.NewRouter()
-	p.registerControllers()
+	p.registerControllers(defaultTTL)
 
 	return p
 }
@@ -29,8 +29,6 @@ func validateApp(app map[string]interface{}, vars map[string]string) bool {
 }
 
 func validateInstance(app map[string]interface{}, vars map[string]string) bool {
-	// log.Infof(">>>>>>>>>>> validateInstance APP: %#v", app)
-	// log.Infof(">>>>>>>>>>> validateInstance VARS: %#v", vars)
 	if len(app) == 1 {
 		var repo *repository.EtcdBaseRepository = repository.NewEctdRepository()
 		repo.SetCollection("/apps")
@@ -46,10 +44,10 @@ func validateInstance(app map[string]interface{}, vars map[string]string) bool {
 	}
 }
 
-func (p *PrivateServer) registerControllers() {
+func (p *PrivateServer) registerControllers(defaultTTL int) {
 	p.controllers = make([]controller.Controller, 2)
-	p.controllers[0], _ = controller.NewBasicController("/apps", validateApp)
-	p.controllers[1], _ = controller.NewBasicController("/apps/{appId}/Instances", validateInstance)
+	p.controllers[0], _ = controller.NewBasicController("/apps", true, defaultTTL, validateApp)
+	p.controllers[1], _ = controller.NewBasicController("/apps/{appId}/Instances", true, defaultTTL, validateInstance)
 }
 
 func (p *PrivateServer) RegisterHandlers() {

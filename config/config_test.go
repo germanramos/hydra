@@ -24,23 +24,24 @@ var _ = Describe("Config", func() {
 	Describe("loading from TOML", func() {
 		Context("when the TOML file exists", func() {
 			const (
-				APPS_FILE          string = "/etc/hydra-test/apps.json"
-				BIND_ADDR          string = "127.0.0.1:5011"
-				CA_FILE            string = "./fixtures/ca/server-chain.pem"
-				CERT_FILE          string = "./fixtures/ca/server.crt"
-				DATA_DIR           string = "/tmp/hydra-0"
-				DISCOVERY          string = "http://etcd.local:4001/v2/keys/_etcd/registry/examplecluster"
-				ETCD_ADDR          string = "127.0.0.1:5001"
-				KEY_FILE           string = "./fixtures/ca/server.key.insecure"
-				LOAD_BALANCER_ADDR string = "*:5555"
-				NAME               string = "hydra-0"
-				PEER_1             string = "192.168.113.101:7001"
-				PEER_2             string = "192.168.113.102:7001"
-				PRIVATE_ADDR       string = "127.0.0.1:8771"
-				PUBLIC_ADDR        string = "127.0.0.1:8772"
-				SNAPSHOT           bool   = false
-				SNAPSHOT_COUNT     int    = 333
-				VERBOSE            bool   = false
+				APPS_FILE                string = "/etc/hydra-test/apps.json"
+				BIND_ADDR                string = "127.0.0.1:5011"
+				CA_FILE                  string = "./fixtures/ca/server-chain.pem"
+				CERT_FILE                string = "./fixtures/ca/server.crt"
+				DATA_DIR                 string = "/tmp/hydra-0"
+				DISCOVERY                string = "http://etcd.local:4001/v2/keys/_etcd/registry/examplecluster"
+				ETCD_ADDR                string = "127.0.0.1:5001"
+				INSTANCE_EXPIRATION_TIME int    = 1000
+				KEY_FILE                 string = "./fixtures/ca/server.key.insecure"
+				LOAD_BALANCER_ADDR       string = "*:5555"
+				NAME                     string = "hydra-0"
+				PEER_1                   string = "192.168.113.101:7001"
+				PEER_2                   string = "192.168.113.102:7001"
+				PRIVATE_ADDR             string = "127.0.0.1:8771"
+				PUBLIC_ADDR              string = "127.0.0.1:8772"
+				SNAPSHOT                 bool   = false
+				SNAPSHOT_COUNT           int    = 333
+				VERBOSE                  bool   = false
 
 				PEER_ADDR              string = "127.0.0.1:8001"
 				PEER_BIND_ADDR         string = "127.0.0.1:8011"
@@ -58,6 +59,7 @@ var _ = Describe("Config", func() {
 				cert_file = "` + CERT_FILE + `"
 				data_dir = "` + DATA_DIR + `"
 				discovery = "` + DISCOVERY + `"
+				instance_expiration_time = ` + strconv.FormatInt(int64(INSTANCE_EXPIRATION_TIME), 10) + `
 				key_file = "` + KEY_FILE + `"
 				load_balancer_addr = "` + LOAD_BALANCER_ADDR + `"
 				name = "` + NAME + `"
@@ -88,6 +90,7 @@ var _ = Describe("Config", func() {
 					Expect(c.DataDir).To(Equal(DATA_DIR))
 					Expect(c.Discovery).To(Equal(DISCOVERY))
 					Expect(c.EtcdAddr).To(Equal(ETCD_ADDR))
+					Expect(c.InstanceExpirationTime).To(Equal(INSTANCE_EXPIRATION_TIME))
 					Expect(c.KeyFile).To(Equal(KEY_FILE))
 					Expect(c.LoadBalancerAddr).To(Equal(LOAD_BALANCER_ADDR))
 					Expect(c.Name).To(Equal(NAME))
@@ -132,6 +135,7 @@ var _ = Describe("Config", func() {
 				Expect(err).To(BeNil(), "error should be nil")
 				Expect(c.AppsFile).To(Equal(DEFAULT_APPS_FILE))
 				Expect(c.DataDir).To(Equal(DEFAULT_DATA_DIR))
+				Expect(c.InstanceExpirationTime).To(Equal(DEFAULT_INSTANCE_EXPIRATION_TIME))
 				// Expect(c.EtcdAddr).To(Equal(DEFAULT_ETCD_ADDR))
 				Expect(c.LoadBalancerAddr).To(Equal(DEFAULT_LOAD_BALANCER_ADDR))
 				Expect(c.Peer.Addr).To(Equal(DEFAULT_PEER_ADDR))
@@ -258,6 +262,15 @@ var _ = Describe("Config", func() {
 			It("should be loaded successfully", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(c.Force).To(BeTrue())
+			})
+		})
+		Context("When -instance-expiration-time flag exists", func() {
+			const INSTANCE_EXPIRATION_TIME int = 500
+			c := New()
+			err := c.LoadFlags([]string{"-instance-expiration-time", strconv.FormatInt(int64(INSTANCE_EXPIRATION_TIME), 10)})
+			It("should be loaded successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(c.InstanceExpirationTime).To(Equal(INSTANCE_EXPIRATION_TIME))
 			})
 		})
 		Context("When -key-file flag exists", func() {

@@ -67,7 +67,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to create hydra private listener: ", err)
 		}
-		var privateServer = server.NewPrivateServer(privateHydraListener)
+		var privateServer = server.NewPrivateServer(privateHydraListener, conf.InstanceExpirationTime)
 		privateServer.RegisterHandlers()
 		go func() {
 			log.Infof("hydra private server [name %s, listen on %s, advertised url %s]", conf.Name, conf.PrivateAddr, "http://"+conf.PrivateAddr)

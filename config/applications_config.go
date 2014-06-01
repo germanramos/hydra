@@ -42,7 +42,7 @@ func (a *ApplicationsConfig) loadAppsFromJSON(pathToFile string) error {
 // TODO: Test
 func (a *ApplicationsConfig) Persists() error {
 	for _, app := range a.Apps {
-		err := a.Repo.Set(&app)
+		err := a.Repo.Set(&app, "", nil, nil)
 		if err != nil {
 			log.Fatal("Error persisting app config")
 			// TODO: delete applications directory

@@ -6,7 +6,7 @@ import (
 	"github.com/innotech/hydra/log"
 	// "fmt"
 	"net/http"
-	// "strconv"
+	"strconv"
 	"strings"
 
 	"github.com/innotech/hydra/model/entity"
@@ -21,15 +21,19 @@ type Controller interface {
 }
 
 type BasicController struct {
+	allowOrigin   bool
 	basePath      string
+	defaultTTL    string
 	PathVariables []string
 	repo          *repository.EtcdBaseRepository
 	setValidation func(map[string]interface{}, map[string]string) bool
 }
 
-func NewBasicController(basePath string, setValidation func(map[string]interface{}, map[string]string) bool) (*BasicController, error) {
+func NewBasicController(basePath string, allowOrigin bool, defaultTTL int, setValidation func(map[string]interface{}, map[string]string) bool) (*BasicController, error) {
 	var b = new(BasicController)
+	b.allowOrigin = allowOrigin
 	b.basePath = basePath
+	b.defaultTTL = strconv.Itoa(defaultTTL)
 	b.setValidation = setValidation
 	var err error
 	b.PathVariables, err = extractPathVariables(basePath)
@@ -71,10 +75,17 @@ func (b *BasicController) GetConfiguredRepository(pathVars map[string]string) *r
 }
 
 func (a *BasicController) RegisterHandlers(r *mux.Router) {
-	r.HandleFunc(a.basePath+"/{id}", a.Delete).Methods("DELETE")
-	r.HandleFunc(a.basePath+"/{id}", a.Get).Methods("GET")
-	r.HandleFunc(a.basePath, a.List).Methods("GET")
-	r.HandleFunc(a.basePath, a.Set).Methods("POST")
+	if a.allowOrigin {
+		r.HandleFunc(a.basePath+"/{id}", a.Delete).Methods("DELETE", "OPTIONS")
+		r.HandleFunc(a.basePath+"/{id}", a.Get).Methods("GET", "OPTIONS")
+		r.HandleFunc(a.basePath, a.List).Methods("GET", "OPTIONS")
+		r.HandleFunc(a.basePath, a.Set).Methods("POST", "OPTIONS")
+	} else {
+		r.HandleFunc(a.basePath+"/{id}", a.Delete).Methods("DELETE")
+		r.HandleFunc(a.basePath+"/{id}", a.Get).Methods("GET")
+		r.HandleFunc(a.basePath, a.List).Methods("GET")
+		r.HandleFunc(a.basePath, a.Set).Methods("POST")
+	}
 }
 
 func (a *BasicController) Delete(rw http.ResponseWriter, req *http.Request) {
@@ -112,8 +123,11 @@ func (a *BasicController) List(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	rw.WriteHeader(http.StatusOK)
 	rw.Header().Set("Content-Type", "application/json")
+	// allow cross domain AJAX requests
+	rw.Header().Set("Access-Control-Allow-Origin", "*")
+	rw.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With")
+	rw.WriteHeader(http.StatusOK)
 	rw.Write(jsonOutput)
 }
 
@@ -135,7 +149,11 @@ func (a *BasicController) Set(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = a.GetConfiguredRepository(vars).Set(&app)
+	var ttl string = req.FormValue("ttl")
+	if ttl == "" {
+		ttl = a.defaultTTL
+	}
+	err = a.GetConfiguredRepository(vars).Set(&app, ttl, rw, req)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return

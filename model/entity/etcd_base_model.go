@@ -2,6 +2,7 @@ package entity
 
 import (
 	"errors"
+	"log"
 	"reflect"
 	"strconv"
 	"strings"
@@ -104,6 +105,7 @@ func (e EtcdBaseModel) ExportEtcdOperations() (map[string]string, error) {
 	var processInterface func(interface{}, string) error
 	var processMap func(map[string]interface{}, string) error
 	var processSlice func([]interface{}, string) error
+	// var extractParentKeyOperation func(map[string]interface{})
 
 	processInterface = func(in interface{}, key string) error {
 		switch reflect.ValueOf(in).Kind() {
@@ -139,9 +141,25 @@ func (e EtcdBaseModel) ExportEtcdOperations() (map[string]string, error) {
 		return nil
 	}
 
+	// extractParentKeyOperation = func(object map[string]interface{}) {
+	// 	if len(object) == 1 {
+	// 		for key, _ := range object {
+	// 			// operations["/"+key] = ""
+	// 			operations[key] = ""
+	// 			break
+	// 		}
+	// 	}
+	// }
+	// Extract parent key
+	// extractParentKeyOperation(e)
+	// log.Println("PRE -> OPERATIONS")
+	// log.Printf("%#v", operations)
+	// Process entity
 	if err := processMap(e, ""); err != nil {
 		return nil, err
 	}
+	log.Println("OPERATIONS")
+	log.Printf("%#v", operations)
 	return operations, nil
 }
 
