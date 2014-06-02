@@ -19,12 +19,14 @@ fi
 APP_NAME=hydra
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/local/hydra/hydra
-DAEMON_ARGS=" &> /var/log/${APP_NAME}/hydra.log"
+DAEMON_ARGS=""
 RUNDIR=/usr/local/hydra
 PID_DIR=/var/run
 PID_NAME=$APP_NAME.pid
 PID_FILE=$PID_DIR/$PID_NAME
 LOCK_FILE=/var/lock/subsys/${APP_NAME}
+USER=root
+GROUP=root
 
 case "$1" in
 start)
@@ -32,8 +34,10 @@ start)
   then
     echo Already running with PID `cat $PID_FILE`
   else
+    cd $RUNDIR
+    rm -rf conf log snapshot
     if [[ $(echo $DISTRO_INFO | grep 'Debian\|Ubuntu') != "" ]]; then
-      if start-stop-daemon --start --pidfile $PID_FILE --chdir $RUNDIR --background --make-pidfile --exec $DAEMON -- $DAEMON_ARGS
+      if start-stop-daemon --start --pidfile $PID_FILE --chdir $RUNDIR --background --make-pidfile --exec $DAEMON -- $DAEMON_ARGS &> /var/log/${APP_NAME}/hydra.log
       then
         echo ok
       else
@@ -43,9 +47,8 @@ start)
       if [ ! -d /var/log/${APP_NAME} ]; then
         sudo mkdir /var/log/${APP_NAME}
       fi
-      sudo chown -R $USER:$GROUP /var/log/${APP_NAME}
-      cd $RUNDIR
-      $DAEMON $DAEMON_ARGS &>/dev/null &
+      sudo chown -R $USER:$GROUP /var/log/${APP_NAME}   
+      $DAEMON $DAEMON_ARGS &> /var/log/${APP_NAME}/hydra.log &
       RETVAL=$?
       if [ $RETVAL -eq 0 ]
       then
