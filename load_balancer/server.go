@@ -130,8 +130,10 @@ func (self *loadBalancer) decomposeMapOfInstancesMsg(msg []byte) []byte {
 	// TODO: extract uris
 	sortedInstanceUris := make([]string, 0)
 	for _, instance := range computedInstances {
-		if uri, ok := instance.(map[string]interface{})["Info"].(map[string]interface{})["uri"]; ok {
-			sortedInstanceUris = append(sortedInstanceUris, uri.(string))
+		if instance != nil {
+			if uri, ok := instance.(map[string]interface{})["Info"].(map[string]interface{})["uri"]; ok {
+				sortedInstanceUris = append(sortedInstanceUris, uri.(string))
+			}
 		} else {
 			log.Warn("Remove instance without uri attribute from last balancer response")
 		}

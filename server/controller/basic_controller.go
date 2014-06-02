@@ -70,8 +70,9 @@ func (b *BasicController) GetConfiguredRepository(pathVars map[string]string) *r
 		finalPath = strings.Replace(finalPath, "{"+key+"}", value, 1)
 	}
 	// log.Info("Controller Set Collection " + finalPath)
-	b.repo.SetCollection(finalPath)
-	return b.repo
+	repo := repository.NewEctdRepository()
+	repo.SetCollection(finalPath)
+	return repo
 }
 
 func (a *BasicController) RegisterHandlers(r *mux.Router) {
