@@ -88,7 +88,6 @@ func NewLoadBalancer(frontendEndpoint, backendEndpoint string) *loadBalancer {
 // Deletes worker from all data structures, and deletes worker.
 func (self *loadBalancer) deleteWorker(worker *lbWorker, disconnect bool) {
 	log.Info("----------------------------- Entra en deleteWorker")
-	log.Infof("***************************** %d", worker.service.waiting.Len())
 	if worker == nil {
 		log.Warn("Nil worker")
 	}
@@ -103,7 +102,6 @@ func (self *loadBalancer) deleteWorker(worker *lbWorker, disconnect bool) {
 	}
 	self.waiting.Delete(worker)
 	delete(self.workers, worker.identity)
-	log.Infof("***************************** %d", worker.service.waiting.Len())
 }
 
 // Decompose
@@ -132,7 +130,11 @@ func (self *loadBalancer) decomposeMapOfInstancesMsg(msg []byte) []byte {
 	// TODO: extract uris
 	sortedInstanceUris := make([]string, 0)
 	for _, instance := range computedInstances {
-		sortedInstanceUris = append(sortedInstanceUris, instance.(map[string]interface{})["Info"].(map[string]interface{})["uri"].(string))
+		if uri, ok := instance.(map[string]interface{})["Info"].(map[string]interface{})["uri"]; ok {
+			sortedInstanceUris = append(sortedInstanceUris, uri.(string))
+		} else {
+			log.Warn("Remove instance without uri attribute from last balancer response")
+		}
 	}
 
 	uris, err := json.Marshal(sortedInstanceUris)

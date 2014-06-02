@@ -165,7 +165,9 @@ func (e EtcdConnector) Set(key string, dir bool, value string, ttl string, w htt
 			return err
 		} else {
 			// log.Println("Pre WriteHeader 2")
-			w.WriteHeader(http.StatusOK)
+			if w != nil {
+				w.WriteHeader(http.StatusOK)
+			}
 			// log.Println("Post WriteHeader 2")
 
 			return nil
