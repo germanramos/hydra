@@ -39,8 +39,9 @@ func (b *BalancedInstancesController) sendZMQRequestToBalancer(app []byte, data 
 
 	log.Println("App: " + string(app))
 	// Dump(data)
+	log.Println("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨ START sendZMQRequestToBalancer")
 	reply = client.Send(app, data)
-	// log.Println("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨ RESPONSE sendZMQRequestToBalancer")
+	log.Println("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨ END sendZMQRequestToBalancer")
 	// Dump(reply)
 	// log.Println("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨ END RESPONSE sendZMQRequestToBalancer")
 	return
@@ -99,9 +100,18 @@ func (b *BalancedInstancesController) Get(rw http.ResponseWriter, req *http.Requ
 			}
 
 			response := b.sendZMQRequestToBalancer([]byte(appEntity.Id), [][]byte{balancers, instances})
+			log.Println("++++++++++++++++++ ZMQ RESPONSE ++++++++++++++++++")
+			log.Printf("%#v", response)
 			// TODO: process response
 
-			jsonOutput = response[0]
+			if len(response) > 0 {
+				jsonOutput = response[0]
+			} else {
+				log.Println("Zeromq request timeout expired")
+				http.Error(rw, "Zeromq request timeout expired", http.StatusInternalServerError)
+				return
+			}
+
 		} else {
 			jsonOutput = []byte("[]")
 		}

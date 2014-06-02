@@ -84,13 +84,13 @@ func (e *EtcdBaseRepository) Set(entity *entity.EtcdBaseModel, ttl string, w htt
 		return err
 	}
 	for key, value := range ops {
-		log.Println("Probe KEY: " + e.makePath(key))
-		log.Println("Probe KEY TTL: " + ttl)
+		// log.Println("Probe KEY: " + e.makePath(key))
+		// log.Println("Probe KEY TTL: " + ttl)
 		var dir bool = false
 		if value == "" {
 			dir = true
 		}
-		log.Printf("DIR: %#v", dir)
+		// log.Printf("DIR: %#v", dir)
 		if err := e.conn.Set(e.makePath(key), dir, value, ttl, w, req); err != nil {
 			// TODO: logger
 			log.Println("SET ERROR")

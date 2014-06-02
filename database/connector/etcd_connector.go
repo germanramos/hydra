@@ -111,9 +111,9 @@ func (e EtcdConnector) Set(key string, dir bool, value string, ttl string, w htt
 		}
 
 		if w != nil {
-			log.Println("Pre WriteHeader")
+			// log.Println("Pre WriteHeader")
 			w.WriteHeader(http.StatusOK)
-			log.Println("Post WriteHeader")
+			// log.Println("Post WriteHeader")
 		}
 
 		return nil
@@ -152,7 +152,7 @@ func (e EtcdConnector) Set(key string, dir bool, value string, ttl string, w htt
 		log.Printf("%#v", v)
 		// req, _ := http.NewRequest("PUT", leaderUrl+"/v2/keys"+key, strings.NewReader(v.Encode()))
 		req, _ := http.NewRequest("PUT", leaderUrl+"/v2/keys"+key+v, nil)
-		log.Println("CLIENT POST to: " + leaderUrl + "/v2/keys" + key)
+		// log.Println("CLIENT POST to: " + leaderUrl + "/v2/keys" + key)
 		// ...
 		// req.Header.Add("If-None-Match", `W/"wyzzy"`)
 		resp, err := client.Do(req)
@@ -164,9 +164,9 @@ func (e EtcdConnector) Set(key string, dir bool, value string, ttl string, w htt
 			log.Println(err)
 			return err
 		} else {
-			log.Println("Pre WriteHeader 2")
+			// log.Println("Pre WriteHeader 2")
 			w.WriteHeader(http.StatusOK)
-			log.Println("Post WriteHeader 2")
+			// log.Println("Post WriteHeader 2")
 
 			return nil
 		}

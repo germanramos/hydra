@@ -57,10 +57,22 @@ func (self *client) Send(service []byte, request [][]byte) (reply [][]byte) {
 	frame := append([][]byte{service}, request...)
 
 	log.Println("^^^^^^^^^^^^^^ PRE SEND TO SERVER")
-	self.socket.SendMultipart(frame, 0)
+	// tim, _ := self.socket.RcvTimeout()
+	// log.Println("RcvTimeout")
+	// log.Printf("%d", int64(tim))
+	var t time.Duration = 2500 * time.Millisecond
+	if err := self.socket.SetRcvTimeout(t); err != nil {
+		log.Println(err)
+	}
+	// time2, _ := self.socket.RcvTimeout()
+	// log.Println("RcvTimeout 2")
+	// log.Printf("%d", int64(time2))
+	self.socket.SendMultipart(frame, zmq.NOBLOCK)
+
+	log.Println("^^^^^^^^^^^^^^ POST SEND TO SERVER")
 
 	msg, _ := self.socket.RecvMultipart(0)
-	// log.Println("^^^^^^^^^^^^^^ RECV FROM SERVER")
+	log.Println("^^^^^^^^^^^^^^ RECV FROM SERVER")
 	// Dump(msg)
 	// log.Println("^^^^^^^^^^^^^^ END RECV FROM SERVER")
 
