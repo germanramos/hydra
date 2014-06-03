@@ -149,7 +149,6 @@ func (self *loadBalancer) decomposeMapOfInstancesMsg(msg []byte) []byte {
 // Dispatch chains advancing a shackle
 func (self *loadBalancer) advanceShackle(chain lbChain) {
 	log.Info("----------------------------- Entra en advanceShackle")
-	log.Infof("Chain Shackles Len %d", chain.shackles.Len())
 	elem := chain.shackles.Pop()
 	log.Infof("Elem %#v", elem)
 	if elem == nil {
@@ -174,7 +173,6 @@ func (self *loadBalancer) advanceShackle(chain lbChain) {
 // Dispatch requests to waiting workers as possible
 func (self *loadBalancer) dispatch(service *lbService, msg [][]byte) {
 	log.Info("----------------------------- Entra en dispatch")
-	log.Infof("***************************** %d", service.waiting.Len())
 	// log.Infof("Service Object: %#v", service)
 	// log.Info("Sending DISPATCH")
 	if service == nil {
@@ -198,7 +196,6 @@ func (self *loadBalancer) dispatch(service *lbService, msg [][]byte) {
 
 		self.sendToWorker(worker, SIGNAL_REQUEST, nil, msg)
 	}
-	log.Infof("***************************** %d", service.waiting.Len())
 }
 
 // Register chain from new client request
@@ -282,10 +279,8 @@ func (self *loadBalancer) processWorker(sender []byte, msg [][]byte) {
 			//  Attach worker to service and mark as idle
 			// log.Info("++++++++++++++++++ Attach worker")
 			worker.service = self.requireService(string(service))
-			log.Infof("***************************** %d", worker.service.waiting.Len())
 			self.workerWaiting(worker)
 			log.Infof("Registered new worker for service %s\n", worker.service.name)
-			log.Infof("***************************** %d", worker.service.waiting.Len())
 		}
 	case SIGNAL_REPLY:
 		log.Info("COMMAND: REPLY")
@@ -324,7 +319,6 @@ func (self *loadBalancer) processWorker(sender []byte, msg [][]byte) {
 //  Workers are oldest to most recent, so we stop at the first alive worker.
 func (self *loadBalancer) purgeWorkers() {
 	log.Info("----------------------------- Entra en purgeWorkers")
-	log.Infof("?????? self.waiting.Len: %d", self.waiting.Len())
 	now := time.Now()
 	for elem := self.waiting.Front(); elem != nil; elem = self.waiting.Front() {
 		worker, _ := elem.Value.(*lbWorker)
@@ -334,7 +328,6 @@ func (self *loadBalancer) purgeWorkers() {
 		}
 		self.deleteWorker(worker, false)
 	}
-	log.Infof("?????? self.waiting.Len: %d", self.waiting.Len())
 }
 
 // Locates the service (creates if necessary).
@@ -358,7 +351,6 @@ func (self *loadBalancer) requireService(name string) *lbService {
 		}
 		self.services[name] = service
 	}
-	log.Infof("***************************** %d", service.waiting.Len())
 	return service
 }
 
@@ -366,7 +358,6 @@ func (self *loadBalancer) requireService(name string) *lbService {
 //  If message is provided, sends that message.
 func (self *loadBalancer) sendToWorker(worker *lbWorker, command string, option []byte, msg [][]byte) {
 	log.Info("----------------------------- Entra en sendToWorker")
-	log.Infof("***************************** %d", worker.service.waiting.Len())
 	//  Stack routing and protocol envelopes to start of message and routing envelope
 	if len(option) > 0 {
 		msg = append([][]byte{option}, msg...)
@@ -378,7 +369,6 @@ func (self *loadBalancer) sendToWorker(worker *lbWorker, command string, option 
 	// 	Dump(msg)
 	// }
 	self.backend.SendMultipart(msg, 0)
-	log.Infof("***************************** %d", worker.service.waiting.Len())
 }
 
 //  Handle internal service according to 8/MMI specification
@@ -403,13 +393,11 @@ func (self *loadBalancer) sendToWorker(worker *lbWorker, command string, option 
 func (self *loadBalancer) workerWaiting(worker *lbWorker) {
 	//  Queue to broker and service waiting lists
 	log.Info("----------------------------- Entra en workerWaiting")
-	log.Info("***************************** %d", worker.service.waiting.Len())
 	self.waiting.PushBack(worker)
 	// log.Info("***************************** %d", worker.service.waiting.Len())
 	worker.service.waiting.PushBack(worker)
 	worker.expiry = time.Now().Add(HEARTBEAT_EXPIRY)
 	self.dispatch(worker.service, nil)
-	log.Info("***************************** %d", worker.service.waiting.Len())
 }
 
 func (self *loadBalancer) Close() {
