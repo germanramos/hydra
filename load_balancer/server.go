@@ -117,12 +117,14 @@ func (self *loadBalancer) decomposeMapOfInstancesMsg(msg []byte) []byte {
 	processMapLevels = func(levels []interface{}) {
 		for _, level := range levels {
 			log.Infof("-Level: %#v", level)
-			kind := reflect.TypeOf(level).Kind()
-			if kind == reflect.Slice || kind == reflect.Array {
-				processMapLevels(level.([]interface{}))
-			} else {
-				computedInstances = append(computedInstances, levels...)
-				return
+			if level != nil {
+				kind := reflect.TypeOf(level).Kind()
+				if kind == reflect.Slice || kind == reflect.Array {
+					processMapLevels(level.([]interface{}))
+				} else {
+					computedInstances = append(computedInstances, levels...)
+					return
+				}
 			}
 		}
 	}
