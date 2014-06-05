@@ -57,7 +57,7 @@ func (b *BalancedInstancesController) RegisterHandlers(r *mux.Router) {
 func (b *BalancedInstancesController) getActiveInstances(instances []Instance) []Instance {
 	activeInstances := make([]Instance, 0)
 	for _, instance := range instances {
-		if len(instance.Info) > 0 {
+		if len(instance.Info) > 0 && instance.Info["state"] == "0" {
 			activeInstances = append(activeInstances, instance)
 		}
 	}
@@ -125,38 +125,6 @@ func (b *BalancedInstancesController) Get(rw http.ResponseWriter, req *http.Requ
 		jsonOutput, _ = json.Marshal(sortedInstanceUris)
 	}
 
-	// balancers, err := json.Marshal(appEntity.Balancers)
-	// // log.Printf("Balancers: " + string(balancers))
-	// if err != nil {
-	// 	log.Println("No Balancers")
-	// 	http.Error(rw, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
-	// // TODO: check si hay Balanceadores a los que enviar por zeromq
-
-	// instances, err := json.Marshal(appEntity.Instances)
-	// // log.Printf("Instances: " + string(instances))
-	// if err != nil {
-	// 	log.Println("No Instances")
-	// 	http.Error(rw, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
-	// // TODO: check si hay instancias y si hay eliminar las vacias antes de enviar al load balancer
-
-	// // log.Println("PRE ZMQ send request")
-	// // log.Println(appId)
-	// // log.Println(appEntity.Id)
-	// // Request to balancer server
-	// response := b.sendZMQRequestToBalancer([]byte(appEntity.Id), [][]byte{balancers, instances})
-	// // TODO: process response
-
-	// jsonOutput := response[0]
-	// // jsonOutput, err := json.Marshal(response)
-	// // log.Println("EMIT RESPONSE TO FINAL CLIENT: " + string(jsonOutput))
-	// if err != nil {
-	// 	http.Error(rw, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
 	rw.WriteHeader(http.StatusOK)
 	rw.Header().Set("Content-Type", "application/json")
 	rw.Write(jsonOutput)
