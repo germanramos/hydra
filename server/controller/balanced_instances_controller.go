@@ -57,7 +57,7 @@ func (b *BalancedInstancesController) RegisterHandlers(r *mux.Router) {
 func (b *BalancedInstancesController) getActiveInstances(instances []Instance) []Instance {
 	activeInstances := make([]Instance, 0)
 	for _, instance := range instances {
-		if len(instance.Info) > 0 && instance.Info["state"] == "0" {
+		if len(instance.Info) > 0 && instance.Info["state"] == "0.00" {
 			activeInstances = append(activeInstances, instance)
 		}
 	}
