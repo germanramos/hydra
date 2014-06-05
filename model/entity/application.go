@@ -2,6 +2,7 @@ package entity
 
 import (
 	"errors"
+	"log"
 )
 
 type Application struct {
@@ -64,8 +65,15 @@ func extractBalancers(data map[string]interface{}) ([]Balancer, error) {
 
 func generateBalancers(balancers map[string]interface{}) ([]Balancer, error) {
 	var balancerEntities []Balancer = make([]Balancer, 0)
-	for id, data := range balancers {
-		balancer, err := NewBalancer(id, data.(map[string]interface{}))
+	for _, data := range balancers {
+		var id string = data.(map[string]interface{})["worker"].(string)
+		var workerData map[string]interface{} = make(map[string]interface{})
+		for key, value := range data.(map[string]interface{}) {
+			if key != "worker" {
+				workerData[key] = value
+			}
+		}
+		balancer, err := NewBalancer(id, workerData)
 		if err != nil {
 			return nil, err
 		}

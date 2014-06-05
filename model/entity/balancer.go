@@ -12,10 +12,10 @@ func NewBalancer(id string, data map[string]interface{}) (Balancer, error) {
 	}, nil
 }
 
-func NewBalancerFromEtcdBaseModel(e *EtcdBaseModel) (Balancer, error) {
-	id, data, err := e.Explode()
-	if err != nil {
-		return Balancer{}, err
-	}
-	return NewBalancer(id, data)
-}
+// func NewBalancerFromEtcdBaseModel(e *EtcdBaseModel) (Balancer, error) {
+// 	id, data, err := e.Explode()
+// 	if err != nil {
+// 		return Balancer{}, err
+// 	}
+// 	return NewBalancer(id, data)
+// }
