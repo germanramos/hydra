@@ -157,6 +157,7 @@ func (e EtcdConnector) Set(key string, dir bool, value string, ttl string, w htt
 		// req.Header.Add("If-None-Match", `W/"wyzzy"`)
 		resp, err := client.Do(req)
 		log.Printf("%#v", resp)
+		resp.Body.Close()
 		// _, err := http.PostForm(leaderUrl+key,
 		// 	url.Values{"dir": {strconv.FormatBool(dir)}, "value": {value}, "ttl": {ttl}})
 
