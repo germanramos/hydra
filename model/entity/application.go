@@ -2,7 +2,6 @@ package entity
 
 import (
 	"errors"
-	"log"
 )
 
 type Application struct {
