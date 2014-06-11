@@ -9,10 +9,9 @@ http://innotech.github.io/hydra/
 Hydra is multi-cloud application discovery, management and balancing service.
 It attempts to ease the routing and balancing burden from servers and delegate it on the client (browser, mobile app, etc).
 
-Hydra is composed of 3 server-side applications:
-* <a href="https://github.com/innotech/hydra_server">Hydra Server</a>
-* <a href="https://github.com/innotech/hydra_app_manager">AppManager</a>
-* <a href="https://github.com/innotech/hydra_basic_probe">AppManager Info Server (Probe)</a>
+Hydra is composed of 2 server-side applications:
+* <a href="https://github.com/innotech/hydra">Hydra Server (This repository)</a>
+* <a href="https://github.com/innotech/hydra-basic-probe">Hydra Basic Probe</a>
 
 Also there is several client-side library:
 * <a href="https://github.com/innotech/hydra-javascript-client">Hydra Javascript Client</a>
@@ -20,14 +19,28 @@ Also there is several client-side library:
 * <a href="https://github.com/innotech/hydra-java-client">Hydra Java Client</a>
 
 Finally, there is web monitor that connects to an Hydra Server an print all the information:
-* <a href="https://github.com/innotech/hydra/tree/master/src/app_manager_sysmon">Hydra Sys Monitor</a>
+* <a href="https://github.com/innotech/hydra-web-monitor">Hydra Sys Monitor</a>
 
-To use Hydra, you need to deploy all the 3 server-side applications. 
-* An Hydra server per cloud to comunicate your applications to the world.
-* An AppManager per app to notify information to Hydra.
-* An AppManager Info Server on each single server your application is deployed in. AppManager will gather the status information connecting to it.
+To use Hydra, you need to deploy: 
+* At least one Hydra server (per cloud prefered) to comunicate your applications to the world.
+* An Hydra Basic Probe on each single server your application is deployed in. 
 
 For information on how to deploy each individual piece, check out their respective repositories.
+
+# Hydra Server
+
+The Hydra server is also composed by one core application and one or more add-ons. These add-ons are "workers" and Hydra use them in order to delegate the balance calculation. You can deploy as many workers as you want in the same server than Hydra or in different servers. The communication between Hydra Core and the workers is made with a TCP connection using ZeroMQ.
+
+## Hydra Core
+* <a href="https://github.com/innotech/hydra/blob/master/Documentation/configuration.md">Instalation and Configuration</a>
+* <a href="https://github.com/innotech/hydra/blob/master/Documentation/development_enviroment.md">Development Environment</a>
+* <a href="https://github.com/innotech/hydra/blob/master/Documentation/roadmap.md">Roadmap</a>
+
+## Hydra Workers
+* <a href="https://github.com/innotech/hydra-worker-round-robin">Round Robin Worker</a>
+* <a href="https://github.com/innotech/hydra-worker-map-sort">Map and Sort Worker</a>
+* <a href="https://github.com/innotech/hydra-worker-sort-by-number">Sort by Number Workder</a>
+* <a href="https://github.com/innotech/hydra-worker-map-by-limit">Map by Limir Worker</a>
 
 # License
 
