@@ -24,7 +24,7 @@ sudo /etc/init.d/hydra start
 
 # Hydra Configuration
 
-The hydra configuration file ("/etc/hydra/hydra.conf") includes many of the options availables in the etcd configuration and these arguments preserve the same names than the original version of etcd.
+The hydra configuration file ("/etc/hydra/hydra.conf") includes many of the options availables in the <a href="https://github.com/coreos/etcd/blob/master/README.md">ETCD</a> configuration and these arguments preserve the same names than the original version of etcd.
 
 Configuration options can be set in two places:
 
@@ -124,11 +124,11 @@ The applications settings ("/etc/init.d/apps.json") allow to define for each app
 				"sortAttr": "cpuLoad",
 				"order": 1
 			}
-		}
+		]
 	}
 }, {
 	"App2": {
-		"Balancers": {
+		"Balancers": [
 			{
 				"worker": "MapByLimit",
 				"limitAttr": "limit",
@@ -139,7 +139,7 @@ The applications settings ("/etc/init.d/apps.json") allow to define for each app
 				"worker": "RoundRobin"
 				"simple": "OK"
 			}
-		}
+		]
 	}
 }]
 ```
