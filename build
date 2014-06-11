@@ -1,0 +1,14 @@
+#!/bin/sh -e
+
+if [ ! -h src/github.com/innotech/hydra ]; then
+	mkdir -p src/github.com/innotech/
+	ln -s ../../.. src/github.com/innotech/hydra
+fi
+
+export GOBIN=${PWD}/bin
+#export GOPATH=${PWD}
+
+go clean
+go install -tags zmq_3_x
+go install github.com/innotech/hydra
+# go install github.com/coreos/etcd/bench

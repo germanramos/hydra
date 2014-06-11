@@ -1,0 +1,12 @@
+{
+	"dummy1": [{
+		"id": "cloud-map"
+	}, {
+		"id": "cpu-load"
+	}],
+	"dummy2": [{
+		"id": "cloud-map"
+	}, {
+		"id": "mem-load"
+	}]
+}

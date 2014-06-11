@@ -1,0 +1,14 @@
+[{
+	"App1": {
+		"Balancers": {
+			"MapByLimit": {	
+				"limitAttr": "limit",
+				"limitValue": 50,
+				"mapSort": "reverse"
+			},
+			"RoundRobin": {
+				"simple": "OK"
+			}
+		}
+	}
+}]
