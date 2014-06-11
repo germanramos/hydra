@@ -1,7 +1,30 @@
+# Hydra Installation
+
+## Ubuntu/Debian
+
+Add PPAs for:  
+https://launchpad.net/~chris-lea/+archive/libpgm  
+https://launchpad.net/~chris-lea/+archive/zeromq  
+  
+and execute:  
+```
+sudo dpkg -i hydra-3-0.x86_64.deb
+sudo apt-get install -f
+```
+## CentOS/RedHat/Fedora
+```
+sudo yum install libzmq3-3.2.2-13.1.x86_64.rpm hydra-3-0.x86_64.rpm
+```
+
+## Run
+Check the configurations files "hydra.conf" and "apps.json" under /etc/hydra directory. After that just run:
+```
+sudo /etc/init.d/hydra start
+```
+
 # Hydra Configuration
 
-The hydra configuration includes many of the options availables in the etcd configuration and these arguments 
-preserve the same names than the original version of etcd.
+The hydra configuration file ("/etc/hydra/hydra.conf") includes many of the options availables in the etcd configuration and these arguments preserve the same names than the original version of etcd.
 
 Configuration options can be set in two places:
 
@@ -84,8 +107,7 @@ election_timeout = 400
 
 # Applications Configuration
 
-The applications settings allow to define for each application how they will be balanced by specifying 
-the (balancers) workers that will be part of the chain and their arguments. For example:
+The applications settings ("/etc/init.d/apps.json") allow to define for each application how they will be balanced by specifying the (balancers) workers that will be part of the chain and their arguments. For example:
 
 
 ```JSON
