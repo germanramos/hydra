@@ -91,12 +91,14 @@ the (balancers) workers that will be part of the chain and their arguments. For 
 ```JSON
 [{
 	"App1": {
-		"Balancers": {
-			"MapAndSort": {	
+		"Balancers": [
+			{
+				"worker": "MapAndSort",
 				"mapAttr": "cloud",
 				"mapSort": ["google", "amazon", "azure"]
 			},
-			"SortByNumber": {
+			{
+				"worker": "SortByNumber",
 				"sortAttr": "cpuLoad",
 				"order": 1
 			}
@@ -105,12 +107,14 @@ the (balancers) workers that will be part of the chain and their arguments. For 
 }, {
 	"App2": {
 		"Balancers": {
-			"MapByLimit": {	
+			{
+				"worker": "MapByLimit",
 				"limitAttr": "limit",
 				"limitValue": 50,
 				"mapSort": "reverse"
 			},
-			"RoundRobin": {
+			{
+				"worker": "RoundRobin"
 				"simple": "OK"
 			}
 		}
