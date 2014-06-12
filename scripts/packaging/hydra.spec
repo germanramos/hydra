@@ -35,4 +35,4 @@ echo   When finished, you may want to run \"update-rc.d hydra defaults\"
 /usr/local/hydra/hydra
 /etc/hydra/hydra.conf
 /etc/hydra/apps-example.json
-/etc/init.d/hydra
+/etc/init.d/hydra-core
