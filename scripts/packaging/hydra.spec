@@ -20,7 +20,7 @@ install -m 0755 -d $RPM_BUILD_ROOT/usr/local/hydra
 install -m 0755 hydra $RPM_BUILD_ROOT/usr/local/hydra/hydra
 
 install -m 0755 -d $RPM_BUILD_ROOT/etc/init.d
-install -m 0755 hydra-init.d.sh $RPM_BUILD_ROOT/etc/init.d/hydra
+install -m 0755 hydra-init.d.sh $RPM_BUILD_ROOT/etc/init.d/hydra-core
 
 install -m 0755 -d $RPM_BUILD_ROOT/etc/hydra
 install -m 0644 hydra.conf $RPM_BUILD_ROOT/etc/hydra/hydra.conf

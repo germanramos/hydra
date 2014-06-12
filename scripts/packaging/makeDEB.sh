@@ -11,7 +11,7 @@ cp ./fixtures/hydra.conf ~/debbuild/etc/hydra
 cp ./fixtures/apps-example.json ~/debbuild/etc/hydra
 
 mkdir -p ~/debbuild/etc/init.d
-cp hydra-init.d.sh ~/debbuild/etc/init.d/hydra
+cp hydra-init.d.sh ~/debbuild/etc/init.d/hydra-core
 
 mkdir -p ~/debbuild/usr/local/hydra
 cp ../../bin/hydra  ~/debbuild/usr/local/hydra
