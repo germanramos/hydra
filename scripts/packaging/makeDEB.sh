@@ -17,7 +17,7 @@ mkdir -p ~/debbuild/usr/local/hydra
 cp ../../bin/hydra  ~/debbuild/usr/local/hydra
 
 chmod -R 644 ~/debbuild/usr/local/hydra/* ~/debbuild/etc/hydra/*
-chmod 755 ~/debbuild/etc/init.d/hydra
+chmod 755 ~/debbuild/etc/init.d/hydra-core
 chmod 755 ~/debbuild/usr/local/hydra/hydra
 
 sudo chown -R root:root ~/debbuild/*
