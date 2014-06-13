@@ -2,7 +2,7 @@ Name: hydra-core
 Version: 3
 Release: 0
 Summary: Hydra
-Source0: hydra-3.0.tar.gz
+Source0: hydra-core-3.0.tar.gz
 License: MIT
 Group: custom
 URL: https://github.com/innotech/hydra

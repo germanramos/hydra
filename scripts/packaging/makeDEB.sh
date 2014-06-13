@@ -26,4 +26,4 @@ pushd ~
 sudo dpkg-deb --build debbuild
 
 popd
-sudo mv ~/debbuild.deb hydra-3-0.x86_64.deb
+sudo mv ~/debbuild.deb hydra-core-3-0.x86_64.deb
