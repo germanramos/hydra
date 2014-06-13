@@ -18,6 +18,7 @@ import (
 
 const (
 	DEFAULT_APPS_FILE                = "/etc/hydra/apps.json"
+	DEFAULT_BALANCE_TIMEOUT          = 2500
 	DEFAULT_CONFIG_FILE_PATH         = "/etc/hydra/hydra.conf"
 	DEFAULT_DATA_DIR                 = "/tmp/hydra"
 	DEFAULT_ETCD_ADDR                = "127.0.0.1:7401"
@@ -38,6 +39,7 @@ type Config struct {
 	AppsConf *ApplicationsConfig
 
 	AppsFile               string `toml:"apps_file"`
+	BalanceTimeout         int    `toml:"balance_timeout"`
 	BindAddr               string `toml:"bind_addr"`
 	CAFile                 string `toml:"ca_file"`
 	CertFile               string `toml:"cert_file"`
@@ -71,6 +73,7 @@ func New() *Config {
 	c := new(Config)
 	c.EtcdConf = etcdConfig.New()
 	c.AppsFile = DEFAULT_APPS_FILE
+	c.BalanceTimeout = DEFAULT_BALANCE_TIMEOUT
 	c.ConfigFilePath = DEFAULT_CONFIG_FILE_PATH
 	c.DataDir = DEFAULT_DATA_DIR
 	// c.EtcdAddr = DEFAULT_ETCD_ADDR
@@ -155,6 +158,7 @@ func (c *Config) LoadFlags(arguments []string) error {
 	f.SetOutput(ioutil.Discard)
 	f.StringVar(&c.EtcdAddr, "addr", c.EtcdAddr, "")
 	f.StringVar(&c.AppsFile, "apps-file", c.AppsFile, "")
+	f.IntVar(&c.BalanceTimeout, "balance-timeout", c.BalanceTimeout, "")
 	f.StringVar(&c.BindAddr, "bind-addr", c.BindAddr, "")
 	f.StringVar(&c.CAFile, "ca-file", c.CAFile, "")
 	f.StringVar(&c.CertFile, "cert-file", c.CertFile, "")

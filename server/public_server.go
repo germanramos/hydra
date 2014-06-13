@@ -13,13 +13,15 @@ type PublicServer struct {
 	controllers                 []controller.Controller
 	Listener                    net.Listener
 	loadBalancerFrontendAddress string
+	requestTimeout              int
 	Router                      *mux.Router
 }
 
-func NewPublicServer(l net.Listener, loadBalancerFrontendAddress string) *PublicServer {
+func NewPublicServer(l net.Listener, loadBalancerFrontendAddress string, requestTimeout int) *PublicServer {
 	var p = new(PublicServer)
 	p.Listener = l
 	p.loadBalancerFrontendAddress = loadBalancerFrontendAddress
+	p.requestTimeout = requestTimeout
 	p.Router = mux.NewRouter()
 	p.registerControllers()
 
@@ -28,7 +30,7 @@ func NewPublicServer(l net.Listener, loadBalancerFrontendAddress string) *Public
 
 func (p *PublicServer) registerControllers() {
 	p.controllers = make([]controller.Controller, 1)
-	p.controllers[0], _ = controller.NewBalancedInstancesController(p.loadBalancerFrontendAddress)
+	p.controllers[0], _ = controller.NewBalancedInstancesController(p.loadBalancerFrontendAddress, p.requestTimeout)
 }
 
 func (p *PublicServer) RegisterHandlers() {

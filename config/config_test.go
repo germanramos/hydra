@@ -25,6 +25,7 @@ var _ = Describe("Config", func() {
 		Context("when the TOML file exists", func() {
 			const (
 				APPS_FILE                string = "/etc/hydra-test/apps.json"
+				BALANCE_TIMEOUT          int    = 2000
 				BIND_ADDR                string = "127.0.0.1:5011"
 				CA_FILE                  string = "./fixtures/ca/server-chain.pem"
 				CERT_FILE                string = "./fixtures/ca/server.crt"
@@ -53,6 +54,7 @@ var _ = Describe("Config", func() {
 			)
 			fileContent := `
 				addr = "` + ETCD_ADDR + `"
+				balance_timeout = ` + strconv.FormatInt(int64(BALANCE_TIMEOUT), 10) + `
 				bind_addr = "` + BIND_ADDR + `"
 				apps_file = "` + APPS_FILE + `"
 				ca_file = "` + CA_FILE + `"
@@ -84,6 +86,7 @@ var _ = Describe("Config", func() {
 				It("should be loaded successfully", func() {
 					Expect(err).To(BeNil(), "error should be nil")
 					Expect(c.AppsFile).To(Equal(APPS_FILE))
+					Expect(c.BalanceTimeout).To(Equal(BALANCE_TIMEOUT))
 					Expect(c.BindAddr).To(Equal(BIND_ADDR))
 					Expect(c.CAFile).To(Equal(CA_FILE))
 					Expect(c.CertFile).To(Equal(CERT_FILE))
@@ -134,6 +137,7 @@ var _ = Describe("Config", func() {
 				err := c.Load([]string{})
 				Expect(err).To(BeNil(), "error should be nil")
 				Expect(c.AppsFile).To(Equal(DEFAULT_APPS_FILE))
+				Expect(c.BalanceTimeout).To(Equal(DEFAULT_BALANCE_TIMEOUT))
 				Expect(c.DataDir).To(Equal(DEFAULT_DATA_DIR))
 				Expect(c.InstanceExpirationTime).To(Equal(DEFAULT_INSTANCE_EXPIRATION_TIME))
 				// Expect(c.EtcdAddr).To(Equal(DEFAULT_ETCD_ADDR))
@@ -183,6 +187,15 @@ var _ = Describe("Config", func() {
 			It("should be loaded successfully", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(c.EtcdAddr).To(Equal(ETCD_ADDR))
+			})
+		})
+		Context("When -balance-timeout flag exists", func() {
+			const BALANCE_TIMEOUT int = 4000
+			c := New()
+			err := c.LoadFlags([]string{"-balance-timeout", strconv.FormatInt(int64(BALANCE_TIMEOUT), 10)})
+			It("should be loaded successfully", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(c.BalanceTimeout).To(Equal(BALANCE_TIMEOUT))
 			})
 		})
 		Context("When -bind-addr flag exists", func() {

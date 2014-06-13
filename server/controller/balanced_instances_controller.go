@@ -16,12 +16,14 @@ import (
 type BalancedInstancesController struct {
 	BasicController
 	loadBalancerAddress string
+	requestTimeout      int
 }
 
-func NewBalancedInstancesController(loadBalancerAddresss string) (*BalancedInstancesController, error) {
+func NewBalancedInstancesController(loadBalancerAddresss string, requestTimeout int) (*BalancedInstancesController, error) {
 	var b = new(BalancedInstancesController)
 	b.basePath = "/apps"
 	b.loadBalancerAddress = loadBalancerAddresss
+	b.requestTimeout = requestTimeout
 	var err error
 	b.PathVariables, err = extractPathVariables(b.basePath)
 	if err != nil {
@@ -34,7 +36,7 @@ func NewBalancedInstancesController(loadBalancerAddresss string) (*BalancedInsta
 
 func (b *BalancedInstancesController) sendZMQRequestToBalancer(app []byte, data [][]byte) (reply [][]byte) {
 	// log.Println(b.loadBalancerAddress)
-	client := NewClient(b.loadBalancerAddress)
+	client := NewClient(b.loadBalancerAddress, b.requestTimeout)
 	defer client.Close()
 
 	log.Println("App: " + string(app))
@@ -101,7 +103,7 @@ func (b *BalancedInstancesController) Get(rw http.ResponseWriter, req *http.Requ
 
 			response := b.sendZMQRequestToBalancer([]byte(appEntity.Id), [][]byte{balancers, instances})
 			log.Println("++++++++++++++++++ ZMQ RESPONSE ++++++++++++++++++")
-			log.Printf("%#v", response)
+			// log.Printf("%#v", response)
 			// TODO: process response
 
 			if len(response) > 0 {

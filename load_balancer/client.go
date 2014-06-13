@@ -15,18 +15,20 @@ type Requester interface {
 }
 
 type client struct {
-	socket  *zmq.Socket
-	context *zmq.Context
-	server  string
-	timeout time.Duration
+	socket         *zmq.Socket
+	context        *zmq.Context
+	server         string
+	timeout        time.Duration
+	requestTimeout time.Duration
 }
 
-func NewClient(server string) *client {
+func NewClient(server string, requestTimeout int) *client {
 	context, _ := zmq.NewContext()
 	self := &client{
-		server:  server,
-		context: context,
-		timeout: 2500 * time.Millisecond,
+		server:         server,
+		context:        context,
+		timeout:        2500 * time.Millisecond,
+		requestTimeout: time.Duration(requestTimeout) * time.Millisecond,
 	}
 	self.connect()
 	return self
@@ -60,8 +62,8 @@ func (self *client) Send(service []byte, request [][]byte) (reply [][]byte) {
 	// tim, _ := self.socket.RcvTimeout()
 	// log.Println("RcvTimeout")
 	// log.Printf("%d", int64(tim))
-	var t time.Duration = 2500 * time.Millisecond
-	if err := self.socket.SetRcvTimeout(t); err != nil {
+	// var t time.Duration = 2500 * time.Millisecond
+	if err := self.socket.SetRcvTimeout(self.requestTimeout); err != nil {
 		log.Println(err)
 	}
 	// time2, _ := self.socket.RcvTimeout()

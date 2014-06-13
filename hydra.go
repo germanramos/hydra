@@ -80,7 +80,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to create hydra public listener: ", err)
 		}
-		var publicServer = server.NewPublicServer(publicHydraListener, loadBalancerFrontendEndpoint)
+		var publicServer = server.NewPublicServer(publicHydraListener, loadBalancerFrontendEndpoint, conf.BalanceTimeout)
 		publicServer.RegisterHandlers()
 		go func() {
 			log.Infof("hydra public server [name %s, listen on %s, advertised url %s]", conf.Name, conf.PublicAddr, "http://"+conf.PublicAddr)
