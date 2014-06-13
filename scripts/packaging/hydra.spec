@@ -1,4 +1,4 @@
-Name: hydra
+Name: hydra-core
 Version: 3
 Release: 0
 Summary: Hydra
