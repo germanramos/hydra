@@ -5,7 +5,6 @@ import (
 	"github.com/innotech/hydra/model/entity"
 	"log"
 	"net/http"
-	// "time"
 )
 
 const KEY_PREFIX string = "/db"
@@ -39,8 +38,6 @@ func (e *EtcdBaseRepository) SetCollection(collection string) {
 }
 
 func (e *EtcdBaseRepository) makePath(key string) string {
-	// log.Println(">>>>>>>>>>>>>>>> KEY_PREFIX: " + KEY_PREFIX)
-	// log.Println(">>>>>>>>>>>>>>>> e.collection: " + e.collection)
 	prefix := KEY_PREFIX + e.collection
 	if key != "" {
 		if string(key[0]) == "/" {
@@ -48,10 +45,6 @@ func (e *EtcdBaseRepository) makePath(key string) string {
 		} else {
 			return prefix + "/" + key
 		}
-		// log.Println(">>>>>>>>>>>>>>>> PREFIX: " + prefix)
-		// // return prefix + "/" + key
-		// log.Println(">>>>>>>>>>>>>>>> FINAL KEY: " + prefix + key)
-		// return prefix + key
 	}
 	return prefix
 }
@@ -84,15 +77,11 @@ func (e *EtcdBaseRepository) Set(entity *entity.EtcdBaseModel, ttl string, w htt
 		return err
 	}
 	for key, value := range ops {
-		// log.Println("Probe KEY: " + e.makePath(key))
-		// log.Println("Probe KEY TTL: " + ttl)
 		var dir bool = false
 		if value == "" {
 			dir = true
 		}
-		// log.Printf("DIR: %#v", dir)
 		if err := e.conn.Set(e.makePath(key), dir, value, ttl, w, req); err != nil {
-			// TODO: logger
 			log.Println("SET ERROR")
 			log.Println(err)
 			return err
