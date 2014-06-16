@@ -76,7 +76,6 @@ func New() *Config {
 	c.BalanceTimeout = DEFAULT_BALANCE_TIMEOUT
 	c.ConfigFilePath = DEFAULT_CONFIG_FILE_PATH
 	c.DataDir = DEFAULT_DATA_DIR
-	// c.EtcdAddr = DEFAULT_ETCD_ADDR
 	c.InstanceExpirationTime = DEFAULT_INSTANCE_EXPIRATION_TIME
 	c.LoadBalancerAddr = DEFAULT_LOAD_BALANCER_ADDR
 	c.PrivateAddr = DEFAULT_PRIVATE_ADDR
@@ -91,7 +90,6 @@ func New() *Config {
 	return c
 }
 
-// TODO: comment
 func (c *Config) Load(arguments []string) error {
 	var path string
 	f := flag.NewFlagSet("hydra", flag.ContinueOnError)
@@ -205,7 +203,6 @@ func (c *Config) LoadFlags(arguments []string) error {
 // Loads etcd configuration
 func (c *Config) LoadEtcdConfig() error {
 	fileContent := c.makeEtcdConfig()
-	// TODO: Check if file is created
 	f, _ := ioutil.TempFile("", "")
 	f.WriteString(fileContent)
 	f.Close()
@@ -234,8 +231,7 @@ func (c *Config) Reset() error {
 
 func (c *Config) makeEtcdConfig() string {
 	var content string
-	addLineToFileContent := func( /*fileContent *string, */ line string) {
-		// *fileContent = *fileContent + line + "\n"
+	addLineToFileContent := func(line string) {
 		content = content + line + "\n"
 	}
 	if c.EtcdAddr == "" {

@@ -5,7 +5,6 @@ import (
 	. "github.com/innotech/hydra/vendors/github.com/onsi/ginkgo"
 	. "github.com/innotech/hydra/vendors/github.com/onsi/gomega"
 
-	// "fmt"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -140,7 +139,6 @@ var _ = Describe("Config", func() {
 				Expect(c.BalanceTimeout).To(Equal(DEFAULT_BALANCE_TIMEOUT))
 				Expect(c.DataDir).To(Equal(DEFAULT_DATA_DIR))
 				Expect(c.InstanceExpirationTime).To(Equal(DEFAULT_INSTANCE_EXPIRATION_TIME))
-				// Expect(c.EtcdAddr).To(Equal(DEFAULT_ETCD_ADDR))
 				Expect(c.LoadBalancerAddr).To(Equal(DEFAULT_LOAD_BALANCER_ADDR))
 				Expect(c.Peer.Addr).To(Equal(DEFAULT_PEER_ADDR))
 				Expect(c.Peer.HeartbeatTimeout).To(Equal(DEFAULT_PEER_HEARTBEAT_TIMEOUT))
@@ -467,7 +465,6 @@ var _ = Describe("Config", func() {
 					It("should be override the configuration loaded from custom configuration file", func() {
 						Expect(c.PublicAddr).To(Equal(addrCustomFlag), "c.Addr should be equal "+addrCustomFlag)
 					})
-					// TODO: Check Error() message
 				})
 			})
 		})
