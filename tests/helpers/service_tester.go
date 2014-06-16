@@ -6,7 +6,6 @@ import (
 
 	"bytes"
 	"encoding/json"
-	// "fmt"
 	"log"
 	"strings"
 	"time"
@@ -43,10 +42,7 @@ func (s *ServiceTester) DefineServiceTests(entity1 map[string]interface{}, entit
 		app_config := "fixtures/apps.empty.json"
 		hydra_name := "hydra0"
 		data_dir_path := DATA_DIR_PATH + hydra_name
-		// loadBalancerAddr := "tcp://127.0.0.1:7777"
 		privateAddr := "127.0.0.1:7771"
-		// publicAddr := "127.0.0.1:7772"
-		// pingInstancesAddr := "http://" + privateAddr + "/apps/Ping/Instances"
 		args := []string{"-name=" + hydra_name, "-private-addr=" + privateAddr, "-data-dir=" + data_dir_path, "-apps-file=" + app_config}
 		process := RunHydraInStandaloneAndReturnProcess(args)
 		defer KillHydraProcess(process)
@@ -82,9 +78,7 @@ func (s *ServiceTester) DefineServiceTests(entity1 map[string]interface{}, entit
 					Expect(err1).NotTo(HaveOccurred())
 					Expect(response1.StatusCode).To(Equal(200))
 				})
-				log.Print("********************" + s.baseURI + "/" + s.baseId + "1")
 				response2, err2 := s.httpUtils.Get(s.baseURI + "/" + s.baseId + "1")
-				log.Print(response2)
 				It("should return a success response", func() {
 					Expect(err2).NotTo(HaveOccurred())
 					Expect(response2.StatusCode).To(Equal(200))

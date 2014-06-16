@@ -6,23 +6,6 @@ import (
 
 var appBaseId string = "App"
 
-// var app1 = map[string]interface{}{
-// 	appBaseId + "1": map[string]interface{}{
-// 		"Cloud": "google",
-// 		"WWW":   "12.98",
-// 	},
-// }
-
-// var app1 = map[string]interface{}{
-// 	appBaseId + "1": map[string]interface{}{
-// 		"Balancers": map[string]interface{}{
-// 			"Pong": map[string]interface{}{
-// 				"Status": "5",
-// 			},
-// 		},
-// 	},
-// }
-
 var app1 = map[string]interface{}{
 	appBaseId + "1": map[string]interface{}{
 		"Cala": map[string]interface{}{

@@ -19,7 +19,6 @@ func NewHTTPClientHelper() *HTTPClientHelper {
 // Creates a new HTTP client with KeepAlive disabled.
 func newHTTPClient() *http.Client {
 	return &http.Client{Transport: &http.Transport{DisableKeepAlives: true}}
-	// return &http.Client{}
 }
 
 // Reads the body from the response and closes it.
