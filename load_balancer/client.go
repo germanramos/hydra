@@ -8,7 +8,6 @@ import (
 	uuid "github.com/innotech/hydra/vendors/github.com/nu7hatch/gouuid"
 )
 
-// TODO: change to Sender
 type Requester interface {
 	Close()
 	Send([]byte, [][]byte) [][]byte
@@ -58,25 +57,12 @@ func (self *client) Close() {
 func (self *client) Send(service []byte, request [][]byte) (reply [][]byte) {
 	frame := append([][]byte{service}, request...)
 
-	log.Println("^^^^^^^^^^^^^^ PRE SEND TO SERVER")
-	// tim, _ := self.socket.RcvTimeout()
-	// log.Println("RcvTimeout")
-	// log.Printf("%d", int64(tim))
-	// var t time.Duration = 2500 * time.Millisecond
 	if err := self.socket.SetRcvTimeout(self.requestTimeout); err != nil {
 		log.Println(err)
 	}
-	// time2, _ := self.socket.RcvTimeout()
-	// log.Println("RcvTimeout 2")
-	// log.Printf("%d", int64(time2))
+
 	self.socket.SendMultipart(frame, zmq.NOBLOCK)
-
-	log.Println("^^^^^^^^^^^^^^ POST SEND TO SERVER")
-
 	msg, _ := self.socket.RecvMultipart(0)
-	log.Println("^^^^^^^^^^^^^^ RECV FROM SERVER")
-	// Dump(msg)
-	// log.Println("^^^^^^^^^^^^^^ END RECV FROM SERVER")
 
 	if len(msg) < 1 {
 		reply = [][]byte{}
