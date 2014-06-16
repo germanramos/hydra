@@ -93,10 +93,8 @@ func (e EtcdConnector) Set(key string, dir bool, value string, ttl string, w htt
 			v += "dir=" + strconv.FormatBool(dir) + "&ttl=" + ttl
 		}
 
-		log.Printf("%#v", v)
 		req, _ := http.NewRequest("PUT", leaderUrl+"/v2/keys"+key+v, nil)
 		resp, err := client.Do(req)
-		log.Printf("%#v", resp)
 		resp.Body.Close()
 
 		if err != nil {
@@ -128,9 +126,7 @@ func (e EtcdConnector) Dispatch(c raft.Command, w http.ResponseWriter, req *http
 		}
 
 		if w != nil {
-			log.Println("Pre WriteHeader")
 			w.WriteHeader(http.StatusOK)
-			log.Println("Post WriteHeader")
 		}
 
 		return nil
@@ -150,9 +146,6 @@ func (e EtcdConnector) Dispatch(c raft.Command, w http.ResponseWriter, req *http
 		default:
 			url, _ = registry.ClientURL(leader)
 		}
-		log.Println("PRE REDIRECT to " + url)
-		log.Printf("%#v", w)
-		log.Printf("%#v", req)
 		uhttp.Redirect(url, w, req)
 
 		return nil
