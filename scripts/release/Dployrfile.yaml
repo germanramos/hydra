@@ -31,6 +31,12 @@ default:
             security_groups:
               - sg-93d934f6 # ssh
             subnet_id: subnet-1eebe07c
+        us-west-2b: # Oregon
+          attributes:
+            keypair: vagrant-aws-oregon
+            security_groups:
+              - sg-9bf641fe # ssh
+            subnet_id: subnet-ef757e8d
 
 ubuntu:
   scripts:
@@ -42,6 +48,9 @@ ubuntu:
         sa-east-1a: # Sao Paulo
           attributes:
             ami: ami-a3e34dbe # Ubuntu 12.04 (hydra-probe-ubuntu)
+        us-west-2b: # Oregon
+          attributes:
+            ami: ami-4981fe79 # Ubuntu 12.04 (hydra-probe-ubuntu)
 
 centos:
   scripts:
@@ -53,3 +62,6 @@ centos:
         sa-east-1a: # Sao Paulo
           attributes:
             ami: ami-a7e34dba # CentOS 6 (CentOS-6-x86_64-20120527-EBS-03-adc4348e-1dc3-41df-b833-e86ba57a33d6-ami-8f9af1e6.1)
+        us-west-2b: # Oregon
+          attributes:
+            ami: ami-4d81fe7d # CentOS 6 (CentOS-6-x86_64-20120527-EBS-03-adc4348e-1dc3-41df-b833-e86ba57a33d6-ami-8f9af1e6.1)
