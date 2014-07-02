@@ -11,7 +11,7 @@ default:
     #   - remote_path: sudo /tmp/common/updatedns.sh
     #     args: "%{name}"
     tag:
-      - remote_path: /tmp/scripts/build.sh
+      - remote_path: /tmp/scripts/build_and_tag.sh
         args: "%{branch} %{tag}"
     release:
       - remote_path: python /tmp/scripts/make_release.py
