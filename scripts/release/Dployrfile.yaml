@@ -1,8 +1,8 @@
 default:
   attributes:
     prefix: hydra-release
-    private_key_path: ~/pems/innotechdev.pem
-    username: innotechdev
+    # private_key_path: ~/pems/innotechdev.pem
+    # username: innotechdev
   scripts:
     pre-provision:
       - source: ./scripts
@@ -31,14 +31,18 @@ default:
             security_groups:
               - sg-93d934f6 # ssh
             subnet_id: subnet-1eebe07c
+            private_key_path: ~/pems/vagrant-aws-saopaulo.pem
         us-west-2b: # Oregon
           attributes:
             keypair: vagrant-aws-oregon
             security_groups:
               - sg-9bf641fe # ssh
             subnet_id: subnet-ef757e8d
+            private_key_path: ~/pems/vagrant-aws-oregon.pem
 
 ubuntu:
+  attributes:
+    username: ubuntu
   scripts:
     package:
       - remote_path: /tmp/scripts/packaging/makeDEB.sh
@@ -53,6 +57,8 @@ ubuntu:
             ami: ami-4981fe79 # Ubuntu 12.04 (hydra-probe-ubuntu)
 
 centos:
+  attributes:
+    username: root
   scripts:
     package:
       - remote_path: /tmp/scripts/packaging/makeRPM.sh
