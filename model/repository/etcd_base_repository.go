@@ -76,12 +76,19 @@ func (e *EtcdBaseRepository) Set(entity *entity.EtcdBaseModel, ttl string, w htt
 		log.Fatal("Error expoting etcd operations")
 		return err
 	}
+	response := make(chan error)
 	for key, value := range ops {
 		var dir bool = false
 		if value == "" {
 			dir = true
 		}
-		if err := e.conn.Set(e.makePath(key), dir, value, ttl, w, req); err != nil {
+		go func() {
+			response <- e.conn.Set(e.makePath(key), dir, value, ttl, w, req)
+		}()
+	}
+	// Check responses
+	for i := 0; i < len(ops); i++ {
+		if err := <-response; err != nil {
 			log.Println("SET ERROR")
 			log.Println(err)
 			return err
