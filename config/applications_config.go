@@ -10,7 +10,6 @@ import (
 
 type ApplicationsConfig struct {
 	Apps EtcdBaseModels
-	// Repo *EtcdBaseRepository
 	Repo EtcdAccessLayer
 }
 

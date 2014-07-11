@@ -2,7 +2,6 @@ package entity
 
 import (
 	"errors"
-	"log"
 	"reflect"
 	"strconv"
 	"strings"
@@ -45,12 +44,12 @@ func NewModelsFromEvent(event *store.Event) (*EtcdBaseModels, error) {
 func ExtractJsonKeyFromEtcdKey(s string) (string, error) {
 	lastIndex := strings.LastIndex(s, "/")
 	if lastIndex == -1 {
-		// TODO
+		// TODO: improve error
 		return "", errors.New("Bad etcd key")
 	}
 	key := s[lastIndex+1:]
 	if len(key) == 0 {
-		// TODO
+		// TODO: improve error
 		return "", errors.New("Bad etcd key")
 	}
 	return key, nil
@@ -77,7 +76,6 @@ func proccessStruct(s interface{}, m map[string]interface{}) error {
 	return nil
 }
 
-// func (e EtcdBaseModel) CastInterfaceToString(v interface{}) (string, error) {
 func CastInterfaceToString(v interface{}) (string, error) {
 	var str string
 	switch v.(type) {
@@ -105,7 +103,6 @@ func (e EtcdBaseModel) ExportEtcdOperations() (map[string]string, error) {
 	var processInterface func(interface{}, string) error
 	var processMap func(map[string]interface{}, string) error
 	var processSlice func([]interface{}, string) error
-	// var extractParentKeyOperation func(map[string]interface{})
 
 	processInterface = func(in interface{}, key string) error {
 		switch reflect.ValueOf(in).Kind() {
@@ -141,25 +138,11 @@ func (e EtcdBaseModel) ExportEtcdOperations() (map[string]string, error) {
 		return nil
 	}
 
-	// extractParentKeyOperation = func(object map[string]interface{}) {
-	// 	if len(object) == 1 {
-	// 		for key, _ := range object {
-	// 			// operations["/"+key] = ""
-	// 			operations[key] = ""
-	// 			break
-	// 		}
-	// 	}
-	// }
-	// Extract parent key
-	// extractParentKeyOperation(e)
-	// log.Println("PRE -> OPERATIONS")
-	// log.Printf("%#v", operations)
 	// Process entity
 	if err := processMap(e, ""); err != nil {
 		return nil, err
 	}
-	log.Println("OPERATIONS")
-	log.Printf("%#v", operations)
+
 	return operations, nil
 }
 

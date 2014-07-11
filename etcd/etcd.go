@@ -1,15 +1,9 @@
 package etcd
 
 import (
-	// "fmt"
 	"net"
 	"net/http"
-	// "os"
-	// "path/filepath"
-	// "runtime"
 	"time"
-
-	// hlog "github.com/innotech/hydra/log"
 
 	"github.com/innotech/hydra/vendors/github.com/coreos/etcd/third_party/github.com/coreos/raft"
 
@@ -22,8 +16,7 @@ import (
 )
 
 type Etcd struct {
-	Config *config.Config
-	// Store              store.Store
+	Config             *config.Config
 	EtcdServer         *server.Server
 	PeerServer         *server.PeerServer
 	PeerServerListener net.Listener
@@ -37,30 +30,12 @@ func New(conf *config.Config) *Etcd {
 }
 
 func (e *Etcd) configMetrics() metrics.Bucket {
-	// var mbName string
-	// if e.Config.Trace() {
-	// 	mbName = e.Config.MetricsBucketName()
-	// 	runtime.SetBlockProfileRate(1)
-	// }
-
-	// mb := metrics.NewBucket(mbName)
-
-	// if e.Config.GraphiteHost != "" {
-	// 	err := mb.Publish(e.Config.GraphiteHost)
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// }
-
-	// return mb
-
 	return metrics.NewBucket("")
 }
 
 func (e *Etcd) configPsListener(psConfig server.PeerServerConfig) net.Listener {
 	var psListener net.Listener
 	var err error
-	// hlog.Info(e.Config.Peer.BindAddr)
 	if psConfig.Scheme == "https" {
 		peerServerTLSConfig, err := e.Config.PeerTLSInfo().ServerConfig()
 		if err != nil {
@@ -163,11 +138,9 @@ func (e *Etcd) Load() {
 	e.Registry = registry
 }
 
-// func (e *Etcd) Start(withEtcdServer string) {
 func (e *Etcd) Start(withEtcdServer bool) {
 	e.PeerServer.Start(e.Config.Snapshot, e.Config.Peers)
 
-	// if withEtcdServer == "ETCD_TEST" {
 	if withEtcdServer {
 		sListener := e.configEtcdListener()
 		go func() {

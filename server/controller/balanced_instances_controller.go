@@ -11,8 +11,6 @@ import (
 	"github.com/innotech/hydra/vendors/github.com/gorilla/mux"
 )
 
-// var ZMQ_EMPTY_PART = []byte("")
-
 type BalancedInstancesController struct {
 	BasicController
 	loadBalancerAddress string
@@ -35,17 +33,11 @@ func NewBalancedInstancesController(loadBalancerAddresss string, requestTimeout 
 }
 
 func (b *BalancedInstancesController) sendZMQRequestToBalancer(app []byte, data [][]byte) (reply [][]byte) {
-	// log.Println(b.loadBalancerAddress)
 	client := NewClient(b.loadBalancerAddress, b.requestTimeout)
 	defer client.Close()
 
-	log.Println("App: " + string(app))
-	// Dump(data)
-	log.Println("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨ START sendZMQRequestToBalancer")
 	reply = client.Send(app, data)
-	log.Println("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨ END sendZMQRequestToBalancer")
-	// Dump(reply)
-	// log.Println("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨ END RESPONSE sendZMQRequestToBalancer")
+
 	return
 }
 

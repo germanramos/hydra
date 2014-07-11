@@ -3,13 +3,9 @@ package config_test
 import (
 	. "github.com/innotech/hydra/config"
 	. "github.com/innotech/hydra/model/entity"
-	"github.com/innotech/hydra/model/repository/mock_repository"
-	"github.com/innotech/hydra/vendors/code.google.com/p/gomock/gomock"
 	. "github.com/innotech/hydra/vendors/github.com/onsi/ginkgo"
-	"github.com/innotech/hydra/vendors/github.com/onsi/ginkgo/thirdparty/gomocktestreporter"
 	. "github.com/innotech/hydra/vendors/github.com/onsi/gomega"
 
-	// "fmt"
 	"io/ioutil"
 	"os"
 )
@@ -27,21 +23,29 @@ var _ = Describe("ApplicationsConfig", func() {
 	// END OF HELPERS /////////////////////////////////////////////////////////////////
 	fileContent := `[{
 			"dummy1": {
- 				"balancers": {
- 					"cloud-map": {
- 					},
-					"cpu-load": {
-					}
+				"Balancers": [
+				{
+					"worker": "RoundRobin",
+					"simple": "OK"
+				},
+				{
+					"worker": "SortByNumber",
+					"sortAttr": "cost"
 				}
+				]
 			}
 		}, {
 			"dummy2": {
- 				"balancers": {
- 					"cloud-map": {
-					},
-					"mem-load": {
-					}
+				"Balancers": [
+				{
+					"worker": "RoundRobin",
+					"simple": "OK"
+				},
+				{
+					"worker": "SortByNumber",
+					"sortAttr": "cost"
 				}
+				]
 			}
 		}]`
 	Describe("Loading from JSON", func() {
@@ -51,7 +55,6 @@ var _ = Describe("ApplicationsConfig", func() {
 				err := a.Load(pathToFile + ".bad")
 				It("should throw an error", func() {
 					Expect(err).To(HaveOccurred())
-					// TODO: check kind of error
 				})
 			})
 		})
@@ -62,7 +65,6 @@ var _ = Describe("ApplicationsConfig", func() {
 					err := a.Load(pathToFile)
 					It("should throw an error", func() {
 						Expect(err).To(HaveOccurred())
-						// TODO: check kind of error
 					})
 				})
 			})
@@ -81,118 +83,23 @@ var _ = Describe("ApplicationsConfig", func() {
 						Expect(apps[0]).To(BeAssignableToTypeOf(app0))
 						app0 = apps[0]
 						Expect(app0).To(HaveKey("dummy1"))
-						Expect(app0["dummy1"]).To(HaveKey("balancers"))
-						Expect(app0["dummy1"].(map[string]interface{})["balancers"]).To(HaveKey("cloud-map"))
-						Expect(app0["dummy1"].(map[string]interface{})["balancers"]).To(HaveKey("cpu-load"))
+						Expect(app0["dummy1"]).To(HaveKey("Balancers"))
+						Expect(app0["dummy1"].(map[string]interface{})["Balancers"].([]interface{})[0]).To(HaveKey("worker"))
+						Expect(app0["dummy1"].(map[string]interface{})["Balancers"].([]interface{})[0].(map[string]interface{})["worker"].(string)).To(Equal("RoundRobin"))
+						Expect(app0["dummy1"].(map[string]interface{})["Balancers"].([]interface{})[1]).To(HaveKey("worker"))
+						Expect(app0["dummy1"].(map[string]interface{})["Balancers"].([]interface{})[1].(map[string]interface{})["worker"].(string)).To(Equal("SortByNumber"))
 						var app1 map[string]interface{}
 						Expect(apps[1]).To(BeAssignableToTypeOf(app1))
 						app1 = apps[1]
 						Expect(app1).To(HaveKey("dummy2"))
-						Expect(app1["dummy2"]).To(HaveKey("balancers"))
-						Expect(app1["dummy2"].(map[string]interface{})["balancers"]).To(HaveKey("cloud-map"))
-						Expect(app1["dummy2"].(map[string]interface{})["balancers"]).To(HaveKey("mem-load"))
+						Expect(app1["dummy2"]).To(HaveKey("Balancers"))
+						Expect(app1["dummy2"].(map[string]interface{})["Balancers"].([]interface{})[0]).To(HaveKey("worker"))
+						Expect(app1["dummy2"].(map[string]interface{})["Balancers"].([]interface{})[0].(map[string]interface{})["worker"].(string)).To(Equal("RoundRobin"))
+						Expect(app1["dummy2"].(map[string]interface{})["Balancers"].([]interface{})[1]).To(HaveKey("worker"))
+						Expect(app1["dummy2"].(map[string]interface{})["Balancers"].([]interface{})[1].(map[string]interface{})["worker"].(string)).To(Equal("SortByNumber"))
 					})
 				})
 			})
 		})
-	})
-	Describe("Saving loaded applications", func() {
-		var (
-			mockCtrl  *gomock.Controller
-			mockRepo  *mock_repository.MockEtcdAccessLayer
-			appConfig *ApplicationsConfig
-		)
-
-		BeforeEach(func() {
-			mockCtrl = gomock.NewController(gomocktestreporter.New())
-			mockRepo = mock_repository.NewMockEtcdAccessLayer(mockCtrl)
-			appConfig = NewApplicationsConfig()
-			appConfig.Repo = mockRepo
-			// appConfig.Repo = mock_repository.NewMockEtcdAccessLayer(mockCtrl)
-			// mockRepo = appConfig.Repo
-		})
-
-		AfterEach(func() {
-			mockCtrl.Finish()
-		})
-
-		// It("should persist applications successfully", func() {
-		// 	// var previusCall *gomock.Call
-		// 	// hasPreviusCall := false
-		// 	// for _, app := range appConfig.Apps {
-		// 	// 	if !hasPreviusCall {
-		// 	// 		previusCall = mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
-		// 	// 		hasPreviusCall = true
-		// 	// 	} else {
-		// 	// 		previusCall = mockRepo.EXPECT().Set(app).After(previusCall)
-		// 	// 	}
-		// 	// }
-		// 	// appConfig = NewApplicationsConfig()
-		// 	// appConfig.Repo = nil
-		// 	// appConfig.Repo = mockRepo
-		// 	// Expect(appConfig.Repo).To(Equal(mockRepo))
-		// 	// mockRepo = mock_repository.NewMockEtcdAccessLayer(mockCtrl)
-
-		// 	mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
-		// 	_ = appConfig.Persists()
-		// 	// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
-		// 	// Expect(err).ToNot(HaveOccurred())
-		// })
-
-		WithTempFile(fileContent, func(pathToFile string) {
-			It("should persist applications successfully", func() {
-				var err error
-				err = appConfig.Load(pathToFile)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(err).To(BeNil(), "error should be nil")
-				Expect(appConfig.Apps).ToNot(BeNil())
-				Expect(appConfig.Repo).To(Equal(mockRepo))
-				mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
-				err = appConfig.Persists()
-				Expect(err).ToNot(HaveOccurred())
-			})
-		})
-
-		// WithTempFile(fileContent, func(pathToFile string) {
-		// 	mockCtrl = gomock.NewController(gomocktestreporter.New())
-		// 	// defer mockCtrl.Finish()
-		// 	// mockThing = mockthing.NewMockThing(mockCtrl)
-		// 	mockRepo = mock_repository.NewMockEtcdAccessLayer(mockCtrl)
-		// 	// mockRepo.setCollection("applications")
-		// 	appConfig = NewApplicationsConfig()
-		// 	// appConfig.Repo = mockRepo
-		// 	// repo := appConfig.Repo
-		// 	// fmt.Println(pathToFile)
-		// 	// a := NewApplicationsConfig()
-		// 	// err := a.Load(pathToFile)
-		// 	err := appConfig.Load(pathToFile)
-		// 	if err != nil {
-		// 		fmt.Println(err)
-		// 	}
-		// 	// var err error = nil
-		// 	It("should persist applications successfully", func() {
-		// 		Expect(err).ToNot(HaveOccurred())
-		// 	})
-		// 	It("should persist applications successfully", func() {
-		// 		// var previusCall *gomock.Call
-		// 		// hasPreviusCall := false
-		// 		// for _, app := range appConfig.Apps {
-		// 		// 	if !hasPreviusCall {
-		// 		// 		previusCall = mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
-		// 		// 		hasPreviusCall = true
-		// 		// 	} else {
-		// 		// 		previusCall = mockRepo.EXPECT().Set(app).After(previusCall)
-		// 		// 	}
-		// 		// }
-		// 		appConfig.Repo = mockRepo
-		// 		Expect(appConfig.Repo).To(Equal(mockRepo))
-		// 		// mockRepo.EXPECT().Set(gomock.Any())
-		// 		// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
-		// 		err := appConfig.Persists()
-		// 		mockRepo.EXPECT().Set(gomock.Any())
-		// 		// mockRepo.EXPECT().Set(gomock.Any()).Return(nil)
-		// 		Expect(err).ToNot(HaveOccurred())
-		// 	})
-		// })
 	})
 })

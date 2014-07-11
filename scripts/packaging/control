@@ -1,8 +1,8 @@
-Package: hydra
+Package: hydra-core
 Version: 3-0
 Architecture: all
 Maintainer: innotech
-Installed-Size: 16777216
+Installed-Size: 16777
 Section: custom
 Priority: extra
 Description: Hydra

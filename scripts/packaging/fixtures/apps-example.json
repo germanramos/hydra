@@ -1,27 +1,27 @@
 [{
 	"App1": {
-		"Balancers": {
-			"MapAndSort": {	
-				"mapAttr": "cloud",
-				"mapSort": ["google", "amazon", "azure"]
-			},
-			"SortByNumber": {
-				"sortAttr": "cost",
-				"order": 1
-			}
-		}
+		"Balancers": [
+		{
+			"worker": "MapAndSort",
+			"mapAttr": "cloud",
+			"mapSort": ["google", "amazon", "azure"]
+		}, {
+			"worker": "SortByNumber",
+			"sortAttr": "cost",
+			"order": 1
+		}]
 	}
 }, {
 	"App2": {
-		"Balancers": {
-			"MapByLimit": {	
-				"limitAttr": "limit",
-				"limitValue": 50,
-				"mapSort": "reverse"
-			},
-			"RoundRobin": {
-				"simple": "OK"
-			}
-		}
+		"Balancers": [
+		{
+			"worker": "MapByLimit",
+			"limitAttr": "limit",
+			"limitValue": 50,
+			"mapSort": "reverse"
+		}, {
+			"worker": "RoundRobin",
+			"simple": "OK"
+		}]
 	}
 }]

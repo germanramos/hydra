@@ -18,7 +18,6 @@ func init() {
 		os.Exit(1)
 	}
 	FIXTURES_PATH = pwd
-	fmt.Println("--------------------> " + FIXTURES_PATH)
 
 	// Initialize the 'hydra' binary path or default it to the hydra diretory.
 	HydraBinPath = os.Getenv("HYDRA_BIN_PATH")

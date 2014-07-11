@@ -1,7 +1,6 @@
 package main
 
 import (
-	// "fmt"
 	"net"
 	"net/http"
 	"os"
@@ -41,15 +40,12 @@ func main() {
 		log.Fatalf("Unable to load etcd conf: %s", err)
 	}
 
-	// connector.SetEtcdConnector(etcd)
-
 	// Launch services
 	var etcd = etcd.New(conf.EtcdConf)
 	etcd.Load()
 	hydraEnv := os.Getenv("HYDRA_ENV")
 	if hydraEnv == "ETCD_TEST" {
 		etcd.Start(true)
-		// etcd.Start(hydraEnv)
 	} else {
 		go func() {
 			var withEtcdServer bool = false
@@ -57,7 +53,6 @@ func main() {
 				withEtcdServer = true
 			}
 			etcd.Start(withEtcdServer)
-			// etcd.Start(hydraEnv)
 		}()
 
 		connector.SetEtcdConnector(etcd)
@@ -106,8 +101,6 @@ func main() {
 		// Load Balancer
 		loadBalancer := load_balancer.NewLoadBalancer(loadBalancerFrontendEndpoint, "tcp://"+conf.LoadBalancerAddr)
 		defer loadBalancer.Close()
-		log.Info("PRE LOAD BALANCER")
 		loadBalancer.Run()
-		log.Info("POST LOAD BALANCER")
 	}
 }

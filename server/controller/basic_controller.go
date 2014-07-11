@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/innotech/hydra/log"
-	// "fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -69,7 +68,6 @@ func (b *BasicController) GetConfiguredRepository(pathVars map[string]string) *r
 	for key, value := range pathVars {
 		finalPath = strings.Replace(finalPath, "{"+key+"}", value, 1)
 	}
-	// log.Info("Controller Set Collection " + finalPath)
 	repo := repository.NewEctdRepository()
 	repo.SetCollection(finalPath)
 	return repo
@@ -128,6 +126,7 @@ func (a *BasicController) List(rw http.ResponseWriter, req *http.Request) {
 	// allow cross domain AJAX requests
 	rw.Header().Set("Access-Control-Allow-Origin", "*")
 	rw.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With")
+	// TODO: Add Allow-Methods
 	rw.WriteHeader(http.StatusOK)
 	rw.Write(jsonOutput)
 }
@@ -142,8 +141,6 @@ func (a *BasicController) Set(rw http.ResponseWriter, req *http.Request) {
 	}
 	vars := mux.Vars(req)
 
-	// log.Infof("%#v", app)
-	// log.Infof("%#v", vars)
 	if a.setValidation(app, vars) != true {
 		log.Warn("Post Instance: Set validation fail")
 		http.Error(rw, "Post Instance: Set validation fail", http.StatusBadRequest)
