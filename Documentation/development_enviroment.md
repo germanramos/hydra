@@ -34,7 +34,7 @@ go get github.com/innotech/hydra
 cd /home/innotechdev/go/src/github.com/innotech/hydra
 git checkout 3.0.0
 cd vendors
-goven goven github.com/coreos/etcd
+goven github.com/coreos/etcd
 ```
 
 #####6. Build Hydra
