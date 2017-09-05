@@ -1,0 +1,29 @@
+{
+	"app-1": {
+		"balancers": {
+			"ping": {
+				"args": {
+					"msg": "OK",
+					"status": "lazy",
+					"priority": "5"
+				}
+			},
+			"pong": {
+				"args": {
+					"msg": "CONTINUE",
+					"priority": "1"
+				}
+			}
+		}
+	},
+	"app-2": {
+		"balancers": {
+			"pong": {
+				"args": {
+					"msg": "CONTINUE",
+					"priority": "1"
+				}
+			}
+		}
+	}
+}

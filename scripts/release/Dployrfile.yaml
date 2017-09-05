@@ -1,0 +1,73 @@
+default:
+  attributes:
+    prefix: hydra-release
+    # private_key_path: ~/pems/innotechdev.pem
+    # username: innotechdev
+  scripts:
+    pre-provision:
+      - source: ./scripts
+        target: /tmp/
+    # provision:
+    #   - remote_path: sudo /tmp/common/updatedns.sh
+    #     args: "%{name}"
+    tag:
+      - remote_path: /tmp/scripts/build_and_tag.sh
+        args: "%{branch} %{tag}"
+    release:
+      - remote_path: python /tmp/scripts/make_release.py
+        args: "%{name}"
+  providers:
+    aws:
+      attributes:
+        instance_type: t1.micro
+        # instance_type: m1.small
+      # scripts:
+      #   pre-provision:
+      #     - remote_path: sudo /tmp/common/routes_allregions.sh
+      regions:
+        sa-east-1a: # Sao Paulo
+          attributes:
+            keypair: vagrant-aws-saopaulo
+            security_groups:
+              - sg-93d934f6 # ssh
+            subnet_id: subnet-1eebe07c
+            private_key_path: ~/pems/vagrant-aws-saopaulo.pem
+        us-west-2b: # Oregon
+          attributes:
+            keypair: vagrant-aws-oregon
+            security_groups:
+              - sg-9bf641fe # ssh
+            subnet_id: subnet-ef757e8d
+            private_key_path: ~/pems/vagrant-aws-oregon.pem
+
+ubuntu:
+  attributes:
+    username: ubuntu
+  scripts:
+    package:
+      - remote_path: /tmp/scripts/packaging/makeDEB.sh
+  providers:
+    aws:
+      regions:
+        sa-east-1a: # Sao Paulo
+          attributes:
+            ami: ami-a3e34dbe # Ubuntu 12.04 (hydra-probe-ubuntu)
+        us-west-2b: # Oregon
+          attributes:
+            ami: ami-4981fe79 # Ubuntu 12.04 (hydra-probe-ubuntu)
+
+centos:
+  attributes:
+    username: root
+  scripts:
+    package:
+      - remote_path: /tmp/scripts/packaging/makeRPM.sh
+  providers:
+    aws:
+      regions:
+        sa-east-1a: # Sao Paulo
+          attributes:
+            ami: ami-a7e34dba # CentOS 6 (CentOS-6-x86_64-20120527-EBS-03-adc4348e-1dc3-41df-b833-e86ba57a33d6-ami-8f9af1e6.1)
+        us-west-2b: # Oregon
+          attributes:
+            ami: ami-4d81fe7d # CentOS 6 (CentOS-6-x86_64-20120527-EBS-03-adc4348e-1dc3-41df-b833-e86ba57a33d6-ami-8f9af1e6.1)
